@@ -13,8 +13,12 @@ var Autofill = (function () {
         '%ZIP%': 'SEARCH_FOR_ME',
         '%PHONE%': 'SEARCH_FOR_ME',
         '%NEW_PHONE%': 'SEARCH_FOR_ME',
+        '%USED_PHONE%': 'SEARCH_FOR_ME',
+        '%SERVICE_PHONE%': 'SEARCH_FOR_ME',
+        '%PARTS_PHONE%': 'SEARCH_FOR_ME',
     };
     defaultValues();
+    defaultPhoneNumber();
 
     // default styles
     //    let callCss = document.createElement('link');
@@ -988,6 +992,27 @@ var Autofill = (function () {
 
     }
 
+    /**
+    *   Get Phone Numbers
+    */
+    function defaultPhoneNumber() {
+        let webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
+        let siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=en_US&pathName=editSettings`;
+
+        jQuery.get(siteSettingsURL, function (data) {
+            let myDiv = document.createElement('div');
+            myDiv.innerHTML = data;
+
+            defaultList['%PHONE%'] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
+            defaultList['%NEW_PHONE%'] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
+            defaultList['%USED_PHONE%'] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
+            defaultList['%SERVICE_PHONE%'] = myDiv.querySelector('input[name*="(__service_).ctn"]').value;
+            defaultList['%PARTS_PHONE%'] = myDiv.querySelector('input[name*="(__parts_).ctn"]').value;
+
+        }, 'html');
+    }
+
+
     // Build Sortable object for use in tool
     //    let sortable = Sortable.create(autofillOptions, {
     //    let sortable = Sortable.create(autofillOptions, {
@@ -1053,11 +1078,11 @@ var Autofill = (function () {
 
             console.log(evt);
             console.log('changing values');
-                        // update display message
+            // update display message
             messageDisplay.textContent = 'Values Saved';
             jQuery('#toolMessageDisplay').animateCss('tada');
             // save new values
-//            saveState();
+            //            saveState();
             // Save state
             this.save();
             //            sortable.save();
