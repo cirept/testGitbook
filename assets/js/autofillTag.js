@@ -13,8 +13,12 @@ var Autofill = (function () {
         '%ZIP%': 'SEARCH_FOR_ME',
         '%PHONE%': 'SEARCH_FOR_ME',
         '%NEW_PHONE%': 'SEARCH_FOR_ME',
+        '%USED_PHONE%': 'SEARCH_FOR_ME',
+        '%SERVICE_PHONE%': 'SEARCH_FOR_ME',
+        '%PARTS_PHONE%': 'SEARCH_FOR_ME',
     };
     defaultValues();
+    defaultPhoneNumber();
 
     // default styles
     //    let callCss = document.createElement('link');
@@ -62,7 +66,7 @@ var Autofill = (function () {
     applyAutofills.classList.add('myButts');
     applyAutofills.type = 'button';
     applyAutofills.title = 'apply autofills';
-    applyAutofills.innerHTML = '<i class="fas fa-check fa-lg"></i>';
+    applyAutofills.innerHTML = '<i class="fas fa-magic fa-lg"></i>';
     applyAutofills.onclick = autofills;
 
     let addButton = document.createElement('button');
@@ -274,7 +278,7 @@ var Autofill = (function () {
     }
 
     /**
-     *
+     * Show error if input search field is empty
      */
     function validateList() {
 
@@ -292,77 +296,6 @@ var Autofill = (function () {
         }
     }
 
-    //    // Build Sortable object for use in tool
-    //    //    let sortable = Sortable.create(autofillOptions, {
-    //    //    let sortable = Sortable.create(autofillOptions, {
-    //    let sortable = Sortable.create(autofillOptionsList, {
-    //        //        'group': 'autofillOptions',
-    //        'delay': 0,
-    //        'sort': true,
-    //        'handle': '.my-handle',
-    //        'chosenClass': 'chosen',
-    //        'animation': 150,
-    //        'store': {
-    //            /**
-    //             * Get the order of elements. Called once during initialization.
-    //             * @param   {Sortable}  sortable
-    //             * @returns {Array}
-    //             */
-    //            'get': function (sortable) {
-    //
-    //                let order = localStorage.getItem(sortable.options.group.name);
-    //                return order ? order.split('|') : [];
-    //            },
-    //
-    //            /**
-    //             * Save the order of elements. Called onEnd (when the item is dropped).
-    //             * @param {Sortable}  sortable
-    //             */
-    //            'set': function (sortable) {
-    //
-    //                let order;
-    //                if (typeof Storage !== 'undefined') {
-    //                    order = sortable.toArray();
-    //                    localStorage.setItem(sortable.options.group.name, order.join('|'));
-    //                } else {
-    //                    // Sorry! No Web Storage support..
-    //                }
-    //            },
-    //        },
-    //        'filter': '.js-remove',
-    //        /**
-    //         * event, if list item is removed
-    //         */
-    //        'onFilter': function (evt) {
-    //
-    //            let item = evt.item;
-    //            let ctrl = evt.target;
-    //
-    //            if (Sortable.utils.is(ctrl, '.js-remove')) { // Click on remove button
-    //                item.parentNode.removeChild(item); // remove sortable item
-    //                messageDisplay.textContent = 'Item Removed';
-    //                jQuery(messageDisplay).animateCss('tada');
-    //
-    //                // Save state
-    //                this.save();
-    //                //                sortable.save();
-    //                saveToLocalStorage(createArray());
-    //                removeDisable(item);
-    //
-    //            }
-    //        },
-    //        // Called by any change to the list (add / update / remove)
-    //        'onSort': function ( /* evt */ ) {
-    //
-    //            // Save state
-    //            this.save();
-    //            //            sortable.save();
-    //            saveToLocalStorage(createArray());
-    //        },
-    //    });
-
-    //    console.log(sortable);
-
     /**
      * display message that list have been saved
      */
@@ -379,7 +312,6 @@ var Autofill = (function () {
     function saveState() {
 
         sortable.save();
-        //        Sortable.save();
         saveToLocalStorage(createArray());
     }
 
@@ -497,9 +429,7 @@ var Autofill = (function () {
             elem.classList.add('disabled');
 
             let listElement = listItem(elem.textContent);
-
             autofillOptionsList.appendChild(listElement);
-
             let listLength = listElement.children.length;
 
             for (let y = 0; y < listLength; y += 1) {
@@ -507,6 +437,7 @@ var Autofill = (function () {
                     listElement.children[y].focus();
                 }
             }
+
             // hide drop down menu
             document.querySelector('ul.autofill-dropdown').classList.add('hide');
 
@@ -564,7 +495,6 @@ var Autofill = (function () {
             } else {
 
                 let listElement = listItem(autofillTag);
-
                 autofillOptionsList.appendChild(listElement);
 
                 // bind list item elements
@@ -726,28 +656,54 @@ var Autofill = (function () {
     }
 
     /**
+     * Replace text on a CMS style input window
+     * @param {array} recordEditWindow - array of DOM input elements
+     * @param {regex} regReplace - list of regex values
+     */
+    function replaceTextCMS(recordEditWindow, regReplace) {
+        // pass elements with children as base element for autofill replacing
+        useAutofillTags(recordEditWindow, regReplace);
+
+        // change focus between text area to trigger text saving.
+        let recordLendth = recordEditWindow.length;
+        for (let z = 0; z < recordLendth; z += 1) {
+            jQuery(recordEditWindow[z]).focus();
+        }
+    }
+
+    /**
      * will walk through edittable portion of WSM window and perform text
      * replacing with data contained in the list area of tool
      */
     function autofills() {
-
-        // WSM MAIN WINDOW
-        // ----------------------------------------
+        // WSM MAIN WINDOW LOGIC
 
         const contentFrame = jQuery('iframe#cblt_content').contents();
-        let siteEditorIframe;
+        let siteEditorIframe = contentFrame.find('iframe#siteEditorIframe').contents();
         let viewerIframe;
+        let cmsIframe;
         let myChild;
         let recordEditWindow;
         let regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
 
-        if (location.pathname.indexOf('editSite') >= 0) {
-            siteEditorIframe = contentFrame.find('iframe#siteEditorIframe').contents();
+        // run CMS Content Pop Up edit window IF WINDOW IS OPEN
+        if (location.pathname.indexOf('editSite') >= 0 && siteEditorIframe.find('div#hiddenContentPopUpOuter').hasClass('opened')) {
+
+            // save contents of cms content edit frame
+            cmsIframe = siteEditorIframe.find('iframe#cmsContentEditorIframe').contents();
+
+            // if quick CMS editor is open
+            recordEditWindow = cmsIframe.find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
+
+            // pass elements with children as base element for autofill replacing
+            replaceTextCMS(recordEditWindow, regReplace);
+        } else if (location.pathname.indexOf('editSite') >= 0 && !siteEditorIframe.find('div#hiddenContentPopUpOuter').hasClass('opened')) {
+
+            // get contens of iframe
             viewerIframe = siteEditorIframe.find('iframe#viewer').contents();
 
             // return array of elements that have children
             myChild = viewerIframe.find('body').children().filter(function (index, value) {
-
                 if (value.children.length !== 0) {
                     return this;
                 }
@@ -756,21 +712,14 @@ var Autofill = (function () {
             // pass elements with children as base element for autofill replacing
             useAutofillTags(myChild, regReplace);
 
-        } else {
+        } else if (location.pathname.indexOf('cms') >= 0) {
+            // CMS LOGIC
 
-            // CMS
-            // ----------------------------------------
-
+            // get contens of iframe
             recordEditWindow = contentFrame.find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
 
             // pass elements with children as base element for autofill replacing
-            useAutofillTags(recordEditWindow, regReplace);
-
-            // change focus between text area to trigger text saving.
-            let recordLendth = recordEditWindow.length;
-            for (let z = 0; z < recordLendth; z += 1) {
-                jQuery(recordEditWindow[z]).focus();
-            }
+            replaceTextCMS(recordEditWindow, regReplace);
         }
     }
 
@@ -988,6 +937,27 @@ var Autofill = (function () {
 
     }
 
+    /**
+     *   Get Phone Numbers
+     */
+    function defaultPhoneNumber() {
+        let webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
+        let siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=en_US&pathName=editSettings`;
+
+        jQuery.get(siteSettingsURL, function (data) {
+            let myDiv = document.createElement('div');
+            myDiv.innerHTML = data;
+
+            defaultList['%PHONE%'] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
+            defaultList['%NEW_PHONE%'] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
+            defaultList['%USED_PHONE%'] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
+            defaultList['%SERVICE_PHONE%'] = myDiv.querySelector('input[name*="(__service_).ctn"]').value;
+            defaultList['%PARTS_PHONE%'] = myDiv.querySelector('input[name*="(__parts_).ctn"]').value;
+
+        }, 'html');
+    }
+
+
     // Build Sortable object for use in tool
     //    let sortable = Sortable.create(autofillOptions, {
     //    let sortable = Sortable.create(autofillOptions, {
@@ -1037,15 +1007,17 @@ var Autofill = (function () {
             if (Sortable.utils.is(ctrl, '.js-remove')) { // Click on remove button
                 item.parentNode.removeChild(item); // remove sortable item
 
+                // run validate check
+                validateList();
+
+                // display red message at top of tool
                 messageDisplay.textContent = 'Item Removed';
                 jQuery(messageDisplay).animateCss('tada');
 
                 // Save state
                 this.save();
-                //                sortable.save();
                 saveToLocalStorage(createArray());
                 removeDisable(item);
-
             }
         },
         // Called by any change to the list (add / update / remove)
@@ -1053,14 +1025,13 @@ var Autofill = (function () {
 
             console.log(evt);
             console.log('changing values');
-                        // update display message
+
+            // update display message
             messageDisplay.textContent = 'Values Saved';
             jQuery('#toolMessageDisplay').animateCss('tada');
-            // save new values
-//            saveState();
+
             // Save state
             this.save();
-            //            sortable.save();
             saveToLocalStorage(createArray());
         },
     });
