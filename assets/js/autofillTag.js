@@ -741,6 +741,7 @@ var Autofill = (function () {
         const contentFrame = jQuery('iframe#cblt_content').contents();
         let siteEditorIframe;
         let viewerIframe;
+        let cmsIframe;
         let myChild;
         let recordEditWindow;
         let regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
@@ -749,9 +750,26 @@ var Autofill = (function () {
             siteEditorIframe = contentFrame.find('iframe#siteEditorIframe').contents();
             viewerIframe = siteEditorIframe.find('iframe#viewer').contents();
 
+            // run CMS Content Pop Up edit window IF WINDOW IS OPEN
+            if (siteEditorIframe.find('div#cmsContentContainer').children().length) {
+                // save contents of cms content edit frame
+                cmsIframe = siteEditorIframe.find('iframe#cmsContentEditorIframe').contents();
+
+                // if quick CMS editor is open
+                recordEditWindow = cmsIframe.find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
+
+                // pass elements with children as base element for autofill replacing
+                useAutofillTags(recordEditWindow, regReplace);
+
+                // change focus between text area to trigger text saving.
+                let recordLendth = recordEditWindow.length;
+                for (let z = 0; z < recordLendth; z += 1) {
+                    jQuery(recordEditWindow[z]).focus();
+                }
+            }
+
             // return array of elements that have children
             myChild = viewerIframe.find('body').children().filter(function (index, value) {
-
                 if (value.children.length !== 0) {
                     return this;
                 }
@@ -765,7 +783,7 @@ var Autofill = (function () {
             // CMS
             // ----------------------------------------
 
-            recordEditWindow = contentFrame.find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
+            recordEditWindow = contentFrame.find('div#cmsContentContainer').find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
 
             // pass elements with children as base element for autofill replacing
             useAutofillTags(recordEditWindow, regReplace);
@@ -993,8 +1011,8 @@ var Autofill = (function () {
     }
 
     /**
-    *   Get Phone Numbers
-    */
+     *   Get Phone Numbers
+     */
     function defaultPhoneNumber() {
         let webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
         let siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=en_US&pathName=editSettings`;

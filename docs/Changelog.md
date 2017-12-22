@@ -1,10 +1,13 @@
 # Change Log
 
-## v1.0.3 - **(12/22/2017)**
+## v1.1.0 - **(12/22/2017)**
 
-### Added additional values to reset function
-* "Default" values added when tool is reset
-    * Phone numbers are grabbed from the SETTINGS tab in WSM.
+### Additional support
+* Tool now works with the content editor pop up that appears when editing content in the Editor tab
+
+### Added additional default values
+* Added more phone numbers autofill tags.
+* Values are grabbed from the SETTINGS tab in WSM.
         * %USED_PHONE%
         * %SERVICE_PHONE%
         * %PARTS_PHONE%
