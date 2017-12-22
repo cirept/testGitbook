@@ -296,77 +296,6 @@ var Autofill = (function () {
         }
     }
 
-    //    // Build Sortable object for use in tool
-    //    //    let sortable = Sortable.create(autofillOptions, {
-    //    //    let sortable = Sortable.create(autofillOptions, {
-    //    let sortable = Sortable.create(autofillOptionsList, {
-    //        //        'group': 'autofillOptions',
-    //        'delay': 0,
-    //        'sort': true,
-    //        'handle': '.my-handle',
-    //        'chosenClass': 'chosen',
-    //        'animation': 150,
-    //        'store': {
-    //            /**
-    //             * Get the order of elements. Called once during initialization.
-    //             * @param   {Sortable}  sortable
-    //             * @returns {Array}
-    //             */
-    //            'get': function (sortable) {
-    //
-    //                let order = localStorage.getItem(sortable.options.group.name);
-    //                return order ? order.split('|') : [];
-    //            },
-    //
-    //            /**
-    //             * Save the order of elements. Called onEnd (when the item is dropped).
-    //             * @param {Sortable}  sortable
-    //             */
-    //            'set': function (sortable) {
-    //
-    //                let order;
-    //                if (typeof Storage !== 'undefined') {
-    //                    order = sortable.toArray();
-    //                    localStorage.setItem(sortable.options.group.name, order.join('|'));
-    //                } else {
-    //                    // Sorry! No Web Storage support..
-    //                }
-    //            },
-    //        },
-    //        'filter': '.js-remove',
-    //        /**
-    //         * event, if list item is removed
-    //         */
-    //        'onFilter': function (evt) {
-    //
-    //            let item = evt.item;
-    //            let ctrl = evt.target;
-    //
-    //            if (Sortable.utils.is(ctrl, '.js-remove')) { // Click on remove button
-    //                item.parentNode.removeChild(item); // remove sortable item
-    //                messageDisplay.textContent = 'Item Removed';
-    //                jQuery(messageDisplay).animateCss('tada');
-    //
-    //                // Save state
-    //                this.save();
-    //                //                sortable.save();
-    //                saveToLocalStorage(createArray());
-    //                removeDisable(item);
-    //
-    //            }
-    //        },
-    //        // Called by any change to the list (add / update / remove)
-    //        'onSort': function ( /* evt */ ) {
-    //
-    //            // Save state
-    //            this.save();
-    //            //            sortable.save();
-    //            saveToLocalStorage(createArray());
-    //        },
-    //    });
-
-    //    console.log(sortable);
-
     /**
      * display message that list have been saved
      */
@@ -383,7 +312,6 @@ var Autofill = (function () {
     function saveState() {
 
         sortable.save();
-        //        Sortable.save();
         saveToLocalStorage(createArray());
     }
 
@@ -501,9 +429,7 @@ var Autofill = (function () {
             elem.classList.add('disabled');
 
             let listElement = listItem(elem.textContent);
-
             autofillOptionsList.appendChild(listElement);
-
             let listLength = listElement.children.length;
 
             for (let y = 0; y < listLength; y += 1) {
@@ -511,6 +437,7 @@ var Autofill = (function () {
                     listElement.children[y].focus();
                 }
             }
+
             // hide drop down menu
             document.querySelector('ul.autofill-dropdown').classList.add('hide');
 
@@ -568,7 +495,6 @@ var Autofill = (function () {
             } else {
 
                 let listElement = listItem(autofillTag);
-
                 autofillOptionsList.appendChild(listElement);
 
                 // bind list item elements
@@ -734,9 +660,7 @@ var Autofill = (function () {
      * replacing with data contained in the list area of tool
      */
     function autofills() {
-
-        // WSM MAIN WINDOW
-        // ----------------------------------------
+        // WSM MAIN WINDOW LOGIC
 
         const contentFrame = jQuery('iframe#cblt_content').contents();
         let siteEditorIframe;
@@ -779,9 +703,7 @@ var Autofill = (function () {
             useAutofillTags(myChild, regReplace);
 
         } else {
-
-            // CMS
-            // ----------------------------------------
+            // CMS LOGIC
 
             recordEditWindow = contentFrame.find('div#cmsContentContainer').find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
 
