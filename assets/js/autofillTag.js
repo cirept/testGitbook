@@ -656,6 +656,22 @@ var Autofill = (function () {
     }
 
     /**
+     * Replace text on a CMS style input window
+     * @param {array} recordEditWindow - array of DOM input elements
+     * @param {regex} regReplace - list of regex values
+     */
+    function replaceTextCMS(recordEditWindow, regReplace) {
+        // pass elements with children as base element for autofill replacing
+        useAutofillTags(recordEditWindow, regReplace);
+
+        // change focus between text area to trigger text saving.
+        let recordLendth = recordEditWindow.length;
+        for (let z = 0; z < recordLendth; z += 1) {
+            jQuery(recordEditWindow[z]).focus();
+        }
+    }
+
+    /**
      * will walk through edittable portion of WSM window and perform text
      * replacing with data contained in the list area of tool
      */
@@ -663,34 +679,28 @@ var Autofill = (function () {
         // WSM MAIN WINDOW LOGIC
 
         const contentFrame = jQuery('iframe#cblt_content').contents();
-        let siteEditorIframe;
+        let siteEditorIframe = contentFrame.find('iframe#siteEditorIframe').contents();
         let viewerIframe;
         let cmsIframe;
         let myChild;
         let recordEditWindow;
         let regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
 
-        if (location.pathname.indexOf('editSite') >= 0) {
-            siteEditorIframe = contentFrame.find('iframe#siteEditorIframe').contents();
+        // run CMS Content Pop Up edit window IF WINDOW IS OPEN
+        if (location.pathname.indexOf('editSite') >= 0 && siteEditorIframe.find('div#hiddenContentPopUpOuter').hasClass('opened')) {
+
+            // save contents of cms content edit frame
+            cmsIframe = siteEditorIframe.find('iframe#cmsContentEditorIframe').contents();
+
+            // if quick CMS editor is open
+            recordEditWindow = cmsIframe.find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
+
+            // pass elements with children as base element for autofill replacing
+            replaceTextCMS(recordEditWindow, regReplace);
+        } else if (location.pathname.indexOf('editSite') >= 0 && !siteEditorIframe.find('div#hiddenContentPopUpOuter').hasClass('opened')) {
+
+            // get contens of iframe
             viewerIframe = siteEditorIframe.find('iframe#viewer').contents();
-
-            // run CMS Content Pop Up edit window IF WINDOW IS OPEN
-            if (siteEditorIframe.find('div#cmsContentContainer').children().length) {
-                // save contents of cms content edit frame
-                cmsIframe = siteEditorIframe.find('iframe#cmsContentEditorIframe').contents();
-
-                // if quick CMS editor is open
-                recordEditWindow = cmsIframe.find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
-
-                // pass elements with children as base element for autofill replacing
-                useAutofillTags(recordEditWindow, regReplace);
-
-                // change focus between text area to trigger text saving.
-                let recordLendth = recordEditWindow.length;
-                for (let z = 0; z < recordLendth; z += 1) {
-                    jQuery(recordEditWindow[z]).focus();
-                }
-            }
 
             // return array of elements that have children
             myChild = viewerIframe.find('body').children().filter(function (index, value) {
@@ -702,19 +712,14 @@ var Autofill = (function () {
             // pass elements with children as base element for autofill replacing
             useAutofillTags(myChild, regReplace);
 
-        } else {
+        } else if (location.pathname.indexOf('cms') >= 0) {
             // CMS LOGIC
 
-            recordEditWindow = contentFrame.find('div#cmsContentContainer').find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
+            // get contens of iframe
+            recordEditWindow = contentFrame.find('div.main-wrap').find('.input-field').find('div[data-which-field="copy"]');
 
             // pass elements with children as base element for autofill replacing
-            useAutofillTags(recordEditWindow, regReplace);
-
-            // change focus between text area to trigger text saving.
-            let recordLendth = recordEditWindow.length;
-            for (let z = 0; z < recordLendth; z += 1) {
-                jQuery(recordEditWindow[z]).focus();
-            }
+            replaceTextCMS(recordEditWindow, regReplace);
         }
     }
 
