@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name Autofill Tool
+// @name Autofill Tool v1.0.2
 // @namespace www.cobaltgroup.com
 // @version 1.0.2
 // @run-at document-end
