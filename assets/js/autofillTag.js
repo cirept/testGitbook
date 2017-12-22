@@ -62,7 +62,7 @@ var Autofill = (function () {
     applyAutofills.classList.add('myButts');
     applyAutofills.type = 'button';
     applyAutofills.title = 'apply autofills';
-    applyAutofills.innerHTML = '<i class="fas fa-check fa-lg"></i>';
+    applyAutofills.innerHTML = '<i class="fas fa-magic fa-lg"></i>';
     applyAutofills.onclick = autofills;
 
     let addButton = document.createElement('button');
