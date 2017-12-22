@@ -36,10 +36,10 @@ a tool that will replace text with autofill tags
     * **Changes made in CMS (Content Library)**, are not permanent UNTIL you save the changes via one of the save button located at the top right area of the page.
 
 ## What the tool looks like
-![Autofill Tool](../assets/images/WhatToolLooksLike.png)
+![Autofill Tool](assets/images/WhatToolLooksLike.png)
 
 ## Magic Wand Button
-![Autofill Tool](../assets/images/Apply_autofills.png)
+![Autofill Tool](assets/images/Apply_autofills.png)
 * This will trigger the tool's functionality
 
 ### Editor
@@ -51,12 +51,12 @@ a tool that will replace text with autofill tags
 * **Save edits in order to keep the changes.**
 
 ## Magic Eye Button
-![Autofill Tool](../assets/images/Hide_panel.png)
-![Autofill Tool](../assets/images/Unhide_panel.png)
+![Autofill Tool](assets/images/Hide_panel.png)
+![Autofill Tool](assets/images/Unhide_panel.png)
 * This will hide / show main panel for the tool.
 
 ## Autofill Options
-![Autofill Tool](../assets/images/autofill_option_breakdown.png)
+![Autofill Tool](assets/images/autofill_option_breakdown.png)
 
 ## Reorder Purpose (currently broken)
 You may be thinking 'Why would I even need to re-order the autofill tags?'  Well great question!  Allow me to explain.
@@ -97,7 +97,7 @@ Using the text mentioned above.  I want to replace anything related to the deale
 ```
 INFINITI of Tampa``Tampa INFINITI``INFINITI Tampa
 ```
-![Autofill Tool](../assets/images/autofillEntry.png)
+![Autofill Tool](assets/images/autofillEntry.png)
 
 When you click the 'Magic' button the tool will break down the text if it sees `` and start its search.
 * round 1 = INFINITI of Tampa
@@ -108,17 +108,17 @@ When you click the 'Magic' button the tool will break down the text if it sees `
 it will remove the autofill tag from the search list
 
 ## Add autofill Button
-![Autofill Tool](../assets/images/Add_autofill.png)
+![Autofill Tool](assets/images/Add_autofill.png)
 
 Clicking this will display a drop down of currently available autofill tags that looks like this.
 
 ### Why are the options grey'd out?
-![Autofill Tool](../assets/images/AutofillDropdown.png)
+![Autofill Tool](assets/images/AutofillDropdown.png)
 
 Autofill tags that have already been configured will be disabled. (Depicted in grey in the screenshot)
 
 ## Reset Button
-![Autofill Tool](../assets/images/Reset.png)
+![Autofill Tool](assets/images/Reset.png)
 
 Resets the tool to the most commonly used autofill tags.
 * %DEALER_NAME%
