@@ -1,5 +1,20 @@
 # Change Log
 
+## v1.0.3 - **(12/22/2017)**
+
+### Added additional values to reset function
+* "Default" values added when tool is reset
+    * Phone numbers are grabbed from the SETTINGS tab in WSM.
+        * %USED_PHONE%
+        * %SERVICE_PHONE%
+        * %PARTS_PHONE%
+
+<br><br>
+
+---
+
+<br><br>
+
 ## v1.0.2 - **(12/21/2017)**
 
 ### Fixed word seperator functionality
