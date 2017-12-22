@@ -278,7 +278,7 @@ var Autofill = (function () {
     }
 
     /**
-     *
+     * Show error if input search field is empty
      */
     function validateList() {
 
@@ -1062,15 +1062,17 @@ var Autofill = (function () {
             if (Sortable.utils.is(ctrl, '.js-remove')) { // Click on remove button
                 item.parentNode.removeChild(item); // remove sortable item
 
+                // run validate check
+                validateList();
+
+                // display red message at top of tool
                 messageDisplay.textContent = 'Item Removed';
                 jQuery(messageDisplay).animateCss('tada');
 
                 // Save state
                 this.save();
-                //                sortable.save();
                 saveToLocalStorage(createArray());
                 removeDisable(item);
-
             }
         },
         // Called by any change to the list (add / update / remove)
@@ -1078,14 +1080,13 @@ var Autofill = (function () {
 
             console.log(evt);
             console.log('changing values');
+
             // update display message
             messageDisplay.textContent = 'Values Saved';
             jQuery('#toolMessageDisplay').animateCss('tada');
-            // save new values
-            //            saveState();
+
             // Save state
             this.save();
-            //            sortable.save();
             saveToLocalStorage(createArray());
         },
     });
