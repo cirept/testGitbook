@@ -7,7 +7,8 @@
 // @include http://websites.cobalt.com/wsm/editSite.do*
 // @include http://websites.cobalt.com/wsm/cms.do*
 // @require https://code.jquery.com/jquery-3.2.1.js
-// @require https://cdn.jsdelivr.net/sortable/latest/Sortable.min.js
+// @require https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
+// @require https://cdn.rawgit.com/cirept/autofillReplacer/master/assets/js/packs/regular.min.js
 // @require https://cdn.rawgit.com/cirept/autofillReplacer/master/assets/js/packs/light.min.js
 // @require https://cdn.rawgit.com/cirept/autofillReplacer/master/assets/js/packs/solid.min.js
 // @require https://cdn.rawgit.com/cirept/autofillReplacer/master/assets/js/fontawesome.min.js
