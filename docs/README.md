@@ -3,7 +3,16 @@
 # Autofill Replacer
 * a tool that will replace text with autofill tags
 
-## Description :new:
+## What the tool looks like
+* Minimized
+
+![Autofill Tool minimized](assets/images/AutofillReplacerTool_minimized.png)
+
+* Maximized
+
+![Autofill Tool maximized](assets/images/AutofillReplacerTool_maximized.png)
+
+## Description
 * This tool will crawl the editor window and replace all matching text with the designated autofill tag.
 * **Replace Mode - Primarily meant for use WITH the migration tool.**
 * **Highlight Mode - Primarily meant for use in regular WSM editor.**
@@ -14,7 +23,7 @@
     * Deleteing autofill entries
     * Adding autofill entries
 
-## Modes :new:
+## Modes
 ### Replace Mode
 * Will replace all matching text with it's corresponding autofill tag.
 
@@ -41,7 +50,7 @@
 4. **RUN THE AUTOFILL TAG REPLACER TOOL**
 5. Save changes via 'save' button.
 
-### Highlight Mode :new:
+### Highlight Mode
 #### While editting cards in WSM
 1. Navigate to landing page or core page in WSM
 2. **RUN THE AUTOFILL TAG REPLACER TOOL**
@@ -57,15 +66,6 @@
 * Only works in **WSM (Editor) and CMS (Content Library)**
     * **Changes made in Editor**, changes are not permanent and will revert to original text upon page reload. Main purpose of the tool would is to make migrating copy text from external sites easier.
     * **Changes made in CMS (Content Library)**, are not permanent UNTIL you save the changes via one of the save button located at the top right area of the page.
-
-## What the tool looks like
-* Minimized
-
-![Autofill Tool minimized](assets/images/AutofillReplacerTool_minimized.png)
-
-* Maximized
-
-![Autofill Tool maximized](assets/images/AutofillReplacerTool_maximized.png)
 
 ## Action Button
 * maximized button
