@@ -67,9 +67,16 @@
 
 ![Autofill Tool maximized](assets/images/AutofillReplacerTool_maximized.png)
 
-## Magic Wand Button
+## Action Button
+* maximized button
+
 ![Autofill Tool](assets/images/replaceButton.png)
 ![Autofill Tool](assets/images/highlightButton.png)
+
+* minimized button
+
+![Autofill Tool](assets/images/replaceButton_quickAccess.png)
+![Autofill Tool](assets/images/highlightButton_quickAccess.png)
 * This will trigger the tool's functionality
 
 ### Replace Mode
