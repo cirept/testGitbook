@@ -9,7 +9,7 @@
 // @require https://code.jquery.com/jquery-3.2.1.js
 // @require https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
 // @require https://cdn.rawgit.com/cirept/autofillReplacer/reorganizeFolders/assets/js/fontawesome-all.min.js
-// @require https://rawgit.com/cirept/autofillReplacer/reorganizeFolders/assets/js/meta.js
+// @require https://rawgit.com/cirept/autofillReplacer/reorganizeFolders/assets/js/autofillTag.js
 // @grant GM_info
 // @grant GM_setValue
 // @grant GM_getValue
