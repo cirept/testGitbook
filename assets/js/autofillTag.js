@@ -8,6 +8,10 @@ NOTES:
 var Autofill = (function () {
     'use strict';
 
+    // ******************************************************************************************
+    // TAMPERMONKEY FUNCTIONS
+    // ******************************************************************************************
+
     let shared = {
         /**
          * Tampermonkey function.
@@ -53,6 +57,10 @@ var Autofill = (function () {
         },
     };
 
+    // ******************************************************************************************
+    // TOOL "GLOBAL" VARIABLES
+    // ******************************************************************************************
+
     let myURL = 'https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json';
     let defaultList = {
         '%DEALER_NAME%': 'SEARCH_FOR_ME',
@@ -67,63 +75,40 @@ var Autofill = (function () {
         '%SERVICE_PHONE%': 'SEARCH_FOR_ME',
         '%PARTS_PHONE%': 'SEARCH_FOR_ME',
     };
-
     // ----------------------------------------
-    // autofill menu
+    // designated FA class for tool modes
     // ----------------------------------------
+    const highlightIconClass = 'fa-lightbulb';
+    const replaceIconClass = 'fa-exchange';
 
-    // Container
-    let autofillTool = document.createElement('div');
-    autofillTool.id = 'autofillTool';
+    // ******************************************************************************************
+    // AUTOFILL TOOL ELEMENTS - START
+    // ******************************************************************************************
 
-    // toggle Tab
-    let autofillTab = document.createElement('div');
-    autofillTab.id = 'autofillToolTab';
-    autofillTab.classList.add('hide');
-
-    // Main Tool Container
-    let autofillToolContainer = document.createElement('div');
-    autofillToolContainer.id = 'autofillToolContainer';
-    autofillToolContainer.classList.add('hide');
-
+    // *********************************************
+    //  autofillOptionsContainer ELEMENT
+    // *********************************************
     // "Active" Autofill Listing Container
     let autofillOptionsContainer = document.createElement('div');
     autofillOptionsContainer.id = 'autofillOptionsContainer';
     autofillOptionsContainer.classList.add('hide');
 
-    // minimize list element
-    let minimizeList = document.createElement('div');
-    minimizeList.classList.add('minimizeList');
-    minimizeList.title = 'Show Tool';
-    minimizeList.innerHTML = 'Autofill Tool<br><i class="fas fa-eye fa-lg"></i>';
-
-    autofillTab.appendChild(minimizeList);
+    // *********************************************
+    //  autofillOptionsContainer CHILD ELEMENTS
+    // *********************************************
 
     // "Active" Autofill list
     let autofillOptionsList = document.createElement('ul');
     autofillOptionsList.id = 'autofillOptions';
-
-    // message area 'at the top of the tool'
-    let messageDisplay = document.createElement('div');
-    messageDisplay.id = 'toolMessageDisplay';
-    messageDisplay.textContent = `Autofill tag text replacer tool v${GM_info.script.version}`;
-
+    // list title
+    let listTitle = document.createElement('div');
+    listTitle.innerHTML = 'Autofill List';
     // Reset button
     let defaultReset = document.createElement('button');
     defaultReset.id = 'defaultReset';
-    defaultReset.classList.add('myButts');
-    defaultReset.classList.add('secondary');
+    defaultReset.classList.add('myButts', 'secondary');
     defaultReset.title = 'Reset Values';
     defaultReset.innerHTML = '<i class="fas fa-redo fa-lg"></i>';
-
-    // Apply autofill button
-    let applyAutofills = document.createElement('button');
-    applyAutofills.id = 'applyAutofills';
-    applyAutofills.classList.add('myButts');
-    applyAutofills.type = 'button';
-    applyAutofills.title = 'apply autofills';
-    applyAutofills.innerHTML = '<i class="fas fa-magic fa-lg"></i>';
-
     // add autofill button
     let addButton = document.createElement('button');
     addButton.id = 'addAutofill';
@@ -131,79 +116,161 @@ var Autofill = (function () {
     addButton.value = 'addAutofill';
     addButton.title = 'Add Autofill';
     addButton.innerHTML = '<i class="fas fa-plus fa-lg"></i>';
-
     // autofill options drop down list
     let autofillDropdown = document.createElement('ul');
     autofillDropdown.tabIndex = '4';
     autofillDropdown.classList.add('autofill-dropdown');
     autofillDropdown.classList.add('hide');
-
-    // autofill modes
     // ----------------------------------------
+    // build autofillOptionsContainer
+    // ----------------------------------------
+    autofillOptionsContainer.appendChild(listTitle);
+    autofillOptionsContainer.appendChild(autofillOptionsList);
+
+    // *********************************************
+    // DO WORK BUTTONS
+    // *********************************************
+
+    // ----------------------------------------
+    // expanded tool button
+    // ----------------------------------------
+    let applyAutofills = document.createElement('button');
+    applyAutofills.classList.add('applyAutofills', 'myButts');
+    applyAutofills.type = 'button';
+    applyAutofills.title = 'apply autofills';
+    // ----------------------------------------
+    // quick access button
+    // ----------------------------------------
+    // Shortcut autofill button
+    let applyAutofillsShort = document.createElement('button');
+    applyAutofillsShort.classList.add('applyAutofills', 'myButts', 'quickAccess', 'hide');
+    applyAutofillsShort.type = 'button';
+    applyAutofillsShort.title = 'apply autofills';
+    // Add APPLY button Icon
+    let applyIcon = document.createElement('i');
+    applyIcon.classList.add('fas', 'fa-lg', 'fa-fw', 'inline');
+    // APPLY button text
+    let buttonText = document.createElement('div');
+    buttonText.classList.add('inline');
+    // ----------------------------------------
+    // build buttons
+    // ----------------------------------------
+    applyAutofills.appendChild(applyIcon.cloneNode(false));
+    applyAutofillsShort.appendChild(applyIcon.cloneNode(false));
+    applyAutofillsShort.appendChild(buttonText);
+
+    // *********************************************
+    // MESSAGE AREA 'at the top of the tool'
+    // *********************************************
+
+    let messageDisplay = document.createElement('div');
+    messageDisplay.id = 'toolMessageDisplay';
+    messageDisplay.textContent = `Autofill Replacer Tool v${GM_info.script.version}`;
+
+    // *********************************************
+    // AUTOFILL MODES ELEMENTS
+    // *********************************************
+
+    // mode container
     let modeContainer = document.createElement('div');
     modeContainer.id = 'modeContainer';
     modeContainer.classList.add('vertical');
-
+    // mode panel title
     let modeTitle = document.createElement('div');
     modeTitle.textContent = 'modes';
-
-    // Add button Icon
-    let lightbulbIcon = document.createElement('i');
-    lightbulbIcon.classList.add('fas', 'fa-lightbulb', 'fa-lg');
-    lightbulbIcon.setAttribute('data-fa-transform', 'shrink-3');
-
-    // highlight autofills
-    let highlightAutofillsButt = document.createElement('button');
-    highlightAutofillsButt.classList.add('modes');
-    highlightAutofillsButt.classList.add('secondary');
-    highlightAutofillsButt.classList.add('myButts');
-    highlightAutofillsButt.dataset.feature = 'highlight';
-    highlightAutofillsButt.title = 'highlight';
-    highlightAutofillsButt.type = 'button';
-
-    // attach button icon
-    highlightAutofillsButt.appendChild(lightbulbIcon);
-
-    // Exchange Icon
-    let exchangeIcon = document.createElement('i');
-    exchangeIcon.classList.add('fas', 'fa-exchange', 'fa-lg');
-    exchangeIcon.setAttribute('data-fa-transform', 'shrink-3');
-
     // replace autofills
     let replaceAutofillsButt = document.createElement('button');
-    replaceAutofillsButt.classList.add('modes');
-    replaceAutofillsButt.classList.add('secondary');
-    replaceAutofillsButt.classList.add('myButts');
+    replaceAutofillsButt.classList.add('modes', 'secondary', 'myButts', 'replace');
     replaceAutofillsButt.dataset.feature = 'replace';
     replaceAutofillsButt.title = 'replace';
     replaceAutofillsButt.type = 'button';
-
+    // highlight autofills
+    let highlightAutofillsButt = document.createElement('button');
+    highlightAutofillsButt.classList.add('modes', 'secondary', 'myButts', 'highlight');
+    highlightAutofillsButt.dataset.feature = 'highlight';
+    highlightAutofillsButt.title = 'highlight';
+    highlightAutofillsButt.type = 'button';
+    // highlight button Icon
+    let highlightIcon = document.createElement('i');
+    highlightIcon.classList.add('fas', 'fa-lg', highlightIconClass);
+    highlightIcon.setAttribute('data-fa-transform', 'shrink-3');
+    // Exchange Icon
+    let replaceIcon = document.createElement('i');
+    replaceIcon.classList.add('fas', 'fa-lg', replaceIconClass);
+    replaceIcon.setAttribute('data-fa-transform', 'shrink-3');
     // attach button icon
-    replaceAutofillsButt.appendChild(exchangeIcon);
-
+    highlightAutofillsButt.appendChild(highlightIcon);
+    // attach button icon
+    replaceAutofillsButt.appendChild(replaceIcon);
+    // ----------------------------------------
     // build mode container
+    // ----------------------------------------
     modeContainer.appendChild(modeTitle);
     modeContainer.appendChild(replaceAutofillsButt);
     modeContainer.appendChild(highlightAutofillsButt);
 
-    autofillOptionsContainer.appendChild(autofillOptionsList);
-    autofillOptionsContainer.appendChild(defaultReset);
-    autofillOptionsContainer.appendChild(addButton);
-    autofillOptionsContainer.appendChild(autofillDropdown);
+    // *********************************************
+    // TAB ELEMENT
+    // *********************************************
 
+    // toggle Tab
+    let autofillTab = document.createElement('div');
+    autofillTab.id = 'autofillToolTab';
+    autofillTab.classList.add('hide');
+    // minimize list element
+    let minimizeList = document.createElement('div');
+    minimizeList.classList.add('minimizeList');
+    minimizeList.title = 'Show Tool';
+    minimizeList.innerHTML = 'Autofill Tool<br><i class="fas fa-eye fa-lg"></i>';
+    // ----------------------------------------
+    // build autofill tab
+    // ----------------------------------------
+    autofillTab.appendChild(minimizeList);
+
+    // *********************************************
+    // MAIN TOOL CONTAINER
+    // *********************************************
+
+    let autofillToolContainer = document.createElement('div');
+    autofillToolContainer.id = 'autofillToolContainer';
+    autofillToolContainer.classList.add('hide');
+    // ----------------------------------------
+    // build autofillToolContainer
+    // ----------------------------------------
     autofillToolContainer.appendChild(applyAutofills);
     autofillToolContainer.appendChild(messageDisplay);
     autofillToolContainer.appendChild(autofillOptionsContainer);
     autofillToolContainer.appendChild(modeContainer);
 
+        autofillToolContainer.appendChild(defaultReset);
+    autofillToolContainer.appendChild(addButton);
+    autofillToolContainer.appendChild(autofillDropdown);
+
+    // *********************************************
+    // WRAPPER
+    // *********************************************
+
+    // Wrapper
+    let autofillTool = document.createElement('div');
+    autofillTool.id = 'autofillTool';
+    // ----------------------------------------
+    // build autofillTool
+    // ----------------------------------------
     autofillTool.appendChild(autofillToolContainer);
     autofillTool.appendChild(autofillTab);
-
+    autofillTool.appendChild(applyAutofillsShort);
+    // ----------------------------------------
     // attach tool elements to page
+    // ----------------------------------------
     document.body.appendChild(autofillTool);
 
+    // ******************************************************************************************
+    // FUNCTIONS
+    // ******************************************************************************************
+
     /**
-     * jQuery functions for animate css
+     *  jQuery function for animate css
+     *  Allows easy access to animate CSS functionality with jQuery
      */
     jQuery.fn.extend({
         'animateCss': function (animationName, callback) {
@@ -219,36 +286,85 @@ var Autofill = (function () {
     });
 
     /**
+     *  Will return the designated class icon for the current ACTIVE MODE
+     *  @param {string} modeText - the current ACTIVE mode
+     */
+    function iconClass() {
+        // declare local variable
+        let toolSettings = shared.programData();
+        let buttonIcon;
+
+        switch (toolSettings.mode) {
+            case 'replace':
+                buttonIcon = replaceIconClass;
+                break;
+            case 'highlight':
+                buttonIcon = highlightIconClass;
+                break;
+        }
+        return buttonIcon;
+    }
+
+    /**
+     *   Build APPLY buttons
+     *  @param {string} modeText - the current ACTIVE mode
+     */
+    function buildButtons(modeText) {
+        // decalre local variables
+        let applyButtons = document.getElementsByClassName('applyAutofills');
+        let length = applyButtons.length;
+        // loop through buttom DOM elements and change to correct MODE TEXT
+        for (let y = 0; y < length; y += 1) {
+            // apply the correct class to the button, this controls the coloring of the button
+            applyButtons[y].classList.add(modeText);
+            // apply the correct MODE ICON to button
+            applyButtons[y].querySelector('i').classList.add(iconClass());
+            // Change ONLY the quick access button text
+            if (applyButtons[y].classList.contains('quickAccess')) {
+                applyButtons[y].querySelector('div.inline').innerHTML = modeText;
+            }
+        }
+    }
+
+    /**
      *   Load local tool settings
      *   Mode : Replace or Highlight
      */
     function loadToolSettings() {
+        // declare local variable
         let toolSettings = shared.programData();
-
-        if (Object.keys(toolSettings).length > 0) {
-
+        // change actions depending IF there is LOCAL DATA stored on users computer
+        if (Object.keys(toolSettings).length > 0) { // if LOCAL DATA IS FOUND
+            // declare local variable
+            let modeText;
             // this will run if there is tool settings available in local storage
-            if (toolSettings.mode.indexOf('replacer') > -1) {
-
+            if (toolSettings.mode.indexOf('replace') > -1) {
+                // set button text variable
+                modeText = 'replace';
                 // set REPALCER as ACTIVE mode
                 replaceAutofillsButt.classList.add('active');
                 replaceAutofillsButt.classList.remove('secondary');
-                replaceAutofillsButt.title = 'replace *active*';
-
+                replaceAutofillsButt.title = `${modeText} *active*`;
             } else if (toolSettings.mode.indexOf('highlight') > -1) {
-
+                // set button text variable
+                modeText = 'highlight';
                 // set HIGHLIGHT as ACTIVE mode
                 highlightAutofillsButt.classList.add('active');
                 highlightAutofillsButt.classList.remove('secondary');
-                highlightAutofillsButt.title = 'highlight *active*';
+                highlightAutofillsButt.title = `${modeText} *active*`;
             }
-        } else {
-            // this will run if the operator is using the tool for the first time
-
+            // set descriptive title text
+            applyAutofillsShort.title = `*${modeText}* autofills`;
+            // apply class to "Magic" button
+            applyAutofillsShort.classList.toggle(modeText);
+            applyAutofills.classList.toggle(modeText);
+            // build buttons
+            buildButtons(modeText);
+        } else { // if LOCAL DATA IS NOT FOUND, ie running the tool for the first time.
             // set REPALCER as ACTIVE mode
             replaceAutofillsButt.classList.add('active');
             // save MODE in local storage
-            shared.saveValue('mode', 'replacer');
+            shared.saveValue('mode', 'replace');
         }
     }
 
@@ -256,23 +372,22 @@ var Autofill = (function () {
      * Get data from 'Settings' to autofill into the defaults list
      */
     function defaultValues() {
-
+        // declare local variables
         let webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
         let siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=en_US&pathName=editSettings`;
-
+        // get information from SETTINGS TAB in WSM
         jQuery.get(siteSettingsURL, function (data) {
-
+            // create a DOM element to store the data received from the SETTINGS TAB
             let myDiv = document.createElement('div');
             myDiv.innerHTML = data;
             let franchises = myDiv.querySelector('select#associatedFranchises').options;
             let myLength = franchises.length;
             let myFranchises = [];
-
             // create franchises string
             for (let x = 0; x < myLength; x += 1) {
                 myFranchises.push(franchises[x].textContent);
             }
-
+            // store data in tool defaultList array
             defaultList['%DEALER_NAME%'] = myDiv.querySelector('input[name="name"]').value;
             defaultList['%STREET%'] = myDiv.querySelector('input#contact_address_street1').value;
             defaultList['%CITY%'] = myDiv.querySelector('input#contact_address_city').value;
@@ -280,34 +395,29 @@ var Autofill = (function () {
             defaultList['%STATE%'] = myDiv.querySelector('select#contact_address_state').value;
             defaultList['%PHONE%'] = myDiv.querySelector('input[name="contact_phone_number"]').value;
             defaultList['%FRANCHISES%'] = myFranchises.join(', ');
-
         }, 'html');
-
     }
 
     /**
-     *   Get Phone Numbers
+     *   Get Phone Numbers from WSM Settings TAB
      */
     function defaultPhoneNumber() {
+        // declare local variables
         let webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
         let siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=en_US&pathName=editSettings`;
-
+        // get information from SETTINGS TAB in WSM
         jQuery.get(siteSettingsURL, function (data) {
+            // create a DOM element to store the data received from the SETTINGS TAB
             let myDiv = document.createElement('div');
             myDiv.innerHTML = data;
-
+            // store data in tool defaultList array
             defaultList['%PHONE%'] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
             defaultList['%NEW_PHONE%'] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
             defaultList['%USED_PHONE%'] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
             defaultList['%SERVICE_PHONE%'] = myDiv.querySelector('input[name*="(__service_).ctn"]').value;
             defaultList['%PARTS_PHONE%'] = myDiv.querySelector('input[name*="(__parts_).ctn"]').value;
-
         }, 'html');
     }
-
-    // ----------------------------------------
-    // INTERNAL FUNCTIONS - START
-    // ----------------------------------------
 
     /**
      * Build a generic list item to use through out the tool
@@ -359,7 +469,7 @@ var Autofill = (function () {
         removeMeContainer.appendChild(removeMe);
 
         // build list item
-        listElement.appendChild(grabHandle);
+//        listElement.appendChild(grabHandle);
         listElement.appendChild(myInput);
         listElement.appendChild(myPointer);
         listElement.appendChild(label);
@@ -374,7 +484,6 @@ var Autofill = (function () {
      */
     function saveToLocalStorage(myObj) {
 
-        console.log('autofill : saving');
         let saveMe = JSON.stringify(myObj);
         localStorage.setItem('autofillVariables', saveMe);
     }
@@ -485,10 +594,10 @@ var Autofill = (function () {
     function getFromLocalStorage() {
         let returnMe;
         if (localStorage.getItem('autofillVariables') === null) {
-            console.log('autofill : no local data');
+            //            console.log('autofill : no local data');
             returnMe = defaultList;
         } else {
-            console.log('autofill : local data found');
+            //            console.log('autofill : local data found');
             returnMe = JSON.parse(localStorage.getItem('autofillVariables'));
             returnMe = returnMe[0];
         }
@@ -528,13 +637,6 @@ var Autofill = (function () {
         }
     }
 
-    // ----------------------------------------
-    // INTERNAL FUNCTIONS - END
-    // ----------------------------------------
-
-    // ----------------------------------------
-    // METHODS - START
-    // ----------------------------------------
     /**
      * Will show or hide the tool's panel
      * will also update the button's icon and hover text
@@ -545,9 +647,11 @@ var Autofill = (function () {
         let animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
         let $autofillTool = jQuery('#autofillTool');
         let $autofillToolTab = jQuery('#autofillToolTab');
+        let $quickAccess = jQuery('button.quickAccess');
 
         if (autofillToolContainer.classList.contains('hide')) {
-
+            // hide quick access button
+            applyAutofillsShort.classList.toggle('hide');
             // remove hide class from AUTOFILL TOOl Container
             autofillToolContainer.classList.remove('hide');
             autofillToolContainer.classList.add('show');
@@ -556,7 +660,6 @@ var Autofill = (function () {
             autofillOptionsContainer.classList.add('show');
             // animate the tool tab "show" action
             $autofillTool.animateCss('slideInDown');
-
 
         } else if (autofillToolContainer.classList.contains('show')) {
 
@@ -571,6 +674,12 @@ var Autofill = (function () {
 
                 // apply a slide down animation to the tab
                 $autofillToolTab.animateCss('slideInDown', function () {
+
+                    // show quick access button
+                    applyAutofillsShort.classList.toggle('hide');
+                    // animate show action
+                    $quickAccess.animateCss('slideInDown');
+
                     // unbind animation events
                     $autofillTool.off(animationEnd);
                     $autofillToolTab.off(animationEnd);
@@ -750,6 +859,11 @@ var Autofill = (function () {
         let recordEditWindow;
         let regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
 
+        // minimize tool
+        if (!autofillToolContainer.classList.contains('hide')) {
+            autofillTab.click();
+        }
+
         // run CMS Content Pop Up edit window IF WINDOW IS OPEN
         if (location.pathname.indexOf('editSite') >= 0 && siteEditorIframe.find('div#hiddenContentPopUpOuter').hasClass('opened')) {
 
@@ -884,9 +998,11 @@ var Autofill = (function () {
         let regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
 
         // minimize tool
-        autofillTab.click();
+        if (!autofillToolContainer.classList.contains('hide')) {
+            autofillTab.click();
+        }
 
-        // run AUTOFILL REPLACER IF THE CMS Content Pop Up edit window IF WINDOW IS OPEN
+        // run AUTOFILL replace IF THE CMS Content Pop Up edit window IF WINDOW IS OPEN
         if (location.pathname.indexOf('editSite') >= 0 && siteEditorIframe.find('div#hiddenContentPopUpOuter').hasClass('opened')) {
 
             // save contents of cms content edit frame
@@ -898,7 +1014,7 @@ var Autofill = (function () {
             // pass elements with children as base element for autofill replacing
             replaceTextCMS(recordEditWindow, regReplace);
 
-            // run AUTOFILL REPLACER IF THE CMS Content Pop Up edit window IF WINDOW IS OPEN
+            // run AUTOFILL replace IF THE CMS Content Pop Up edit window IF WINDOW IS OPEN
         } else if (location.pathname.indexOf('editSite') >= 0 && !siteEditorIframe.find('div#hiddenContentPopUpOuter').hasClass('opened')) {
 
             // this will contain the actual page content
@@ -940,6 +1056,11 @@ var Autofill = (function () {
 
             viewerIframe[0].src = viewerIframe[0].src + '&disableAutofill=true';
 
+        }  else if (location.pathname.indexOf('cms') >= 0) {
+            // ---------------------------------------- CMS LOGIC
+
+            // alert user
+            window.alert('Autofill Tool\nHighlight functionality does not work in the Content Library Tab');
         }
     }
 
@@ -956,10 +1077,6 @@ var Autofill = (function () {
             addButton.classList.remove('disabled');
         }
     }
-
-    // ----------------------------------------
-    // METHODS - END
-    // ----------------------------------------
 
     /**
      * Converts the autofill tags in local memory to simple array
@@ -1156,6 +1273,7 @@ var Autofill = (function () {
         left: 195px;
         width: auto;
         color: white;
+        font-size: 11px;
         animation-duration: 1.5s;
         -webkit-animation-duration: 1.5s;
     }
@@ -1186,13 +1304,21 @@ var Autofill = (function () {
         cursor: hand;
     }
 
-    #applyAutofills {
+    .applyAutofills {
         display: inline-block;
-        padding: 5px 30px;
-        background: rgb(130, 198, 0);
+        padding: 5px 25px;
+        /*background: rgb(130, 198, 0);*/
     }
 
-    #applyAutofills.disabled {
+    .applyAutofills > * {
+        margin: 0 3px;
+    }
+
+    .applyAutofills > .inline {
+        display: inline;
+    }
+
+    .applyAutofills.disabled {
         background: #333;
     }
 
@@ -1203,7 +1329,7 @@ var Autofill = (function () {
         border-bottom-right-radius: 5px;
     }
 
-    #autofillToolContainer{
+    #autofillToolContainer {
         background: rgb(234, 232, 232);
         padding: 10px;
         border-left: 1px solid rgb(130, 79, 214);
@@ -1215,6 +1341,7 @@ var Autofill = (function () {
         padding: 5px 0 10px 0;
         text-align: center;
         width: 100px;
+        display: inline-block;
         font-size: 13px;
         background: rgb(130, 79, 214);
         border-radius: 0 0 50% 50%;
@@ -1222,6 +1349,23 @@ var Autofill = (function () {
         cursor: hand;
         animation-duration: .75s;
         -webkit-animation-duration: .75s;
+    }
+
+    #autofillOptions {
+
+    }
+
+    #autofillOptionsContainer {
+        width: 450px;
+        border: 1px solid rgb(153, 153, 153);
+        margin: 5px 0;
+        padding: 5px 0;
+        text-align: center;
+    }
+
+    #autofillOptionsContainer > div {
+        color: rgb(153, 153, 153);
+        font-size: 14px;
     }
 
     .vertical {
@@ -1294,8 +1438,9 @@ var Autofill = (function () {
         border: 1px solid rgb(255, 255, 255);
         line-height: 1.25rem;
         text-indent: 10px;
-        margin: 0 0 0 15px;
-        width: 200px !important;
+        /*margin: 0 0 0 15px;*/
+        width: 230px !important;
+        /*width: 200px !important;*/
     }
 
     .autofillEntry {
@@ -1318,11 +1463,12 @@ var Autofill = (function () {
     }
 
     .autofill-dropdown {
-        height: 500px;
+        height: 400px;
         width: 100%;
         overflow: auto;
         position: absolute;
         background: #0A0808;
+        left: 0px;
     }
 
     .autofill-dropdown:focus {
@@ -1339,10 +1485,6 @@ var Autofill = (function () {
         background: rgba(121, 60, 196, .5);
         cursor: pointer;
         cursor: hand;
-    }
-
-    .autofillOptionsContainer {
-        width: 450px;
     }
 
     .hide {
@@ -1372,6 +1514,23 @@ var Autofill = (function () {
     .highlightMe {
         background: yellow;
     }
+
+    .quickAccess {
+        position: absolute;
+        font-size: 12px;
+        width: 100%;
+        padding: 5px 0;
+    }
+
+    .applyAutofills.replace,
+    .active.replace {
+        background: rgb(130, 198, 0);
+    }
+
+    .applyAutofills.highlight,
+    .active.highlight {
+        background: rgb(0, 153, 255);
+    }
     `;
         const myStyles = document.createElement('style');
         myStyles.type = 'text/css';
@@ -1388,10 +1547,18 @@ var Autofill = (function () {
      *   This will determine what action is run when the user clicks the MAGIC ICON button
      */
     function checkModes() {
+        // store all copies of the apply autofill button
+        let applyButtons = document.getElementsByClassName('applyAutofills');
+
+        // update onclick callback depending on the CURRENT MODE
         if (replaceAutofillsButt.classList.contains('active')) {
-            applyAutofills.onclick = autofills;
+            for (let x = 0; x < applyButtons.length; x += 1) {
+                applyButtons[x].onclick = autofills;
+            }
         } else if (highlightAutofillsButt.classList.contains('active')) {
-            applyAutofills.onclick = highlights;
+            for (let x = 0; x < applyButtons.length; x += 1) {
+                applyButtons[x].onclick = highlights;
+            }
         }
     }
 
@@ -1399,18 +1566,32 @@ var Autofill = (function () {
      *   Actions to perform when the REPLACE MODE button is pressed
      */
     function replaceModeActions() {
-
         // save MODE in local storage
-        shared.saveValue('mode', 'replacer');
+        shared.saveValue('mode', 'replace');
 
         // if REPLACE MODE button element DOES NOT contain the active class add it
         if (!replaceAutofillsButt.classList.contains('active')) {
             replaceAutofillsButt.classList.add('active');
             replaceAutofillsButt.classList.remove('secondary');
             replaceAutofillsButt.title = 'replace *active*';
+            // set descriptive title text
+            applyAutofillsShort.title = '*Replace* Autofills';
+            // apply class to "Magic" buttons
+            applyAutofillsShort.classList.toggle('replace');
+            applyAutofillsShort.classList.toggle('highlight');
+            applyAutofills.classList.toggle('replace');
+            applyAutofills.classList.toggle('highlight');
+            // create icon data text
+            let iconClassText = iconClass();
+            let start = iconClassText.indexOf('-') + 1;
+            let dataText = iconClassText.substring(start);
+            // update APPLY BUTTONs
+            applyAutofillsShort.querySelector('svg[data-icon]').dataset.icon = dataText;
+            applyAutofills.querySelector('svg[data-icon]').dataset.icon = dataText;
+            applyAutofillsShort.querySelector('div.inline').innerHTML = shared.getValue('mode');
         }
 
-        // if HIGHLIGHT MODE button element DOES NOT contain the active class add it
+        // if HIGHLIGHT MODE button element DOES contain the active class add it
         if (highlightAutofillsButt.classList.contains('active')) {
             highlightAutofillsButt.classList.remove('active');
             highlightAutofillsButt.classList.add('secondary');
@@ -1425,7 +1606,6 @@ var Autofill = (function () {
      *   Actions to perform when the REPLACE MODE button is pressed
      */
     function highlightModeActions() {
-
         // save MODE in local storage
         shared.saveValue('mode', 'highlight');
 
@@ -1434,9 +1614,24 @@ var Autofill = (function () {
             highlightAutofillsButt.classList.add('active');
             highlightAutofillsButt.classList.remove('secondary');
             highlightAutofillsButt.title = 'highlight *active*';
+            // set descriptive title text
+            applyAutofillsShort.title = '*Highlight* Autofills';
+            // apply class to "Magic" buttons
+            applyAutofillsShort.classList.toggle('highlight');
+            applyAutofillsShort.classList.toggle('replace');
+            applyAutofills.classList.toggle('highlight');
+            applyAutofills.classList.toggle('replace');
+            // create icon data text
+            let iconClassText = iconClass();
+            let start = iconClassText.indexOf('-') + 1;
+            let dataText = iconClassText.substring(start);
+            // update APPLY BUTTONs
+            applyAutofillsShort.querySelector('svg[data-icon]').dataset.icon = dataText;
+            applyAutofills.querySelector('svg[data-icon]').dataset.icon = dataText;
+            applyAutofillsShort.querySelector('div.inline').innerHTML = shared.getValue('mode');
         }
 
-        // if HIGHLIGHT MODE button element DOES NOT contain the active class add it
+        // if HIGHLIGHT MODE button element DOES contain the active class add it
         if (replaceAutofillsButt.classList.contains('active')) {
             replaceAutofillsButt.classList.remove('active');
             replaceAutofillsButt.classList.add('secondary');
@@ -1451,22 +1646,50 @@ var Autofill = (function () {
      *   Bind the actions to perform when clicking the MODE buttons
      */
     function bindElementEvents() {
-        replaceAutofillsButt.onclick = replaceModeActions;
-        highlightAutofillsButt.onclick = highlightModeActions;
         defaultReset.onclick = resetValues;
         autofillDropdown.onblur = hideMe;
         autofillTab.onclick = toggleToolPanel;
     }
 
     /**
+     *   Bind MODE buttons AFTER DOM has loaded
+     *   This is because how FONT AWESOME 5 works, the icons are changed dynamically AFTER
+     *   the DOM content loaded event.
+     *   Elements go from <i> to <svg> elements
+     */
+    function attachClickActions() {
+        replaceAutofillsButt.onclick = replaceModeActions;
+        highlightAutofillsButt.onclick = highlightModeActions;
+    }
+
+    /**
      *   Reveal tool tab
      */
     function revealToolTab() {
+        // store jQuery variables
+        let $autofillToolTab = jQuery('#autofillToolTab');
+        let $quickAccess = jQuery('button.quickAccess');
+        let animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+
         // remove hide class
         autofillTab.classList.toggle('hide');
+
         // animate the "reveal" action
-        jQuery('#autofillToolTab').animateCss('slideInDown');
+        $autofillToolTab.animateCss('slideInDown', function () {
+
+            applyAutofillsShort.classList.toggle('hide');
+
+            $quickAccess.animateCss('slideInDown');
+
+            $autofillToolTab.off(animationEnd);
+        });
+
+        // attach "ACTION" button events
+        attachClickActions();
     }
+
+    // Load Tool once window finishes loading
+    window.onload = revealToolTab;
 
     // ----------------------------------------
     // ****************************************
@@ -1482,22 +1705,12 @@ var Autofill = (function () {
     checkModes();
     bindElementEvents();
 
-    console.log(autofillOptionsContainer.getAttribute('data-max-height'));
-
-    // Load Tool once window finishes loading
-    window.onload = revealToolTab;
-
     // ----------------------------------------
     // ****************************************
     // SORTABLE
     // ****************************************
     // ----------------------------------------
 
-    //    let myList = document.getElementById('autofillOptions');
-    //    console.log('myList');
-    //    console.log(myList);
-    //    var sortable = Sortable.create(myList);
-    //    console.log(sortable);
     let sortable = Sortable.create(autofillOptionsList, {
         'group': 'autofillOptions',
         //        'delay': 0,
