@@ -1,6 +1,6 @@
 # Change Log
 
-## v1.1.1 - **(04/26/2018)**
+## v1.1.2 - **(04/26/2018)**
 
 ### Added additional default values
 
