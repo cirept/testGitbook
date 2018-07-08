@@ -16,16 +16,6 @@ const Autofill = (function () {
     '%SERVICE_PHONE%': 'SEARCH_FOR_ME',
     '%PARTS_PHONE%': 'SEARCH_FOR_ME',
   };
-  window.onload = webIDToolReset; // Added 7/8/2018
-  defaultValues();
-  defaultPhoneNumber();
-
-  // default styles
-  //    let callCss = document.createElement('link');
-  //    callCss.id = 'sortableStyles';
-  //    callCss.rel = 'stylesheet';
-  //    callCss.href = '//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css';
-  //    document.head.appendChild(callCss);
 
   // ----------------------------------------
   // autofill menu
@@ -55,7 +45,7 @@ const Autofill = (function () {
   messageDisplay.textContent = `Autofill tag text replacer tool v${GM_info.script.version}`;
 
   const informationDisplay = document.createElement('div');
-  
+
   const webIDDisplay = document.createElement('div');
   webIDDisplay.classList.add('web-id-display');
 
@@ -348,9 +338,11 @@ const Autofill = (function () {
   /**
    * will construct the autofill display area.
    * Will use data in local storage, if it exists
+   * Otherwise defaults to Website information
    */
   function buildAutofillOptions() {
     const regReplace = getFromLocalStorage();
+    // console.log('defaultList', defaultList);
     let listElement;
 
     // build autofill list options IF there is a list that already exists
@@ -401,7 +393,6 @@ const Autofill = (function () {
     // reset apply button if it is disabled
     toggleMagicButton();
     // update display message
-    // messageDisplay.textContent = 'Values Reset';
     messageDisplay.textContent = message;
     jQuery('#toolMessageDisplay').animateCss('tada');
     // save new values
@@ -527,10 +518,10 @@ const Autofill = (function () {
   function fetchJSON(url) {
     return new Promise(((resolve, reject) => {
       jQuery.getJSON(url)
-        .done( /** resolve data */ (json) => {
+        .done((json) => {
           resolve(json.autofill);
         })
-        .fail( /** error */ (xhr, status, err) => {
+        .fail((xhr, status, err) => {
           reject(status + err.message);
         });
     }));
@@ -710,95 +701,17 @@ const Autofill = (function () {
     }
   }
 
-//   /**
-//    * css styles for tool
-//    */
-//   function styleTools() {
-//     console.log('injecting css');
-//     const animate = document.createElement('link');
-//     animate.rel = 'stylesheet';
-//     animate.type = 'text/css';
-//     animate.href = 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css';
-
-
-//     const toolStyles = `
-
-// `;
-//     const myStyles = document.createElement('style');
-//     myStyles.type = 'text/css';
-//     myStyles.innerHTML = toolStyles;
-
-//     // attach styles to page
-//     document.head.append(myStyles);
-//     document.head.append(animate);
-//   }
-
-  // run tool
-  buildAutofillOptions();
-  getAutofillList();
-  // styleTools();
-
-  /**
-   * Get data from 'Settings' to autofill into the defaults list
-   */
-  function defaultValues() {
-    const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
-    const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=en_US&pathName=editSettings`;
-
-    jQuery.get(siteSettingsURL, (data) => {
-      const myDiv = document.createElement('div');
-      myDiv.innerHTML = data;
-      const franchises = myDiv.querySelector('select#associatedFranchises').options;
-      const myLength = franchises.length;
-      const myFranchises = [];
-
-      // create franchises string
-      for (let x = 0; x < myLength; x += 1) {
-        myFranchises.push(franchises[x].textContent);
-      }
-
-      defaultList['%DEALER_NAME%'] = myDiv.querySelector('input[name="name"]').value;
-      defaultList['%STREET%'] = myDiv.querySelector('input#contact_address_street1').value;
-      defaultList['%CITY%'] = myDiv.querySelector('input#contact_address_city').value;
-      defaultList['%ZIP%'] = myDiv.querySelector('input#contact_address_postalCode').value;
-      defaultList['%STATE%'] = myDiv.querySelector('select#contact_address_state').value;
-      defaultList['%PHONE%'] = myDiv.querySelector('input[name="contact_phone_number"]').value;
-      defaultList['%FRANCHISES%'] = myFranchises.join(', ');
-    }, 'html');
-  }
-
-  /**
-   *   Get Phone Numbers
-   */
-  function defaultPhoneNumber() {
-    const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
-    const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=en_US&pathName=editSettings`;
-
-    jQuery.get(siteSettingsURL, (data) => {
-      const myDiv = document.createElement('div');
-      myDiv.innerHTML = data;
-
-      defaultList['%PHONE%'] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
-      defaultList['%NEW_PHONE%'] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
-      defaultList['%USED_PHONE%'] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
-      defaultList['%SERVICE_PHONE%'] = myDiv.querySelector('input[name*="(__service_).ctn"]').value;
-      defaultList['%PARTS_PHONE%'] = myDiv.querySelector('input[name*="(__parts_).ctn"]').value;
-    }, 'html');
-  }
-
   // ------------------------
   // reset tool if new web ID - start - 7/8/2018
   function webIDToolReset() {
     const currentWebID = getWebID();
-
     if (getItemFromLocalStorage('webID') !== currentWebID) {
       resetValues(false, 'New Web ID Detected, Values Reset');
+      // getWebsiteGeneralInformation();
+      console.log('defaultList', defaultList);
+      // save webid
       saveToLocalStorage('webID', currentWebID);
     }
-
-    // console.log(getItemFromLocalStorage('hello'));
-    // console.log(getItemFromLocalStorage('webID'));
-    // console.log(getItemFromLocalStorage('mode'));
   }
 
   /**
@@ -810,10 +723,6 @@ const Autofill = (function () {
     // console.log(document.querySelector('#siWebId .displayValue').innerText);
     return document.querySelector('#siWebId .displayValue').innerText;
   }
-
-  // function saveWebID(value) {
-  // saveToLocalStorage('webID', value);
-  // }
 
   /**
    * Gets data item from local storage
@@ -833,7 +742,7 @@ const Autofill = (function () {
     webIDDisplay.innerText = getWebID();
   }
 
-  window.onload = displayWebID;
+  // window.onload = displayWebID;
 
   // add web id display to tool - end
   // ------------------------
@@ -911,4 +820,91 @@ const Autofill = (function () {
       saveAutofillParameters(createArray());
     },
   });
-}());
+
+  /**
+   * Loads all the tool styles
+   */
+  const loadAutofillStyles = new Promise(function (resolve, reject) {
+    // default styles
+    let autofillStyles = document.createElement('link');
+    autofillStyles.id = 'autofill-styles';
+    autofillStyles.rel = 'stylesheet';
+    autofillStyles.href = 'https://cdn.rawgit.com/cirept/autofillReplacer/bca1cc8323fc4a726c244cdd021480df5816d82c/assets/css/autofill.css';
+    document.head.appendChild(autofillStyles);
+
+    // send resolve
+    resolve('Sucess!');
+  });
+
+  /**
+   * Get data from 'Settings' to autofill into the defaults list
+   */
+  const getWebsiteGeneralInfo = new Promise((resolve, reject) => {
+    const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
+    const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=en_US&pathName=editSettings`;
+
+    jQuery.get(siteSettingsURL, (data) => {
+      const myDiv = document.createElement('div');
+      myDiv.innerHTML = data;
+      const franchises = myDiv.querySelector('select#associatedFranchises').options;
+      const myLength = franchises.length;
+      const myFranchises = [];
+
+      // create franchises string
+      for (let x = 0; x < myLength; x += 1) {
+        myFranchises.push(franchises[x].textContent);
+      }
+
+      defaultList['%DEALER_NAME%'] = myDiv.querySelector('input[name="name"]').value;
+      defaultList['%STREET%'] = myDiv.querySelector('input#contact_address_street1').value;
+      defaultList['%CITY%'] = myDiv.querySelector('input#contact_address_city').value;
+      defaultList['%ZIP%'] = myDiv.querySelector('input#contact_address_postalCode').value;
+      defaultList['%STATE%'] = myDiv.querySelector('select#contact_address_state').value;
+      defaultList['%PHONE%'] = myDiv.querySelector('input[name="contact_phone_number"]').value;
+      defaultList['%FRANCHISES%'] = myFranchises.join(', ');
+    }, 'html').done(() => {
+      resolve('Success!');
+    });
+  });
+
+  /**
+   *   Get Phone Numbers
+   */
+  const getWebsitePhoneNumbers = new Promise((resolve, reject) => {
+    const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
+    const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=en_US&pathName=editSettings`;
+
+    jQuery.get(siteSettingsURL, (data) => {
+      const myDiv = document.createElement('div');
+      myDiv.innerHTML = data;
+
+      defaultList['%PHONE%'] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
+      defaultList['%NEW_PHONE%'] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
+      defaultList['%USED_PHONE%'] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
+      defaultList['%SERVICE_PHONE%'] = myDiv.querySelector('input[name*="(__service_).ctn"]').value;
+      defaultList['%PARTS_PHONE%'] = myDiv.querySelector('input[name*="(__parts_).ctn"]').value;
+    }, 'html').done(() => {
+      resolve('Success!');
+    });
+  });
+
+  function main() {
+    // run tool
+
+    // getWebsiteGeneralInformation();
+    // getWebsitePhoneNumbers();
+    buildAutofillOptions();
+    getAutofillList();
+    displayWebID();
+    webIDToolReset(); // Added 7/8/2018
+  }
+
+  // loadAutofillStyles.then(() => {
+  Promise.all([loadAutofillStyles, getWebsiteGeneralInfo, getWebsitePhoneNumbers]).then(() => {
+    console.log('tool information and styles loaded');
+    window.onload = main;
+  }, () => {
+    console.log('styles NOT loaded');
+  });
+
+})();
