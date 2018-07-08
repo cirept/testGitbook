@@ -1,0 +1,157 @@
+@import url('https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css');
+
+.customEditorTools {
+  position: absolute;
+  width: auto;
+  color: white;
+  background: #EAE8E8;
+}
+
+#toolMessageDisplay {
+  position: absolute;
+  top: 10px;
+  left: 120px;
+  color: red;
+}
+
+#addAutofill {
+  width: 90%;
+  padding: 5px 30px;
+}
+
+.myButts {
+  background: #824FD6;
+  border-radius: 5px;
+  color: #fff;
+  border: 1px solid rgb(147, 143, 143);
+}
+
+.myButts:hover {
+  background: #793CC4;
+  cursor: pointer;
+  cursor: hand;
+}
+
+#applyAutofills {
+  width: auto;
+  position: relative;
+  padding: 5px 30px;
+  background: rgb(130, 198, 0);
+}
+
+#applyAutofills.disabled {
+  background: #333;
+}
+
+.minimizeList {
+  position: relative;
+  float: right;
+  padding: 5px 13px;
+}
+
+#defaultReset {
+  position: relative;
+  float: right;
+  width: 10%;
+  padding: 5px;
+  background: rgb(255, 255, 255);
+  color: rgb(130, 79, 214);
+}
+
+#defaultReset:hover {
+  background: rgb(130, 79, 214);
+  color: #fff;
+}
+
+.my-handle {
+  border: 1px dotted #793CC4;
+  padding: 2px 6px 2px 5px;
+  cursor: move;
+  cursor: -webkit-grabbing;
+}
+
+.autofillTag {
+  width: 120px;
+  display: inline-block;
+  text-align: center;
+  color: black;
+  word-wrap: break-word;
+}
+
+.regEx {
+  background: #793CC4;
+  color: #fff;
+  border: 1px solid rgb(255, 255, 255);
+  line-height: 1.25rem;
+  text-indent: 10px;
+  margin: 0 0 0 15px;
+  width: 200px !important;
+}
+
+.autofillEntry {
+  width: auto;
+  padding: 5px 10px;
+  border: 1px solid #793CC4;
+  margin: 3px 10px;
+  color: #793CC4;
+}
+
+.js-remove {
+  cursor: pointer;
+  cursor: hand;
+  padding: 0 0 0 10px;
+  display: inline-block;
+}
+
+.leftMarg {
+  margin: 0 0 0 15px;
+}
+
+.autofill-dropdown {
+  height: 500px;
+  width: 100%;
+  overflow: auto;
+  position: absolute;
+  background: #0A0808;
+}
+
+.autofill-dropdown:focus {
+  outline: 0;
+}
+
+.autofill-dropdown li {
+  text-align: center;
+  font-size: 12px;
+  padding: 5px 0;
+}
+
+.autofill-dropdown li:hover {
+  /*background: rgba(10, 8, 8, .5);*/
+  background: rgba(121, 60, 196, .5);
+  cursor: pointer;
+  cursor: hand;
+}
+
+.autofillOptionsContainer {
+  width: 450px;
+}
+
+.hide {
+  display: none;
+}
+
+.disabled {
+  pointer-events: none;
+  background: rgba(0,0,0,.75);
+  cursor: no-drop;
+}
+
+.myError {
+  border: 1px solid red;
+}
+
+.chosen {
+color: #fff;
+background-color: rgb(130, 198, 0);
+}
