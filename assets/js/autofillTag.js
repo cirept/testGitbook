@@ -76,15 +76,17 @@ const Autofill = (function () {
   addButton.classList.add('myButts');
   addButton.classList.add('btn');
   addButton.classList.add('btn-sm');
+  addButton.dataset.toggle = 'modal';
+  addButton.dataset.target = '#autofillModal';
   addButton.value = 'addAutofill';
   addButton.title = 'Add Autofill';
   addButton.innerHTML = '<i class="fas fa-plus fa-lg"></i>';
 
   const autofillDropdown = document.createElement('ul');
   autofillDropdown.tabIndex = '4';
-  autofillDropdown.classList.add('autofill-dropdown');
-  autofillDropdown.classList.add('hide');
-  autofillDropdown.onblur = hideMe;
+  // autofillDropdown.classList.add('autofill-dropdown');
+  // autofillDropdown.classList.add('hide');
+  // autofillDropdown.onblur = hideMe;
 
   const listContainer = document.createElement('div');
   listContainer.classList.add('container-fluid');
@@ -820,26 +822,6 @@ const Autofill = (function () {
   // reset tool if new web ID - end
   // ------------------------
 
-  // ------------------------
-  // add web id display to tool - start - 7/8/2018
-
-  // function displayWebID() {
-  //   const webIDDisplay = document.createElement('div');
-  //   webIDDisplay.classList.add('container-fluid');
-  //   webIDDisplay.innerHTML = `
-  //   <div class="row">
-  //     <div class="col tool-title">Autofill Replacer</div>
-  //   </div>
-  //   `;
-  //   // attach the display to the tool
-  //   informationDisplay.appendChild(webIDDisplay);
-  //   // update the element with the current wed id
-  //   // webIDDisplay.innerText = getWebID();
-  // }
-
-  // add web id display to tool - end
-  // ------------------------
-
   // Build Sortable object for use in tool
   let sortable = Sortable.create(autofillOptionsList, {
     delay: 0,
@@ -932,6 +914,7 @@ const Autofill = (function () {
    */
   function setup() {
     attachToolToPage();
+    attachModals();
     buildAutofillOptions();
     getAutofillList();
     // displayWebID();
@@ -950,6 +933,46 @@ const Autofill = (function () {
       console.log('Autofill Tool Failed to Load');
     });
   }
+
+  // 
+  // Modals
+  // 
+  const autofillModal = document.createElement('div');
+  autofillModal.innerHTML = `
+  <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+{/* <div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+<button type="button" class="btn btn-primary">Save changes</button>
+</div> 
+<h5 class="modal-title" id="autofillModalTitle">Modal title</h5>
+*/}
+
+/**
+ * attach modals
+ */
+function attachModals() {
+  document.body.appendChild(autofillModal);
+
+  document.querySelector('#autofillModal .modal-body').appendChild(autofillDropdown);
+}
+
+  // 
+  // Run Tool
+  // 
 
   main();
 
