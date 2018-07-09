@@ -3,7 +3,7 @@
 // @namespace www.cobaltgroup.com
 // @version 1.1.1
 // @run-at document-end
-// @downloadURL https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/js/meta.js
+// @downloadURL https://github.com/cirept/autofillReplacer/raw/master/assets/js/meta.user.js
 // @include http://websites.cobalt.com/wsm/editSite.do*
 // @include http://websites.cobalt.com/wsm/cms.do*
 // @require https://code.jquery.com/jquery-3.2.1.js
