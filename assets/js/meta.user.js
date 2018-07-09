@@ -13,4 +13,5 @@
 // @require https://cdn.rawgit.com/cirept/autofillReplacer/master/assets/js/fontawesome.min.js
 // @require https://rawgit.com/cirept/autofillReplacer/1.1.1/assets/js/autofillTag.js
 // @author cire.pt
+// @grant GM_getResourceURL
 // ==/UserScript==

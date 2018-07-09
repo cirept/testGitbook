@@ -4,6 +4,7 @@
 // @version 1.1.5-beta3
 // @run-at document-end
 // @downloadURL https://github.com/cirept/autofillReplacer/raw/develop/assets/js/develop.meta.user.js
+// @resource toolStyles https://github.com/cirept/QA_Toolbox/raw/pre-release/assets/css/toolbox.css
 // @include http://websites.cobalt.com/wsm/editSite.do*
 // @include http://websites.cobalt.com/wsm/cms.do*
 // @require https://code.jquery.com/jquery-3.3.1.min.js
