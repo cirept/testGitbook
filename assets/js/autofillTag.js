@@ -2,7 +2,7 @@
 
 const Autofill = (function () {
   const myURL = 'https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json';
-  const myStyles = 'https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta1/assets/css/autofill.css';
+  const myStyles = GM_getResourceURL('toolStyles'); // Tampermonkey function
   const defaultList = {
     '%DEALER_NAME%': 'SEARCH_FOR_ME',
     '%FRANCHISES%': 'SEARCH_FOR_ME',
