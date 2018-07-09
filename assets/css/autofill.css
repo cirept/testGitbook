@@ -27,6 +27,10 @@
   border: 1px solid rgb(147, 143, 143);
 }
 
+#autofillOptions {
+  margin: auto;
+}
+
 .myButts:hover {
   background: #793CC4;
   cursor: pointer;
@@ -108,12 +112,8 @@
   margin: 0 0 0 15px;
 }
 
-.autofill-dropdown {
-  height: 500px;
-  width: 100%;
-  overflow: auto;
-  position: absolute;
-  background: #0A0808;
+li.autofill-list-item {
+  display: block;
 }
 
 .autofill-dropdown:focus {
@@ -131,10 +131,6 @@
   background: rgba(121, 60, 196, .5);
   cursor: pointer;
   cursor: hand;
-}
-
-.autofillOptionsContainer {
-  width: 450px;
 }
 
 .hide {

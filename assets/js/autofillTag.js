@@ -17,9 +17,10 @@ const Autofill = (function () {
     '%PARTS_PHONE%': 'SEARCH_FOR_ME',
   };
 
-  // ----------------------------------------
-  // autofill menu
-  // ----------------------------------------
+  // 
+  // Tool Elements
+  // 
+
   const wsmEditerTools = document.createElement('div');
   wsmEditerTools.classList.add('customEditorTools');
 
@@ -31,6 +32,8 @@ const Autofill = (function () {
   const minimizeList = document.createElement('button');
   minimizeList.classList.add('minimizeList');
   minimizeList.classList.add('myButts');
+  minimizeList.classList.add('btn');
+  minimizeList.classList.add('btn-sm');
   minimizeList.title = 'show list';
   minimizeList.type = 'button';
   minimizeList.innerHTML = '<i class="fas fa-eye fa-lg"></i>';
@@ -40,20 +43,18 @@ const Autofill = (function () {
   autofillOptionsList.id = 'autofillOptions';
   autofillOptionsList.classList.add('autofillOptions');
 
-  const messageDisplay = document.createElement('span');
+  const messageDisplay = document.createElement('div');
   messageDisplay.id = 'toolMessageDisplay';
+  messageDisplay.classList.add('.container-fluid');
   messageDisplay.textContent = `Autofill tag text replacer tool v${GM_info.script.version}`;
 
   const informationDisplay = document.createElement('div');
 
-  const webIDDisplay = document.createElement('div');
-  webIDDisplay.classList.add('web-id-display');
-
-  informationDisplay.appendChild(webIDDisplay);
-
   const defaultReset = document.createElement('button');
   defaultReset.id = 'defaultReset';
   defaultReset.classList.add('myButts');
+  defaultReset.classList.add('btn');
+  defaultReset.classList.add('btn-sm');
   defaultReset.title = 'Reset Values';
   defaultReset.innerHTML = '<i class="fas fa-redo fa-lg"></i>';
   defaultReset.onclick = () => {
@@ -63,6 +64,8 @@ const Autofill = (function () {
   const applyAutofills = document.createElement('button');
   applyAutofills.id = 'applyAutofills';
   applyAutofills.classList.add('myButts');
+  applyAutofills.classList.add('btn');
+  applyAutofills.classList.add('btn-sm');
   applyAutofills.type = 'button';
   applyAutofills.title = 'apply autofills';
   applyAutofills.innerHTML = '<i class="fas fa-magic fa-lg"></i>';
@@ -71,19 +74,29 @@ const Autofill = (function () {
   const addButton = document.createElement('button');
   addButton.id = 'addAutofill';
   addButton.classList.add('myButts');
+  addButton.classList.add('btn');
+  addButton.classList.add('btn-sm');
+  addButton.dataset.toggle = 'modal';
+  addButton.dataset.target = '#autofillModal';
   addButton.value = 'addAutofill';
   addButton.title = 'Add Autofill';
   addButton.innerHTML = '<i class="fas fa-plus fa-lg"></i>';
 
   const autofillDropdown = document.createElement('ul');
   autofillDropdown.tabIndex = '4';
-  autofillDropdown.classList.add('autofill-dropdown');
-  autofillDropdown.classList.add('hide');
-  autofillDropdown.onblur = hideMe;
+  // autofillDropdown.classList.add('autofill-dropdown');
+  // autofillDropdown.classList.add('hide');
+  // autofillDropdown.onblur = hideMe;
+
+  const listContainer = document.createElement('div');
+  listContainer.classList.add('container-fluid');
+
+  listContainer.appendChild(autofillOptionsList);
 
   autofillOptionsContainer.appendChild(messageDisplay);
   autofillOptionsContainer.appendChild(informationDisplay);
-  autofillOptionsContainer.appendChild(autofillOptionsList);
+  // autofillOptionsContainer.appendChild(autofillOptionsList);
+  autofillOptionsContainer.appendChild(listContainer);
   autofillOptionsContainer.appendChild(defaultReset);
   autofillOptionsContainer.appendChild(addButton);
   autofillOptionsContainer.appendChild(autofillDropdown);
@@ -92,8 +105,80 @@ const Autofill = (function () {
   wsmEditerTools.appendChild(applyAutofills);
   wsmEditerTools.appendChild(autofillOptionsContainer);
 
-  // attach tool elements to page
-  document.querySelector('header.wsmMainHeader').appendChild(wsmEditerTools);
+  // 
+  // Promises
+  // 
+
+  /**
+   * Loads all the tool styles
+   */
+  const loadAutofillStyles = new Promise(function (resolve, reject) {
+    // default styles
+    let autofillStyles = document.createElement('link');
+    autofillStyles.id = 'autofill-styles';
+    autofillStyles.rel = 'stylesheet';
+    autofillStyles.href = 'https://cdn.rawgit.com/cirept/autofillReplacer/bca1cc8323fc4a726c244cdd021480df5816d82c/assets/css/autofill.css';
+    document.head.appendChild(autofillStyles);
+
+    // send resolve
+    resolve('Sucess!');
+  });
+
+  /**
+   * Get data from 'Settings' to autofill into the defaults list
+   */
+  const getWebsiteGeneralInfo = new Promise((resolve, reject) => {
+    const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
+    const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=en_US&pathName=editSettings`;
+
+    jQuery.get(siteSettingsURL, (data) => {
+      const myDiv = document.createElement('div');
+      myDiv.innerHTML = data;
+      const franchises = myDiv.querySelector('select#associatedFranchises').options;
+      const myLength = franchises.length;
+      const myFranchises = [];
+
+      // create franchises string
+      for (let x = 0; x < myLength; x += 1) {
+        myFranchises.push(franchises[x].textContent);
+      }
+
+      defaultList['%DEALER_NAME%'] = myDiv.querySelector('input[name="name"]').value;
+      defaultList['%STREET%'] = myDiv.querySelector('input#contact_address_street1').value;
+      defaultList['%CITY%'] = myDiv.querySelector('input#contact_address_city').value;
+      defaultList['%ZIP%'] = myDiv.querySelector('input#contact_address_postalCode').value;
+      defaultList['%STATE%'] = myDiv.querySelector('select#contact_address_state').value;
+      defaultList['%PHONE%'] = myDiv.querySelector('input[name="contact_phone_number"]').value;
+      defaultList['%FRANCHISES%'] = myFranchises.join(', ');
+    }, 'html').done(() => {
+      resolve('Success!');
+    });
+  });
+
+  /**
+   *   Get Phone Numbers
+   */
+  const getWebsitePhoneNumbers = new Promise((resolve, reject) => {
+    const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
+    const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=en_US&pathName=editSettings`;
+
+    jQuery.get(siteSettingsURL, (data) => {
+      const myDiv = document.createElement('div');
+      myDiv.innerHTML = data;
+
+      defaultList['%PHONE%'] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
+      defaultList['%NEW_PHONE%'] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
+      defaultList['%USED_PHONE%'] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
+      defaultList['%SERVICE_PHONE%'] = myDiv.querySelector('input[name*="(__service_).ctn"]').value;
+      defaultList['%PARTS_PHONE%'] = myDiv.querySelector('input[name*="(__parts_).ctn"]').value;
+    }, 'html').done(() => {
+      resolve('Success!');
+    });
+  });
+
+  // 
+  // Functions
+  // 
 
   /**
    * jQuery functions for animate css
@@ -447,7 +532,6 @@ const Autofill = (function () {
   /**
    * SUCCESS BINDING EVENT
    * Build out drop down list with data gathered from JSON file
-   * @param {OBJECT} listContainer - the UL element that will contain autofill options
    * @param {object} data - the autofill data that will be used to populate the options
    */
   function buildAutofillList(data) {
@@ -457,6 +541,9 @@ const Autofill = (function () {
       // create 'li' for each autofill tag in the list
       const myListItem = document.createElement('li');
       myListItem.textContent = myKey;
+      myListItem.classList.add('btn');
+      myListItem.classList.add('btn-outline-secondary');
+      myListItem.classList.add('autofill-list-item');
       // if autofill tag is present in the active list, disable it
       if (localData.includes(myKey)) {
         myListItem.classList.add('disabled');
@@ -501,19 +588,20 @@ const Autofill = (function () {
    * Bind onclick function dynamically depending on autofill JSON load
    * @param {bool} bool - boolean variable that will determine what method will be used
    */
-  function addButtonEventListener(bool) {
-    if (bool) {
-      return function () {
-        this.classList.add('disabled');
-        autofillDropdown.classList.remove('hide');
-        autofillDropdown.focus();
-      };
-    }
-    return bindAddAutofill();
-  }
+  // function addButtonEventListener(bool) {
+  //   if (bool) {
+  //     return function () {
+  //       // this.classList.add('disabled');
+  //       // autofillDropdown.classList.remove('hide');
+  //       // autofillDropdown.focus();
+  //     };
+  //   }
+  //   return bindAddAutofill();
+  // }
 
   /**
    * read data from json file
+   * @param {string} url - the url for the data to read
    */
   function fetchJSON(url) {
     return new Promise(((resolve, reject) => {
@@ -533,13 +621,13 @@ const Autofill = (function () {
   function getAutofillList() {
     fetchJSON(myURL).then((data) => {
       console.log('autofill : autofill list loaded.');
-      addButton.onclick = addButtonEventListener(true);
+      // addButton.onclick = addButtonEventListener(true);
       // build out drop down menu
       buildAutofillList(data);
     }).catch((error) => {
       console.log('autofill : autofill list failed to load, reverting to manual autofill entry method');
       console.log(error);
-      addButton.onclick = addButtonEventListener(false);
+      // addButton.onclick = addButtonEventListener(false);
     });
   }
 
@@ -570,6 +658,7 @@ const Autofill = (function () {
   /**
    * Test if phone number
    * Checked format = 000-0000
+   * @param {string} text - the text to verify
    */
   function phoneNumberText(text) {
     const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
@@ -658,7 +747,6 @@ const Autofill = (function () {
    */
   function autofills() {
     // WSM MAIN WINDOW LOGIC
-
     const contentFrame = jQuery('iframe#cblt_content').contents();
     const siteEditorIframe = contentFrame.find('iframe#siteEditorIframe').contents();
     let viewerIframe;
@@ -703,12 +791,14 @@ const Autofill = (function () {
 
   // ------------------------
   // reset tool if new web ID - start - 7/8/2018
+
+  /**
+   * Determine if the current website is different
+   */
   function webIDToolReset() {
     const currentWebID = getWebID();
     if (getItemFromLocalStorage('webID') !== currentWebID) {
       resetValues(false, 'New Web ID Detected, Values Reset');
-      // getWebsiteGeneralInformation();
-      console.log('defaultList', defaultList);
       // save webid
       saveToLocalStorage('webID', currentWebID);
     }
@@ -735,23 +825,8 @@ const Autofill = (function () {
   // reset tool if new web ID - end
   // ------------------------
 
-  // ------------------------
-  // add web id display to tool - start - 7/8/2018
-
-  function displayWebID() {
-    webIDDisplay.innerText = getWebID();
-  }
-
-  // window.onload = displayWebID;
-
-  // add web id display to tool - end
-  // ------------------------
-
   // Build Sortable object for use in tool
-  //    let sortable = Sortable.create(autofillOptions, {
-  //    let sortable = Sortable.create(autofillOptions, {
   let sortable = Sortable.create(autofillOptionsList, {
-    //        'group': 'autofillOptions',
     delay: 0,
     sort: true,
     handle: '.my-handle',
@@ -822,89 +897,88 @@ const Autofill = (function () {
   });
 
   /**
-   * Loads all the tool styles
+   * attaches the tool elements to the page
    */
-  const loadAutofillStyles = new Promise(function (resolve, reject) {
-    // default styles
-    let autofillStyles = document.createElement('link');
-    autofillStyles.id = 'autofill-styles';
-    autofillStyles.rel = 'stylesheet';
-    autofillStyles.href = 'https://cdn.rawgit.com/cirept/autofillReplacer/bca1cc8323fc4a726c244cdd021480df5816d82c/assets/css/autofill.css';
-    document.head.appendChild(autofillStyles);
-
-    // send resolve
-    resolve('Sucess!');
-  });
+  function attachToolToPage() {
+    // attach tool elements to page
+    document.querySelector('header.wsmMainHeader').appendChild(wsmEditerTools);
+  }
 
   /**
-   * Get data from 'Settings' to autofill into the defaults list
+   * main function to start the program
    */
-  const getWebsiteGeneralInfo = new Promise((resolve, reject) => {
-    const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
-    const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=en_US&pathName=editSettings`;
-
-    jQuery.get(siteSettingsURL, (data) => {
-      const myDiv = document.createElement('div');
-      myDiv.innerHTML = data;
-      const franchises = myDiv.querySelector('select#associatedFranchises').options;
-      const myLength = franchises.length;
-      const myFranchises = [];
-
-      // create franchises string
-      for (let x = 0; x < myLength; x += 1) {
-        myFranchises.push(franchises[x].textContent);
-      }
-
-      defaultList['%DEALER_NAME%'] = myDiv.querySelector('input[name="name"]').value;
-      defaultList['%STREET%'] = myDiv.querySelector('input#contact_address_street1').value;
-      defaultList['%CITY%'] = myDiv.querySelector('input#contact_address_city').value;
-      defaultList['%ZIP%'] = myDiv.querySelector('input#contact_address_postalCode').value;
-      defaultList['%STATE%'] = myDiv.querySelector('select#contact_address_state').value;
-      defaultList['%PHONE%'] = myDiv.querySelector('input[name="contact_phone_number"]').value;
-      defaultList['%FRANCHISES%'] = myFranchises.join(', ');
-    }, 'html').done(() => {
-      resolve('Success!');
-    });
-  });
-
-  /**
-   *   Get Phone Numbers
-   */
-  const getWebsitePhoneNumbers = new Promise((resolve, reject) => {
-    const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
-    const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=en_US&pathName=editSettings`;
-
-    jQuery.get(siteSettingsURL, (data) => {
-      const myDiv = document.createElement('div');
-      myDiv.innerHTML = data;
-
-      defaultList['%PHONE%'] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
-      defaultList['%NEW_PHONE%'] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
-      defaultList['%USED_PHONE%'] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
-      defaultList['%SERVICE_PHONE%'] = myDiv.querySelector('input[name*="(__service_).ctn"]').value;
-      defaultList['%PARTS_PHONE%'] = myDiv.querySelector('input[name*="(__parts_).ctn"]').value;
-    }, 'html').done(() => {
-      resolve('Success!');
-    });
-  });
-
   function main() {
     // run tool
+    getToolData();
+  }
 
-    // getWebsiteGeneralInformation();
-    // getWebsitePhoneNumbers();
+  /**
+   * Sets up autofill tool
+   */
+  function setup() {
+    attachToolToPage();
+    attachModals();
     buildAutofillOptions();
     getAutofillList();
-    displayWebID();
+    // displayWebID();
     webIDToolReset(); // Added 7/8/2018
   }
 
-  // loadAutofillStyles.then(() => {
-  Promise.all([loadAutofillStyles, getWebsiteGeneralInfo, getWebsitePhoneNumbers]).then(() => {
-    console.log('tool information and styles loaded');
-    window.onload = main;
-  }, () => {
-    console.log('styles NOT loaded');
-  });
+
+  /**
+   * loads tool styles and gets all the tool data from the website settings
+   */
+  function getToolData() {
+    Promise.all([loadAutofillStyles, getWebsiteGeneralInfo, getWebsitePhoneNumbers]).then(() => {
+      window.onload = setup;
+    }, () => {
+      // tool failed to load
+      console.log('Autofill Tool Failed to Load');
+    });
+  }
+
+  // 
+  // Modals
+  // 
+
+  const autofillModal = document.createElement('div');
+  autofillModal.innerHTML = `
+  <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+{/* 
+          <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+  <div class="modal-footer">
+<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+<button type="button" class="btn btn-primary">Save changes</button>
+</div> 
+<h5 class="modal-title" id="autofillModalTitle">Modal title</h5>
+*/}
+
+/**
+ * attach modals
+ */
+function attachModals() {
+  document.body.appendChild(autofillModal);
+
+  document.querySelector('#autofillModal .modal-body').appendChild(autofillDropdown);
+}
+
+  // 
+  // Run Tool
+  // 
+
+  main();
 
 })();
