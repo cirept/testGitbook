@@ -1,71 +1,43 @@
 @import url('https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css');
-
+@import url('https://fonts.googleapis.com/css?family=Lato');
 .customEditorTools {
   position: absolute;
+  left: 200px;
   width: auto;
+  padding: 0 10px 10px 10px;
   color: white;
-  background: #EAE8E8;
+  background-color: #EEEEEE;
+  font-family: 'Lato', monospace;
 }
 
-#toolMessageDisplay {
-  position: absolute;
-  top: 10px;
-  left: 120px;
-  color: red;
-}
-
-#addAutofill {
-  width: 90%;
+.btn-wd {
   padding: 5px 30px;
 }
 
-.myButts {
+#toolMessageDisplay {
+  color: red;
+  text-align: center;
+}
+
+.btn-autofill-tool {
   background: #824FD6;
-  border-radius: 5px;
   color: #fff;
-  border: 1px solid rgb(147, 143, 143);
 }
 
 #autofillOptions {
   margin: auto;
 }
 
-.myButts:hover {
+.btn-autofill-tool:hover {
   background: #793CC4;
   cursor: pointer;
   cursor: hand;
 }
 
-#applyAutofills {
-  width: auto;
-  position: relative;
-  padding: 5px 30px;
-  background: rgb(130, 198, 0);
-}
-
-#applyAutofills.disabled {
-  background: #333;
-}
-
 .minimizeList {
   position: relative;
   float: right;
-  padding: 5px 13px;
-}
-
-#defaultReset {
-  position: relative;
-  float: right;
-  width: 10%;
-  padding: 5px;
-  background: rgb(255, 255, 255);
-  color: rgb(130, 79, 214);
-}
-
-#defaultReset:hover {
-  background: rgb(130, 79, 214);
-  color: #fff;
 }
 
 .my-handle {
@@ -73,14 +45,18 @@
   padding: 2px 6px 2px 5px;
   cursor: move;
   cursor: -webkit-grabbing;
+  display: inline-block;
 }
 
 .autofillTag {
-  width: 120px;
-  display: inline-block;
+  width: 250px;
   text-align: center;
   color: black;
   word-wrap: break-word;
+}
+
+.list-action-container {
+  margin-top: 10px;
 }
 
 .regEx {
@@ -88,28 +64,23 @@
   color: #fff;
   border: 1px solid rgb(255, 255, 255);
   line-height: 1.25rem;
-  text-indent: 10px;
-  margin: 0 0 0 15px;
-  width: 200px !important;
+  width: 245px;
 }
 
 .autofillEntry {
-  width: auto;
   padding: 5px 10px;
   border: 1px solid #793CC4;
-  margin: 3px 10px;
+  margin: 3px 0px;
   color: #793CC4;
+  margin-bottom: .25rem;
+  margin-top: .25rem;
+  align-items: center;
 }
 
 .js-remove {
   cursor: pointer;
   cursor: hand;
-  padding: 0 0 0 10px;
   display: inline-block;
-}
-
-.leftMarg {
-  margin: 0 0 0 15px;
 }
 
 li.autofill-list-item {
@@ -127,7 +98,6 @@ li.autofill-list-item {
 }
 
 .autofill-dropdown li:hover {
-  /*background: rgba(10, 8, 8, .5);*/
   background: rgba(121, 60, 196, .5);
   cursor: pointer;
   cursor: hand;
@@ -139,7 +109,7 @@ li.autofill-list-item {
 
 .disabled {
   pointer-events: none;
-  background: rgba(0,0,0,.75);
+  background: rgba(0, 0, 0, .75);
   cursor: no-drop;
 }
 
@@ -148,6 +118,6 @@ li.autofill-list-item {
 }
 
 .chosen {
-color: #fff;
-background-color: rgb(130, 198, 0);
+  color: #fff;
+  background-color: rgb(130, 198, 0);
 }
