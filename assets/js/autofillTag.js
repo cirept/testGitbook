@@ -162,9 +162,48 @@ const Autofill = (function () {
       defaultList['%PHONE%'] = myDiv.querySelector('input[name="contact_phone_number"]').value;
       defaultList['%FRANCHISES%'] = myFranchises.join(', ');
     }, 'html').done(() => {
-      resolve('Success!');
+
+      getFullStateName().then(() => {
+        resolve('Success!');
+      });
+
+      // resolve('Success!');
     });
   });
+
+    /**
+     * Get data from 'Settings' to autofill into the defaults list
+     */
+    const getFullStateName = new Promise((resolve, reject) => {
+      // const webID = document.getElementById('siWebId').querySelector('label.displayValue').textContent;
+      // const siteSettingsURL = 'https://rawgit.com/cirept/autofillReplacer/develop/assets/json/states.json';
+      const statesURL = 'https://rawgit.com/cirept/autofillReplacer/develop/assets/json/states.json';
+
+      jQuery.get(statesURL, (data) => {
+        // const myDiv = document.createElement('div');
+        // myDiv.innerHTML = data;
+        // const franchises = myDiv.querySelector('select#associatedFranchises').options;
+        // const myLength = franchises.length;
+        // const myFranchises = [];
+
+        // // create franchises string
+        // for (let x = 0; x < myLength; x += 1) {
+        //   myFranchises.push(franchises[x].textContent);
+        // }
+
+console.log('data', data);
+
+        // defaultList['%DEALER_NAME%'] = myDiv.querySelector('input[name="name"]').value;
+        // defaultList['%STREET%'] = myDiv.querySelector('input#contact_address_street1').value;
+        // defaultList['%CITY%'] = myDiv.querySelector('input#contact_address_city').value;
+        // defaultList['%ZIP%'] = myDiv.querySelector('input#contact_address_postalCode').value;
+        // defaultList['%STATE%'] = myDiv.querySelector('select#contact_address_state').value;
+        // defaultList['%PHONE%'] = myDiv.querySelector('input[name="contact_phone_number"]').value;
+        // defaultList['%FRANCHISES%'] = myFranchises.join(', ');
+      }, 'html').done(() => {
+        resolve('Success!');
+      });
+    });
 
   /**
    *   Get Phone Numbers
