@@ -541,6 +541,9 @@ const Autofill = (function () {
       // create 'li' for each autofill tag in the list
       const myListItem = document.createElement('li');
       myListItem.textContent = myKey;
+      myListItem.classList.add('btn');
+      myListItem.classList.add('btn-outline-secondary');
+      myListItem.classList.add('autofill-list-item');
       // if autofill tag is present in the active list, disable it
       if (localData.includes(myKey)) {
         myListItem.classList.add('disabled');
@@ -585,16 +588,16 @@ const Autofill = (function () {
    * Bind onclick function dynamically depending on autofill JSON load
    * @param {bool} bool - boolean variable that will determine what method will be used
    */
-  function addButtonEventListener(bool) {
-    if (bool) {
-      return function () {
-        this.classList.add('disabled');
-        autofillDropdown.classList.remove('hide');
-        autofillDropdown.focus();
-      };
-    }
-    return bindAddAutofill();
-  }
+  // function addButtonEventListener(bool) {
+  //   if (bool) {
+  //     return function () {
+  //       // this.classList.add('disabled');
+  //       // autofillDropdown.classList.remove('hide');
+  //       // autofillDropdown.focus();
+  //     };
+  //   }
+  //   return bindAddAutofill();
+  // }
 
   /**
    * read data from json file
@@ -618,13 +621,13 @@ const Autofill = (function () {
   function getAutofillList() {
     fetchJSON(myURL).then((data) => {
       console.log('autofill : autofill list loaded.');
-      addButton.onclick = addButtonEventListener(true);
+      // addButton.onclick = addButtonEventListener(true);
       // build out drop down menu
       buildAutofillList(data);
     }).catch((error) => {
       console.log('autofill : autofill list failed to load, reverting to manual autofill entry method');
       console.log(error);
-      addButton.onclick = addButtonEventListener(false);
+      // addButton.onclick = addButtonEventListener(false);
     });
   }
 
@@ -937,16 +940,12 @@ const Autofill = (function () {
   // 
   // Modals
   // 
+
   const autofillModal = document.createElement('div');
   autofillModal.innerHTML = `
   <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
         <div class="modal-body">
         </div>
       </div>
@@ -954,7 +953,13 @@ const Autofill = (function () {
   </div>
 `;
 
-{/* <div class="modal-footer">
+{/* 
+          <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+  <div class="modal-footer">
 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 <button type="button" class="btn btn-primary">Save changes</button>
 </div> 

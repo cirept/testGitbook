@@ -112,13 +112,9 @@
   margin: 0 0 0 15px;
 }
 
-/* .autofill-dropdown {
-  height: 500px;
-  width: 100%;
-  overflow: auto;
-  position: absolute;
-  background: #0A0808;
-} */
+li.autofill-list-item {
+  display: block;
+}
 
 .autofill-dropdown:focus {
   outline: 0;
