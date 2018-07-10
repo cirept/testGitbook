@@ -14,4 +14,4 @@
 * ``%STATE_FULL_NAME%`` will now display the full state name when reset based on the ``%STATE%`` value.
 * Added **Latest Changes** change log pop up
 
-*Released (07/10/2018)*
+``Released (07/10/2018)``
