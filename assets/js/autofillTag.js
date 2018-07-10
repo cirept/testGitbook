@@ -49,13 +49,12 @@ const Autofill = (function () {
   const messageDisplay = document.createElement('div');
   messageDisplay.id = 'toolMessageDisplay';
   messageDisplay.classList.add('container-fluid');
-  messageDisplay.textContent = `Autofill tag text replacer tool v${GM_info.script.version}`;
+  messageDisplay.textContent = `Autofill tag text replacer tool - version ${GM_info.script.version}`;
 
   const defaultReset = document.createElement('button');
   defaultReset.id = 'defaultReset';
   defaultReset.classList.add('btn');
   defaultReset.classList.add('btn-sm');
-  defaultReset.classList.add('btn-wd');
   defaultReset.classList.add('btn-danger');
   defaultReset.classList.add('col');
   defaultReset.title = 'Reset Values';
@@ -98,18 +97,12 @@ const Autofill = (function () {
   changeLogButton.innerHTML = `<i class="fas fa-file-alt"></i>`;
   changeLogButton.title = 'Change Log';
 
+  const buttonContainer = document.createElement('div');
+  buttonContainer.classList.add('row');
+
   const actionContainer = document.createElement('div');
   actionContainer.classList.add('list-action-container');
   actionContainer.classList.add('container-fluid');
-
-  actionContainer.appendChild(buttonContainer);
-
-  const buttonContainer = document.createElement('div');
-  buttonContainer.classList.add('row');
-  // attach bottom buttons
-  buttonContainer.appendChild(addButton);
-  buttonContainer.appendChild(changeLogButton);
-  buttonContainer.appendChild(defaultReset);
 
   const autofillDropdown = document.createElement('ul');
   autofillDropdown.tabIndex = '4';
@@ -118,13 +111,20 @@ const Autofill = (function () {
   listContainer.classList.add('list-container');
   listContainer.classList.add('container-fluid');
 
+  // attach bottom buttons
+  buttonContainer.appendChild(addButton);
+  buttonContainer.appendChild(changeLogButton);
+  buttonContainer.appendChild(defaultReset);
+  // attach button container to container wrapper
+  actionContainer.appendChild(buttonContainer);
+  // attach autofill list to list container 
   listContainer.appendChild(autofillOptionsList);
-
+  // attach all elements to 'toggable' container
   autofillOptionsContainer.appendChild(messageDisplay);
   autofillOptionsContainer.appendChild(listContainer);
   autofillOptionsContainer.appendChild(actionContainer);
   autofillOptionsContainer.appendChild(autofillDropdown);
-
+  // attach tool container to main tool container
   wsmEditerTools.appendChild(applyAutofills);
   wsmEditerTools.appendChild(minimizeList);
   wsmEditerTools.appendChild(autofillOptionsContainer);
