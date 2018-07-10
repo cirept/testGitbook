@@ -121,3 +121,13 @@ li.autofill-list-item {
   color: #fff;
   background-color: rgb(130, 198, 0);
 }
+
+.modal-body h3 {
+  text-decoration: underline;
+}
+
+.modal-body li {
+  margin: .5rem 2rem;
+  padding: 0;
+  list-style: initial;
+}

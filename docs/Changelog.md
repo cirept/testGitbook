@@ -1,5 +1,26 @@
 # Change Log
 
+## v1.1.5 - **(07/09/2018)**
+
+### Updated UI design
+
+* Removed unused tool elements
+* Updated Hover Text for each Input Area
+* Add Autofill interface updated
+
+### Functionality
+
+* Tool will now automatically reset itself if on a new site.
+* STATE_FULL_NAME will now update autofill with full state name.
+
+<br>
+<br>
+
+---
+
+<br>
+<br>
+
 ## v1.1.2 - **(04/26/2018)**
 
 ### Added additional default values
