@@ -57,7 +57,7 @@ const Autofill = (function () {
   defaultReset.classList.add('btn-sm');
   defaultReset.classList.add('btn-wd');
   defaultReset.classList.add('btn-danger');
-  defaultReset.classList.add('col-sm-3');
+  defaultReset.classList.add('col');
   defaultReset.title = 'Reset Values';
   defaultReset.innerHTML = '<i class="fas fa-redo fa-lg"></i>';
   defaultReset.onclick = () => {
@@ -80,7 +80,7 @@ const Autofill = (function () {
   addButton.classList.add('btn');
   addButton.classList.add('btn-sm');
   addButton.classList.add('btn-autofill-tool');
-  addButton.classList.add('col-sm-9');
+  addButton.classList.add('col');
   addButton.dataset.toggle = 'modal';
   addButton.dataset.target = '#autofillModal';
   addButton.value = 'addAutofill';
@@ -91,13 +91,12 @@ const Autofill = (function () {
   changeLogButton.id = 'addAutofill';
   changeLogButton.classList.add('btn');
   changeLogButton.classList.add('btn-sm');
-  changeLogButton.classList.add('btn-light');
-  changeLogButton.classList.add('btn-block');
+  changeLogButton.classList.add('btn-info');
+  changeLogButton.classList.add('col');
   changeLogButton.dataset.toggle = 'modal';
   changeLogButton.dataset.target = '#lastestChangesModal';
-  // changeLogButton.value = 'addAutofill';
-  // changeLogButton.title = 'Add Autofill';
-  changeLogButton.innerHTML = 'Change Log';
+  changeLogButton.innerHTML = `<i class="fas fa-file-alt"></i>`;
+  changeLogButton.title = 'Change Log';
 
   const actionContainer = document.createElement('div');
   actionContainer.classList.add('list-action-container');
@@ -137,7 +136,7 @@ const Autofill = (function () {
   /**
    * Loads all the tool styles
    */
-  const loadAutofillStyles = new Promise(function (resolve, reject) {
+  const loadAutofillStyles = new Promise((resolve, reject) => {
     // default styles
     let autofillStyles = document.createElement('link');
     autofillStyles.id = 'autofill-styles';
@@ -316,7 +315,6 @@ const Autofill = (function () {
    * @param {Object} obj - parameter list to save
    */
   function saveAutofillParameters(myObj) {
-    console.log('autofill : saving');
     const saveMe = JSON.stringify(myObj);
     saveToLocalStorage('autofillVariables', saveMe);
   }
