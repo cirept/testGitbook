@@ -1,6 +1,6 @@
 # Change Log
 
-## v1.1.5 - **(07/09/2018)**
+## v1.1.5
 
 ### Updated UI
 
@@ -15,6 +15,8 @@
 * Tool will now automatically reset itself if on a new site.
 * ``%STATE_FULL_NAME%`` will now display the full state name when reset based on the ``%STATE%`` value.
 * Added **Latest Changes** change log pop up
+
+*Released (07/10/2018)*
 
 <br>
 <br>
