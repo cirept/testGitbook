@@ -3,7 +3,7 @@
 // @namespace www.cobaltgroup.com
 // @version 1.1.5-beta11
 // @run-at document-end
-// @downloadURL https://rawgit.com/cirept/autofillReplacer/develop/assets/js/develop.meta.user.js
+// @downloadURL https://github.com/cirept/autofillReplacer/raw/develop/assets/js/develop.meta.user.js
 // @resource toolStyles https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta11/assets/css/autofill.css
 // @resource changeLog https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta11/docs/LatestChanges.md
 // @include http://websites.cobalt.com/wsm/editSite.do*
