@@ -5,7 +5,7 @@
 // @run-at document-end
 // @downloadURL https://rawgit.com/cirept/autofillReplacer/develop/assets/js/develop.meta.user.js
 // @resource toolStyles https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta6/assets/css/autofill.css
-// @resource toolStyles https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta6/assets/json/LatestChanges.md
+// @resource changeLog https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta6/assets/json/LatestChanges.md
 // @include http://websites.cobalt.com/wsm/editSite.do*
 // @include http://websites.cobalt.com/wsm/cms.do*
 // @require https://code.jquery.com/jquery-3.3.1.min.js
