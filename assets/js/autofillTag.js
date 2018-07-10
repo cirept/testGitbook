@@ -918,14 +918,15 @@ const Autofill = (function () {
     // fill autofill modal with content
     document.querySelector('#autofillModal .modal-body').appendChild(autofillDropdown);
 
-    const getChangeLog = jQuery.get(lastestChanges, (data) => {
+    // get latest changes markdown doc.
+    jQuery.get(lastestChanges, (data) => {
       const conv = new showdown.Converter();
       showdown.setFlavor('github');
       const changeLogData = conv.makeHtml(data);
-      console.log(changeLogData);
 
       // build latest changes modal
       const lastestChangesModal = document.createElement('div');
+      // add the modal content + the Latest Changes Markdown Doc Content
       lastestChangesModal.innerHTML = `
         <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
