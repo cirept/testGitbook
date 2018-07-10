@@ -918,33 +918,26 @@ const Autofill = (function () {
     // fill autofill modal with content
     document.querySelector('#autofillModal .modal-body').appendChild(autofillDropdown);
 
-    // build latest changes modal
-    const lastestChangesModal = document.createElement('div');
-
-    jQuery.get(lastestChanges, (data) => {
-      var conv = new showdown.Converter();
+    const getChangeLog = jQuery.get(lastestChanges, (data) => {
+      const conv = new showdown.Converter();
       showdown.setFlavor('github');
-      var html = conv.makeHtml(data);
-      // console.log(html);
+      const changeLogData = conv.makeHtml(data);
+      console.log(changeLogData);
 
+      // build latest changes modal
+      const lastestChangesModal = document.createElement('div');
       lastestChangesModal.innerHTML = `
         <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
               <div class="modal-body">
-                ${html}
+                ${changeLogData}
               </div>
             </div>
           </div>
         </div>
       `;
 
-      // fill autofill modal with content
-      // const changeModalBody = document.querySelector('#lastestChangesModal .modal-body');
-      // changeModalBody.innerHTML = html;
-
-
-        console.log('attaching completed change log');
       // attach modal to page
       document.body.appendChild(lastestChangesModal);
     });
