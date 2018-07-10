@@ -940,7 +940,7 @@ const Autofill = (function () {
 
       // attach modal to page
       document.body.appendChild(lastestChangesModal);
-    });
+    }, 'text');
   }
 
   // 
