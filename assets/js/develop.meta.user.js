@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name Autofill Tool 1.1.5-beta5
+// @name Autofill Tool 1.1.5-beta6
 // @namespace www.cobaltgroup.com
-// @version 1.1.5-beta5
+// @version 1.1.5-beta6
 // @run-at document-end
 // @downloadURL https://rawgit.com/cirept/autofillReplacer/develop/assets/js/develop.meta.user.js
-// @resource toolStyles https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta5/assets/css/autofill.css
+// @resource toolStyles https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta6/assets/css/autofill.css
+// @resource toolStyles https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta6/assets/json/LatestChanges.md
 // @include http://websites.cobalt.com/wsm/editSite.do*
 // @include http://websites.cobalt.com/wsm/cms.do*
 // @require https://code.jquery.com/jquery-3.3.1.min.js
@@ -13,7 +14,8 @@
 // @require https://cdn.rawgit.com/cirept/autofillReplacer/master/assets/js/packs/light.min.js
 // @require https://cdn.rawgit.com/cirept/autofillReplacer/master/assets/js/packs/solid.min.js
 // @require https://cdn.rawgit.com/cirept/autofillReplacer/master/assets/js/fontawesome.min.js
-// @require https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta5/assets/js/autofillTag.js
+// @require https://cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js
+// @require https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta6/assets/js/autofillTag.js
 // @author cire.pt
 // @grant GM_getResourceURL
 // ==/UserScript==

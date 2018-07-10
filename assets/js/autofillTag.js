@@ -3,6 +3,7 @@
 const Autofill = (function () {
   const myURL = 'https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json';
   const myStyles = GM_getResourceURL('toolStyles'); // Tampermonkey function
+  const lastestChanges = GM_getResourceURL('changeLog');
   const defaultList = {
     '%DEALER_NAME%': 'SEARCH_FOR_ME',
     '%FRANCHISES%': 'SEARCH_FOR_ME',
@@ -86,6 +87,18 @@ const Autofill = (function () {
   addButton.title = 'Add Autofill';
   addButton.innerHTML = '<i class="fas fa-plus fa-lg"></i>';
 
+  const changeLogButton = document.createElement('button');
+  changeLogButton.id = 'addAutofill';
+  changeLogButton.classList.add('btn');
+  changeLogButton.classList.add('btn-sm');
+  changeLogButton.classList.add('btn-light');
+  changeLogButton.classList.add('btn-block');
+  changeLogButton.dataset.toggle = 'modal';
+  changeLogButton.dataset.target = '#lastestChangesModal';
+  // changeLogButton.value = 'addAutofill';
+  // changeLogButton.title = 'Add Autofill';
+  changeLogButton.innerHTML = 'Change Log';
+
   const actionContainer = document.createElement('div');
   actionContainer.classList.add('list-action-container');
   actionContainer.classList.add('container-fluid');
@@ -95,6 +108,7 @@ const Autofill = (function () {
 
   buttonContainer.appendChild(addButton);
   buttonContainer.appendChild(defaultReset);
+  buttonContainer.appendChild(changeLogButton);
 
   actionContainer.appendChild(buttonContainer);
 
@@ -162,7 +176,23 @@ const Autofill = (function () {
       defaultList['%PHONE%'] = myDiv.querySelector('input[name="contact_phone_number"]').value;
       defaultList['%FRANCHISES%'] = myFranchises.join(', ');
     }, 'html').done(() => {
-      resolve('Success!');
+      // set the STATE_FULL_NAME to the states full name
+      getFullStateName.then((data) => {
+        defaultList['%STATE_FULL_NAME%'] = data[defaultList['%STATE%']];
+        resolve('Success!');
+      });
+    });
+  });
+
+  /**
+   * Get States name data from JSON file
+   */
+  const getFullStateName = new Promise((resolve, reject) => {
+    const statesURL = 'https://gist.githubusercontent.com/cirept/21be8036e544efcd6e934257f33862f1/raw/8b0dbb93521f5d6889502305335104218454c2bf/states_hash.json';
+    // get file data
+    jQuery.get(statesURL, () => {}, 'json').done((data) => {
+      // return the STATE json object
+      resolve(data);
     });
   });
 
@@ -176,7 +206,6 @@ const Autofill = (function () {
     jQuery.get(siteSettingsURL, (data) => {
       const myDiv = document.createElement('div');
       myDiv.innerHTML = data;
-
       defaultList['%PHONE%'] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
       defaultList['%NEW_PHONE%'] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
       defaultList['%USED_PHONE%'] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
@@ -868,6 +897,11 @@ const Autofill = (function () {
    * attach modals
    */
   function attachModals() {
+    // 
+    // Autofill Modal
+    // 
+
+    // build autofill modal
     const autofillModal = document.createElement('div');
     autofillModal.innerHTML = `
         <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
@@ -879,10 +913,36 @@ const Autofill = (function () {
           </div>
         </div>
       `;
-
+    // attach modal to page
     document.body.appendChild(autofillModal);
-
+    // fill autofill modal with content
     document.querySelector('#autofillModal .modal-body').appendChild(autofillDropdown);
+
+
+    // build latest changes modal
+    const lastestChangesModal = document.createElement('div');
+    lastestChangesModal.innerHTML = `
+        <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+    // attach modal to page
+    document.body.appendChild(lastestChangesModal);
+
+    jQuery.get(lastestChanges, (data) => {
+      var conv = new showdown.Converter();
+      showdown.setFlavor('github');
+      var html = conv.makeHtml(data);
+      // fill autofill modal with content
+      const changeModalBody = document.querySelector('#lastestChangesModal .modal-body');
+      changeModalBody.innerHTML = html;
+    });
   }
 
   // 
