@@ -918,30 +918,35 @@ const Autofill = (function () {
     // fill autofill modal with content
     document.querySelector('#autofillModal .modal-body').appendChild(autofillDropdown);
 
-
     // build latest changes modal
     const lastestChangesModal = document.createElement('div');
-    lastestChangesModal.innerHTML = `
+
+    jQuery.get(lastestChanges, (data) => {
+      var conv = new showdown.Converter();
+      showdown.setFlavor('github');
+      var html = conv.makeHtml(data);
+      // console.log(html);
+
+      lastestChangesModal.innerHTML = `
         <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
               <div class="modal-body">
+                ${html}
               </div>
             </div>
           </div>
         </div>
       `;
 
-    // attach modal to page
-    document.body.appendChild(lastestChangesModal);
-
-    jQuery.get(lastestChanges, (data) => {
-      var conv = new showdown.Converter();
-      showdown.setFlavor('github');
-      var html = conv.makeHtml(data);
       // fill autofill modal with content
-      const changeModalBody = document.querySelector('#lastestChangesModal .modal-body');
-      changeModalBody.innerHTML = html;
+      // const changeModalBody = document.querySelector('#lastestChangesModal .modal-body');
+      // changeModalBody.innerHTML = html;
+
+
+        console.log('attaching completed change log');
+      // attach modal to page
+      document.body.appendChild(lastestChangesModal);
     });
   }
 
