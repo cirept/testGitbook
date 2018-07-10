@@ -131,3 +131,15 @@ li.autofill-list-item {
   padding: 0;
   list-style: initial;
 }
+
+.modal-dialog h2 {
+  font-size: 2rem;
+  background-color: #793CC4;
+  color: white;
+  padding: 5px;
+  text-align: center;
+}
+
+.modal-dialog h3 {
+  text-align: center;
+}
