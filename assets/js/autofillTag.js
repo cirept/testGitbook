@@ -102,14 +102,14 @@ const Autofill = (function () {
   actionContainer.classList.add('list-action-container');
   actionContainer.classList.add('container-fluid');
 
+  actionContainer.appendChild(buttonContainer);
+
   const buttonContainer = document.createElement('div');
   buttonContainer.classList.add('row');
-
+  // attach bottom buttons
   buttonContainer.appendChild(addButton);
-  buttonContainer.appendChild(defaultReset);
   buttonContainer.appendChild(changeLogButton);
-
-  actionContainer.appendChild(buttonContainer);
+  buttonContainer.appendChild(defaultReset);
 
   const autofillDropdown = document.createElement('ul');
   autofillDropdown.tabIndex = '4';
