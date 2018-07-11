@@ -4,11 +4,10 @@
 .customEditorTools {
   position: absolute;
   left: 200px;
-  width: auto;
   padding: 0 10px 10px 10px;
-  color: white;
-  background-color: #EEEEEE;
+  background-color: rgb(238, 238, 238);
   font-family: 'Lato', monospace;
+  font-size: 13px;
 }
 
 .btn-wd {
@@ -49,7 +48,7 @@
 }
 
 .autofillTag {
-  width: 250px;
+  padding: 0 10px 0 0;
   text-align: center;
   color: black;
   word-wrap: break-word;
@@ -63,24 +62,31 @@
   background: #793CC4;
   color: #fff;
   border: 1px solid rgb(255, 255, 255);
-  line-height: 1.25rem;
+  line-height: 1.75rem;
   width: 245px;
+  text-indent: 15px;
 }
 
 .autofillEntry {
-  padding: 5px 10px;
+  padding: 5px;
   border: 1px solid #793CC4;
-  margin: 3px 0px;
   color: #793CC4;
-  margin-bottom: .25rem;
-  margin-top: .25rem;
+  /* margin-bottom: .25rem; */
+  /* margin-top: .25rem; */
+  margin: .25rem auto;
   align-items: center;
+  position: relative;
+}
+
+.autofillEntry div:last-child {
+  margin-left: auto;
 }
 
 .js-remove {
   cursor: pointer;
   cursor: hand;
-  display: inline-block;
+  /* position: absolute; */
+  /* right: 10px; */
 }
 
 li.autofill-list-item {
@@ -142,4 +148,8 @@ li.autofill-list-item {
 
 .modal-dialog h3 {
   text-align: center;
+}
+
+.arrow {
+  margin: 0 10px;
 }
