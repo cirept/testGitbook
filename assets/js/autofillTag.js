@@ -6,7 +6,7 @@ const Autofill = (function () {
   const lastestChanges = GM_getResourceURL("changeLog");
   const toolInstructions = GM_getResourceURL("toolInstructions");
   const defaultList = {
-    "***How to Seperate Words***": "Seperate words with ;",
+    "***How to Seperate Words***": "Seperate words with --> ;",
     "***Example***": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*",
     "%DEALER_NAME%": "SEARCH_FOR_ME",
     "%FRANCHISES%": "SEARCH_FOR_ME",
