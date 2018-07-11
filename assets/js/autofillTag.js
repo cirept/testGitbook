@@ -39,7 +39,7 @@ const Autofill = (function () {
   minimizeList.classList.add("btn-autofill-tool");
   minimizeList.title = "show list";
   minimizeList.type = "button";
-  minimizeList.innerHTML = "<i class="fas fa-eye fa-lg"></i>";
+  minimizeList.innerHTML = `<i class="fas fa-eye fa-lg"></i>`;
   minimizeList.onclick = toggleToolPanel;
 
   const autofillOptionsList = document.createElement("ul");
