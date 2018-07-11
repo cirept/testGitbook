@@ -105,13 +105,30 @@ const Autofill = (function () {
   reportBug.classList.add("btn");
   reportBug.classList.add("btn-sm");
   reportBug.classList.add("btn-warning");
-  reportBug.classList.add("btn-block");
+  reportBug.classList.add("col");
   reportBug.classList.add("m-1");
+  reportBug.href = "https://github.com/cirept/autofillReplacer/issues/new?template=bug_report.md";
   reportBug.innerHTML = "<i class='fas fa-bug'></i>";
+  reportBug.target = "_blank";
   reportBug.title = "Report Bug";
 
-  const buttonContainer = document.createElement("div");
-  buttonContainer.classList.add("row");
+  const requestEnhancement = document.createElement("a");
+  requestEnhancement.id = "requestEnhancement";
+  requestEnhancement.classList.add("btn");
+  requestEnhancement.classList.add("btn-sm");
+  requestEnhancement.classList.add("btn-primary");
+  requestEnhancement.classList.add("col");
+  requestEnhancement.classList.add("m-1");
+  requestEnhancement.href = "https://github.com/cirept/autofillReplacer/issues/new?template=feature_request.md";
+  requestEnhancement.innerHTML = "<i class='fas fa-splotch'></i>";
+  requestEnhancement.title = "Request Enhancement";
+  requestEnhancement.target = "_blank";
+
+  const row1 = document.createElement("div");
+  row1.classList.add("row");
+
+  const row2 = document.createElement("div");
+  row2.classList.add("row");
 
   const actionContainer = document.createElement("div");
   actionContainer.classList.add("list-action-container");
@@ -125,12 +142,14 @@ const Autofill = (function () {
   listContainer.classList.add("container-fluid");
 
   // attach bottom buttons
-  buttonContainer.appendChild(addButton);
-  buttonContainer.appendChild(changeLogButton);
-  buttonContainer.appendChild(defaultReset);
-  buttonContainer.appendChild(reportBug);
+  row1.appendChild(addButton);
+  row1.appendChild(defaultReset);
+  row2.appendChild(reportBug);
+  row2.appendChild(changeLogButton);
+  row2.appendChild(requestEnhancement);
   // attach button container to container wrapper
-  actionContainer.appendChild(buttonContainer);
+  actionContainer.appendChild(row1);
+  actionContainer.appendChild(row2);
   // attach autofill list to list container 
   listContainer.appendChild(autofillOptionsList);
   // attach all elements to "toggable" container
