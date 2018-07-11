@@ -39,7 +39,7 @@ const Autofill = (function () {
   minimizeList.classList.add("btn-autofill-tool");
   minimizeList.title = "show list";
   minimizeList.type = "button";
-  minimizeList.innerHTML = `<i class="fas fa-eye fa-lg"></i>`;
+  minimizeList.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
   minimizeList.onclick = toggleToolPanel;
 
   const autofillOptionsList = document.createElement("ul");
@@ -56,11 +56,12 @@ const Autofill = (function () {
   defaultReset.classList.add("btn");
   defaultReset.classList.add("btn-sm");
   defaultReset.classList.add("btn-danger");
+  defaultReset.classList.add("m-1");
   defaultReset.classList.add("col");
   defaultReset.title = "Reset Values";
-  defaultReset.innerHTML = `<i class="fas fa-redo fa-lg"></i>`;
+  defaultReset.innerHTML = "<i class='fas fa-redo fa-lg'></i>";
   defaultReset.onclick = () => {
-    resetValues(true, "Values Reset")
+    resetValues(true, "Values Reset");
   };
 
   const applyAutofills = document.createElement("button");
@@ -71,7 +72,7 @@ const Autofill = (function () {
   applyAutofills.classList.add("btn-success");
   applyAutofills.type = "button";
   applyAutofills.title = "apply autofills";
-  applyAutofills.innerHTML = `<i class="fas fa-magic fa-lg"></i>`;
+  applyAutofills.innerHTML = "<i class='fas fa-magic fa-lg'></i>";
   applyAutofills.onclick = autofills;
 
   const addButton = document.createElement("button");
@@ -79,12 +80,13 @@ const Autofill = (function () {
   addButton.classList.add("btn");
   addButton.classList.add("btn-sm");
   addButton.classList.add("btn-autofill-tool");
+  addButton.classList.add("m-1");
   addButton.classList.add("col");
   addButton.dataset.toggle = "modal";
   addButton.dataset.target = "#autofillModal";
   addButton.value = "addAutofill";
   addButton.title = "Add Autofill";
-  addButton.innerHTML = `<i class="fas fa-plus fa-lg"></i>`;
+  addButton.innerHTML = "<i class='fas fa-plus fa-lg'></i>";
 
   const changeLogButton = document.createElement("button");
   changeLogButton.id = "addAutofill";
@@ -92,13 +94,41 @@ const Autofill = (function () {
   changeLogButton.classList.add("btn-sm");
   changeLogButton.classList.add("btn-info");
   changeLogButton.classList.add("col");
+  changeLogButton.classList.add("m-1");
   changeLogButton.dataset.toggle = "modal";
   changeLogButton.dataset.target = "#lastestChangesModal";
-  changeLogButton.innerHTML = `<i class="fas fa-file-alt"></i>`;
+  changeLogButton.innerHTML = "<i class='fas fa-file-alt'></i>";
   changeLogButton.title = "Change Log";
 
-  const buttonContainer = document.createElement("div");
-  buttonContainer.classList.add("row");
+  const reportBug = document.createElement("a");
+  reportBug.id = "reportBug";
+  reportBug.classList.add("btn");
+  reportBug.classList.add("btn-sm");
+  reportBug.classList.add("btn-warning");
+  reportBug.classList.add("col");
+  reportBug.classList.add("m-1");
+  reportBug.href = "https://github.com/cirept/autofillReplacer/issues/new?template=bug_report.md";
+  reportBug.innerHTML = "<i class='fas fa-bug'></i>";
+  reportBug.target = "_blank";
+  reportBug.title = "Report Bug";
+
+  const requestEnhancement = document.createElement("a");
+  requestEnhancement.id = "requestEnhancement";
+  requestEnhancement.classList.add("btn");
+  requestEnhancement.classList.add("btn-sm");
+  requestEnhancement.classList.add("btn-primary");
+  requestEnhancement.classList.add("col");
+  requestEnhancement.classList.add("m-1");
+  requestEnhancement.href = "https://github.com/cirept/autofillReplacer/issues/new?template=feature_request.md";
+  requestEnhancement.innerHTML = "<i class='fas fa-splotch'></i>";
+  requestEnhancement.title = "Request Enhancement";
+  requestEnhancement.target = "_blank";
+
+  const row1 = document.createElement("div");
+  row1.classList.add("row");
+
+  const row2 = document.createElement("div");
+  row2.classList.add("row");
 
   const actionContainer = document.createElement("div");
   actionContainer.classList.add("list-action-container");
@@ -112,11 +142,14 @@ const Autofill = (function () {
   listContainer.classList.add("container-fluid");
 
   // attach bottom buttons
-  buttonContainer.appendChild(addButton);
-  buttonContainer.appendChild(changeLogButton);
-  buttonContainer.appendChild(defaultReset);
+  row1.appendChild(addButton);
+  row1.appendChild(defaultReset);
+  row2.appendChild(reportBug);
+  row2.appendChild(changeLogButton);
+  row2.appendChild(requestEnhancement);
   // attach button container to container wrapper
-  actionContainer.appendChild(buttonContainer);
+  actionContainer.appendChild(row1);
+  actionContainer.appendChild(row2);
   // attach autofill list to list container 
   listContainer.appendChild(autofillOptionsList);
   // attach all elements to "toggable" container
@@ -149,6 +182,18 @@ const Autofill = (function () {
   });
 
   /**
+   * Get States name data from JSON file
+   */
+  const getFullStateName = new Promise((resolve, reject) => {
+    const statesURL = "https://gist.githubusercontent.com/cirept/21be8036e544efcd6e934257f33862f1/raw/8b0dbb93521f5d6889502305335104218454c2bf/states_hash.json";
+    // get file data
+    jQuery.get(statesURL, () => {}, "json").done((data) => {
+      // return the STATE json object
+      resolve(data);
+    });
+  });
+
+  /**
    * Get data from "Settings" to autofill into the defaults list
    */
   const getWebsiteGeneralInfo = new Promise((resolve, reject) => {
@@ -167,12 +212,12 @@ const Autofill = (function () {
         myFranchises.push(franchises[x].textContent);
       }
 
-      defaultList["%DEALER_NAME%"] = myDiv.querySelector('input[name="name"]').value;
+      defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value;
       defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value;
       defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value;
       defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value;
       defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value;
-      defaultList["%PHONE%"] = myDiv.querySelector('input[name="contact_phone_number"]').value;
+      defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value;
       defaultList["%FRANCHISES%"] = myFranchises.join(", ");
     }, "html").done(() => {
       // set the STATE_FULL_NAME to the states full name
@@ -180,18 +225,6 @@ const Autofill = (function () {
         defaultList["%STATE_FULL_NAME%"] = data[defaultList["%STATE%"]];
         resolve("Success!");
       });
-    });
-  });
-
-  /**
-   * Get States name data from JSON file
-   */
-  const getFullStateName = new Promise((resolve, reject) => {
-    const statesURL = "https://gist.githubusercontent.com/cirept/21be8036e544efcd6e934257f33862f1/raw/8b0dbb93521f5d6889502305335104218454c2bf/states_hash.json";
-    // get file data
-    jQuery.get(statesURL, () => {}, "json").done((data) => {
-      // return the STATE json object
-      resolve(data);
     });
   });
 
@@ -205,11 +238,11 @@ const Autofill = (function () {
     jQuery.get(siteSettingsURL, (data) => {
       const myDiv = document.createElement("div");
       myDiv.innerHTML = data;
-      defaultList["%PHONE%"] = myDiv.querySelector('input[name*="(__primary_).ctn"]').value;
-      defaultList["%NEW_PHONE%"] = myDiv.querySelector('input[name*="(__new_).ctn"]').value;
-      defaultList["%USED_PHONE%"] = myDiv.querySelector('input[name*="(__used_).ctn"]').value;
-      defaultList["%SERVICE_PHONE%"] = myDiv.querySelector('input[name*="(__service_).ctn"]').value;
-      defaultList["%PARTS_PHONE%"] = myDiv.querySelector('input[name*="(__parts_).ctn"]').value;
+      defaultList["%PHONE%"] = myDiv.querySelector("input[name*='(__primary_).ctn']").value;
+      defaultList["%NEW_PHONE%"] = myDiv.querySelector("input[name*='(__new_).ctn']").value;
+      defaultList["%USED_PHONE%"] = myDiv.querySelector("input[name*='(__used_).ctn']").value;
+      defaultList["%SERVICE_PHONE%"] = myDiv.querySelector("input[name*='(__service_).ctn']").value;
+      defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value;
     }, "html").done(() => {
       resolve("Success!");
     });
@@ -249,6 +282,26 @@ const Autofill = (function () {
   }
 
   /**
+   * save current state of the list, only if the configured list
+   * has no errors
+   */
+  function saveState() {
+    saveAutofillParameters(createArray());
+  }
+
+  /**
+   *Updates the tool display message
+   *
+   * @param {string} message - the message to display
+   * @param {string} animationType - the type of animation to use
+   */
+  function updateDisplayMessage(message, animationType = "tada") {
+    // update display message
+    messageDisplay.innerText = message;
+    jQuery("#toolMessageDisplay").animateCss(animationType);
+  }
+
+  /**
    * Build a generic list item to use through out the tool
    * @param {string} autofill - the text that will be used to fill in the autofillTag div
    * @param {string} text - the text that will be used as the input value
@@ -264,13 +317,13 @@ const Autofill = (function () {
 
     const label = document.createElement("div");
     label.classList.add("autofillTag");
-    label.classList.add("col");
+    // label.classList.add("col");
     label.textContent = autofill;
 
     const myInput = document.createElement("input");
     myInput.type = "text";
     myInput.classList.add("regEx");
-    myInput.classList.add("col");
+    // myInput.classList.add("col");
     myInput.title = text;
     myInput.value = text;
 
@@ -278,10 +331,10 @@ const Autofill = (function () {
     myPointer.classList.add("fas");
     myPointer.classList.add("fa-long-arrow-alt-right");
     myPointer.classList.add("fa-lg");
-    myPointer.classList.add("col-sm-1");
+    myPointer.classList.add("arrow");
 
     const removeMeContainer = document.createElement("div");
-    removeMeContainer.classList.add("col-sm-1");
+    // removeMeContainer.classList.add("col-sm-1");
     removeMeContainer.classList.add("js-remove");
     removeMeContainer.title = "click to remove";
     removeMeContainer.onclick = (e) => {
@@ -293,7 +346,7 @@ const Autofill = (function () {
       updateDisplayMessage("Item Removed");
       // remove disabled from the autofill options list
       removeDisable(e.currentTarget.parentElement);
-    }
+    };
 
     const removeMe = document.createElement("i");
     removeMe.classList.add("fas");
@@ -408,11 +461,12 @@ const Autofill = (function () {
   }
 
   /**
-   * save current state of the list, only if the configured list
-   * has no errors
+   * Updates the inputs hover text
+   * @param {object} e - the event object
+   *
    */
-  function saveState() {
-    saveAutofillParameters(createArray());
+  function updateInputTitle(e) {
+    e.target.title = e.target.value;
   }
 
   /**
@@ -427,15 +481,6 @@ const Autofill = (function () {
     jQuery(elem).find("input").on("keyup", () => {
       updateDisplayMessage("Changes Saved", "flash");
     });
-  }
-
-  /**
-   * Updates the inputs hover text
-   * @param {object} e - the event object
-   *
-   */
-  function updateInputTitle(e) {
-    e.target.title = e.target.value;
   }
 
   /**
@@ -482,22 +527,6 @@ const Autofill = (function () {
   }
 
   /**
-   * Reset configured autofill tags to the default list
-   * @param {boolean} confirm - should the user be prompted before reset?
-   * @param {string} message - the message to show when the tool resets
-   */
-  function resetValues(confirm, message) {
-    if (confirm && window.confirm("Reset Values?")) {
-      resetAutofills(message);
-    }
-
-    if (!confirm) {
-      resetAutofills(message);
-    }
-
-  }
-
-  /**
    * resets all the autofill parameters to the default list
    * @param {string} message - the message to show when the tool resets
    */
@@ -517,15 +546,19 @@ const Autofill = (function () {
   }
 
   /**
-   *Updates the tool display message
-   *
-   * @param {string} message - the message to display
-   * @param {string} animationType - the type of animation to use
+   * Reset configured autofill tags to the default list
+   * @param {boolean} confirm - should the user be prompted before reset?
+   * @param {string} message - the message to show when the tool resets
    */
-  function updateDisplayMessage(message, animationType = "tada") {
-    // update display message
-    messageDisplay.innerText = message;
-    jQuery("#toolMessageDisplay").animateCss(animationType);
+  function resetValues(confirm, message) {
+    if (confirm && window.confirm("Reset Values?")) {
+      resetAutofills(message);
+    }
+
+    if (!confirm) {
+      resetAutofills(message);
+    }
+
   }
 
   /**
@@ -582,23 +615,25 @@ const Autofill = (function () {
     const localData = localDataToString();
     // build out drop down menu
     for (const myKey in data[0]) {
-      // create "li" for each autofill tag in the list
-      const myListItem = document.createElement("li");
-      myListItem.textContent = myKey;
-      myListItem.classList.add("btn");
-      myListItem.classList.add("btn-light");
-      myListItem.classList.add("autofill-list-item");
-      // if autofill tag is present in the active list, disable it
-      if (localData.includes(myKey)) {
-        myListItem.classList.add("disabled");
+      if (data[0].hasOwnProperty(myKey)) {
+        // create "li" for each autofill tag in the list
+        const myListItem = document.createElement("li");
+        myListItem.textContent = myKey;
+        myListItem.classList.add("btn");
+        myListItem.classList.add("btn-light");
+        myListItem.classList.add("autofill-list-item");
+        // if autofill tag is present in the active list, disable it
+        if (localData.includes(myKey)) {
+          myListItem.classList.add("disabled");
+        }
+        // add the list element to the "drop down" list
+        autofillDropdown.appendChild(myListItem);
+        // bind listener to "li" item
+        createAutofillDropdownMenu(myListItem);
+        // attach new "li" to main list
+        const tooltipText = data[0][myKey] ? data[0][myKey] : "**No tooltip infor available**";
+        myListItem.title = tooltipText;
       }
-      // add the list element to the "drop down" list
-      autofillDropdown.appendChild(myListItem);
-      // bind listener to "li" item
-      createAutofillDropdownMenu(myListItem);
-      // attach new "li" to main list
-      const tooltipText = data[0][myKey] ? data[0][myKey] : "**No tooltip infor available**";
-      myListItem.title = tooltipText;
     }
   }
 
@@ -810,7 +845,7 @@ const Autofill = (function () {
       // CMS LOGIC
 
       // get contens of iframe
-      recordEditWindow = contentFrame.find("div.main-wrap").find(".input-field").find(`div[data-which-field="copy"]`);
+      recordEditWindow = contentFrame.find("div.main-wrap").find(".input-field").find("div[data-which-field='copy']");
 
       // pass elements with children as base element for autofill replacing
       replaceTextCMS(recordEditWindow, regReplace);
