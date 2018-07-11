@@ -6,6 +6,8 @@ const Autofill = (function () {
   const lastestChanges = GM_getResourceURL("changeLog");
   const toolInstructions = GM_getResourceURL("toolInstructions");
   const defaultList = {
+    "***How to Seperate Words***": "Seperate words with ;",
+    "***Example***": "like;this;you;see",
     "%DEALER_NAME%": "SEARCH_FOR_ME",
     "%FRANCHISES%": "SEARCH_FOR_ME",
     "%STREET%": "SEARCH_FOR_ME",
@@ -17,7 +19,7 @@ const Autofill = (function () {
     "%NEW_PHONE%": "SEARCH_FOR_ME",
     "%USED_PHONE%": "SEARCH_FOR_ME",
     "%SERVICE_PHONE%": "SEARCH_FOR_ME",
-    "%PARTS_PHONE%": "SEARCH_FOR_ME",
+    "%PARTS_PHONE%": "SEARCH_FOR_ME"
   };
 
   // 
