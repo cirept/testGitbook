@@ -6,6 +6,7 @@
 // @downloadURL https://github.com/cirept/autofillReplacer/raw/develop/assets/js/develop.meta.user.js
 // @resource toolStyles https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta15/assets/css/autofill.css
 // @resource changeLog https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta15/docs/LatestChanges.md
+// @resource toolInstructions https://cdn.rawgit.com/cirept/autofillReplacer/1.1.5-beta15/docs/README.md
 // @include http://websites.cobalt.com/wsm/editSite.do*
 // @include http://websites.cobalt.com/wsm/cms.do*
 // @require https://code.jquery.com/jquery-3.3.1.min.js

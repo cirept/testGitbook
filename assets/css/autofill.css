@@ -153,3 +153,12 @@ li.autofill-list-item {
 .arrow {
   margin: 0 10px;
 }
+
+.modal-body ul,
+.modal-body ol {
+  text-align: left;
+}
+
+.modal-body {
+  text-align: center;
+}
