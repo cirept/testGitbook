@@ -333,13 +333,11 @@ const Autofill = (function () {
 
     const label = document.createElement("div");
     label.classList.add("autofillTag");
-    // label.classList.add("col");
     label.textContent = autofill;
 
     const myInput = document.createElement("input");
     myInput.type = "text";
     myInput.classList.add("regEx");
-    // myInput.classList.add("col");
     myInput.title = text;
     myInput.value = text;
 
@@ -350,7 +348,6 @@ const Autofill = (function () {
     myPointer.classList.add("arrow");
 
     const removeMeContainer = document.createElement("div");
-    // removeMeContainer.classList.add("col-sm-1");
     removeMeContainer.classList.add("js-remove");
     removeMeContainer.title = "click to remove";
     removeMeContainer.onclick = (e) => {
@@ -763,8 +760,8 @@ const Autofill = (function () {
         const findMe = regReplace[autofillTag];
 
         // if split phrases are needed
-        if (findMe.indexOf("``") > -1) {
-          const findArray = findMe.split("``");
+        if (findMe.indexOf(";") > -1) {
+          const findArray = findMe.split(";");
           const arrayLength = findArray.length;
           for (let a = 0; a < arrayLength; a += 1) {
             const searchText = findArray[a].trim();
