@@ -4,6 +4,7 @@ const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
   const myStyles = GM_getResourceURL("toolStyles"); // Tampermonkey function
   const lastestChanges = GM_getResourceURL("changeLog");
+  const toolInstructions = GM_getResourceURL("toolInstructions");
   const defaultList = {
     "%DEALER_NAME%": "SEARCH_FOR_ME",
     "%FRANCHISES%": "SEARCH_FOR_ME",
@@ -98,7 +99,7 @@ const Autofill = (function () {
   changeLogButton.dataset.toggle = "modal";
   changeLogButton.dataset.target = "#lastestChangesModal";
   changeLogButton.innerHTML = "<i class='fas fa-file-alt'></i>";
-  changeLogButton.title = "Change Log";
+  changeLogButton.title = "Latest Changes";
 
   const reportBug = document.createElement("a");
   reportBug.id = "reportBug";
@@ -124,6 +125,18 @@ const Autofill = (function () {
   requestEnhancement.title = "Request Enhancement";
   requestEnhancement.target = "_blank";
 
+  const instructions = document.createElement("button");
+  instructions.id = "toolInstructions";
+  instructions.classList.add("btn");
+  instructions.classList.add("btn-sm");
+  instructions.classList.add("btn-info");
+  instructions.classList.add("col");
+  instructions.classList.add("m-1");
+  instructions.dataset.toggle = "modal";
+  instructions.dataset.target = "#toolInstructionsModal";
+  instructions.innerHTML = "<i class='fas fa-info'></i>";
+  instructions.title = "Instructions";
+
   const row1 = document.createElement("div");
   row1.classList.add("row");
 
@@ -145,8 +158,9 @@ const Autofill = (function () {
   row1.appendChild(addButton);
   row1.appendChild(defaultReset);
   row2.appendChild(reportBug);
-  row2.appendChild(changeLogButton);
   row2.appendChild(requestEnhancement);
+  row2.appendChild(changeLogButton);
+  row2.appendChild(instructions);
   // attach button container to container wrapper
   actionContainer.appendChild(row1);
   actionContainer.appendChild(row2);
@@ -951,6 +965,10 @@ const Autofill = (function () {
     // fill autofill modal with content
     document.querySelector("#autofillModal .modal-body").appendChild(autofillDropdown);
 
+    // 
+    // Latest Changes Modal
+    //
+
     // get latest changes markdown doc.
     jQuery.get(lastestChanges, (data) => {
       const conv = new showdown.Converter();
@@ -974,6 +992,41 @@ const Autofill = (function () {
 
       // attach modal to page
       document.body.appendChild(lastestChangesModal);
+    }, "text");
+
+    // 
+    // Instructions Modal
+    //
+
+    // get latest changes markdown doc.
+    jQuery.get(toolInstructions, (data) => {
+      const conv = new showdown.Converter();
+      showdown.setFlavor("github");
+      const toolInstructionsData = conv.makeHtml(data);
+
+      // build latest changes modal
+      const toolInstructionsModal = document.createElement("div");
+      // add the modal content + the Latest Changes Markdown Doc Content
+      toolInstructionsModal.innerHTML = `
+        <div class="modal fade" id="toolInstructionsModal" tabindex="-1" role="dialog" aria-labelledby="toolInstructionsModalTitle" aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Tool Instructions</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                ${toolInstructionsData}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // attach modal to page
+      document.body.appendChild(toolInstructionsModal);
     }, "text");
   }
 
