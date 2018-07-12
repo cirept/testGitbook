@@ -24,6 +24,19 @@ const Autofill = (function () {
     "%PARTS_PHONE%": "SEARCH_FOR_ME"
   };
 
+  /**
+   * 
+   * @param {string} message - Message to write to the console.
+   * @param {object} obj - the object to display in the console message
+   */
+  function log(message, obj) {
+    if (obj) {
+      console.log(`Autofill Tool : ${message}`, obj);
+    } else {
+      console.log(`Autofill Tool : ${message}`);
+    }
+  }
+
   // 
   // Tool Elements
   // 
@@ -339,19 +352,6 @@ const Autofill = (function () {
   // 
   // Functions
   // 
-
-  /**
-   * 
-   * @param {string} message - Message to write to the console.
-   * @param {object} obj - the object to display in the console message
-   */
-  function log(message, obj) {
-    if (obj) {
-      console.log(`Autofill Tool : ${message}`, obj);
-    } else {
-      console.log(`Autofill Tool : ${message}`);
-    }
-  }
 
   /**
    * jQuery functions for animate css
