@@ -1,4 +1,4 @@
-/* global document, location, localStorage, Sortable, NodeFilter, window */
+/* global document, location, localStorage, Sortable, NodeFilter, window, GM_getResourceURL, GM_getResourceURL */
 
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
