@@ -251,10 +251,14 @@ const Autofill = (function () {
           defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value || "SEARCH_FOR_ME";
           defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value || "SEARCH_FOR_ME";
           defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
+
+          // display confirmation message
+          log("Website Settings Information Loaded");
+
           // resolve promise
           resolve("Site Settings Loaded");
         } else {
-          reject('Unable to get site settings.');
+          reject("Unable to get site settings.");
         }
       }, "html")
       /**
@@ -267,29 +271,37 @@ const Autofill = (function () {
          */
         const getFullState = new Promise((resolve, reject) => {
           // consume promise and get the local abbreviation data
-          getLocalAbbreviationInformation.then((data) => {
+          getLocalAbbreviationInformation.then((stateList) => {
+
             // filter the array of states down to the matching state.
-            const filteredStates = data.filter((state) => {
-              defaultList["%STATE%"] === abbrev
+            const filteredStates = stateList.filter((state) => {
+              const {
+                abbreviation
+              } = state;
+              return defaultList["%STATE%"] === abbreviation;
             });
+            // display console message that no match was found
             if (filteredStates.length > 1 || filteredStates.length < 1) {
               // set value to the default value
-              defaultList["%STATE_FULL_NAME%"] = "SEARCH_FOR_ME";
-              console.log("Region not supported by the tool");
+              log("Region not supported by the tool");
             }
+            // set STATE FULL NAME to matched state
             if (filteredStates.length === 1) {
               defaultList["%STATE_FULL_NAME%"] = filteredStates[0].name;
+
+              // display confirmation message
+              log("State Full Name Loaded");
             }
             // resolve with success
             resolve("Success!");
           }, (error) => {
-            console.log("get state full name failed", error.responseText);
+            log("Get state full name failed", error.responseText);
           });
         });
       })
       .fail((error) => {
         // reject(`unable to get site settings, ${error}`);
-        console.log("Failed to Load Website Settings", error);
+        log("Failed to Load Website Settings", error);
       })
       .always(() => {
         resolve();
@@ -297,10 +309,10 @@ const Autofill = (function () {
   });
 
   /**
-   *   Get Phone Numbers
+   *   Get Phone Numbers from website settings
    */
   const getWebsitePhoneNumbers = new Promise((resolve, reject) => {
-    console.log("getting website phone numbers");
+    // build website settings URL path
     const webID = document.getElementById("siWebId").querySelector("label.displayValue").textContent;
     const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
 
@@ -314,21 +326,32 @@ const Autofill = (function () {
         defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value || "SEARCH_FOR_ME";
       }, "html")
       .done(() => {
-        console.log('phone numbers loaded');
+        log("Phone Numbers Loaded");
       })
       .fail(() => {
-        console.log('failed to get phone numbers');
+        log("failed to get phone numbers");
       })
       .always(() => {
         resolve();
       });
-
-    console.log('phone numbers complete');
   });
 
   // 
   // Functions
   // 
+
+  /**
+   * 
+   * @param {string} message - Message to write to the console.
+   * @param {object} obj - the object to display in the console message
+   */
+  function log(message, obj) {
+    if (obj) {
+      console.log(`Autofill Tool : ${message}`, obj);
+    } else {
+      console.log(`Autofill Tool : ${message}`);
+    }
+  }
 
   /**
    * jQuery functions for animate css
@@ -747,10 +770,10 @@ const Autofill = (function () {
       dataType: "json"
     };
     jQuery.ajax(myURL).done((data) => {
-      // console.log("data", data);
+      // log("data", data);
       buildAutofillList(data);
     }).fail((error) => {
-      console.log("Autofill List Failed to Load, reverting to manual Autofill Entry Method", error);
+      log("Autofill List Failed to Load, reverting to manual Autofill Entry Method", error);
     }).always();
   }
 
@@ -958,10 +981,6 @@ const Autofill = (function () {
     getToolData();
   }
 
-
-  // debugger;
-
-
   /**
    * Sets up autofill tool
    */
@@ -978,13 +997,12 @@ const Autofill = (function () {
    * loads tool styles and gets all the tool data from the website settings
    */
   function getToolData() {
-    Promise.all([loadAutofillStyles, getWebsiteGeneralInfo]).then(() => {
-      // Promise.all([loadAutofillStyles, getWebsiteGeneralInfo, getWebsitePhoneNumbers]).then(() => {
-      console.log('data gathered');
+    Promise.all([loadAutofillStyles, getWebsiteGeneralInfo, getWebsitePhoneNumbers]).then(() => {
+      log("All Settings Loaded");
       window.onload = setup;
     }, (error) => {
       // tool failed to load
-      console.log("Autofill Tool Failed to Load data, resorting to default values", error);
+      log("Autofill Tool Failed to Load data, resorting to default values", error);
     });
   }
 
