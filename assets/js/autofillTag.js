@@ -226,7 +226,11 @@ const Autofill = (function () {
     autofillStyles.href = myStyles;
     document.head.appendChild(autofillStyles);
     // resolve or reject
-    document.getElementById("autofill-styles") !== null ? resolve("Success!") : reject("Autofill Tool styles were not attached.");
+    if (document.getElementById("autofill-styles")) {
+      resolve("Success!");
+    } else {
+      reject("Autofill Tool styles were not attached.");
+    }
   });
 
   /**
@@ -258,84 +262,86 @@ const Autofill = (function () {
 
     // get website settings information
     jQuery.get(siteSettingsURL, (data) => {
-      if (data) {
-        const myDiv = document.createElement("div");
-        const franchises = myDiv.querySelector("select#associatedFranchises").options;
-        const myLength = franchises.length;
-        const myFranchises = [];
+        if (data) {
+          const myDiv = document.createElement("div");
+          const franchises = myDiv.querySelector("select#associatedFranchises").options;
+          const myLength = franchises.length;
+          const myFranchises = [];
 
-        // myDiv props
-        myDiv.innerHTML = data;
+          // myDiv props
+          myDiv.innerHTML = data;
 
-        // create franchises string
-        for (let x = 0; x < myLength; x += 1) {
-          myFranchises.push(franchises[x].textContent);
+          // create franchises string
+          for (let x = 0; x < myLength; x += 1) {
+            myFranchises.push(franchises[x].textContent);
+          }
+
+          // fill out autofill list with website settings information
+          defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value || "SEARCH_FOR_ME";
+          defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value || "SEARCH_FOR_ME";
+          defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value || "SEARCH_FOR_ME";
+          defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value || "SEARCH_FOR_ME";
+          defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value || "SEARCH_FOR_ME";
+          defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value || "SEARCH_FOR_ME";
+          defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
+
+          // display confirmation message
+          log("Website Settings Information Loaded");
+
+          // resolve promise
+          resolve("Site Settings Loaded");
+        } else {
+          reject("Unable to get site settings.");
         }
+      }, "html")
 
-        // fill out autofill list with website settings information
-        defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value || "SEARCH_FOR_ME";
-        defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value || "SEARCH_FOR_ME";
-        defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value || "SEARCH_FOR_ME";
-        defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value || "SEARCH_FOR_ME";
-        defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value || "SEARCH_FOR_ME";
-        defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value || "SEARCH_FOR_ME";
-        defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
-
-        // display confirmation message
-        log("Website Settings Information Loaded");
-
-        // resolve promise
-        resolve("Site Settings Loaded");
-      } else {
-        reject("Unable to get site settings.");
-      }
-    }, "html")
-
-    /**
-     * Once the Website Settings have been loaded, Start the process of finding the FULL STATE NAME of the
-     * STATE abbreviation
-     */
-    .done(() => {
       /**
-       * Promise to get full state name from json files
+       * Once the Website Settings have been loaded, Start the process of finding the FULL STATE NAME of the
+       * STATE abbreviation
        */
-      const getFullState = new Promise((resolve, reject) => {
-        // consume promise and get the local abbreviation data
-        // getLocalAbbreviationInformation.then((stateList) => {
-          getLocalAbbreviationInformation.then((stateList) => {
-          // filter the array of states down to the matching state.
-          const filteredStates = stateList.filter((state) => {
-            const {
-              abbreviation,
-            } = state;
-            return defaultList["%STATE%"] === abbreviation;
-          });
-          // display console message that no match was found
-          if (filteredStates.length > 1 || filteredStates.length < 1) {
-            // set value to the default value
-            log("Region not supported by the tool");
-          }
-          // set STATE FULL NAME to matched state
-          if (filteredStates.length === 1) {
-            defaultList["%STATE_FULL_NAME%"] = filteredStates[0].name;
+      .done(() => {
 
-            // display confirmation message
-            log("State Full Name Loaded");
-          }
-          // resolve with success
-          resolve("Success!");
+        /**
+         * Promise to get full state name from json files
+         */
+        new Promise((resolve, reject) => {
+
+          // consume promise and get the local abbreviation data
+          // getLocalAbbreviationInformation.then((stateList) => {
+          getLocalAbbreviationInformation.then((stateList) => {
+            // filter the array of states down to the matching state.
+            const filteredStates = stateList.filter((state) => {
+              const {
+                abbreviation
+              } = state;
+              return defaultList["%STATE%"] === abbreviation;
+            });
+            // display console message that no match was found
+            if (filteredStates.length > 1 || filteredStates.length < 1) {
+              // set value to the default value
+              log("Region not supported by the tool");
+            }
+            // set STATE FULL NAME to matched state
+            if (filteredStates.length === 1) {
+              defaultList["%STATE_FULL_NAME%"] = filteredStates[0].name;
+
+              // display confirmation message
+              log("State Full Name Loaded");
+            }
+            // resolve with success
+            resolve("Success!");
           }, (error) => {
             log("Get state full name failed", error.responseText);
           });
+        });
+      })
+      .fail((error) => {
+        // reject(`unable to get site settings, ${error}`);
+        log("Failed to Load Website Settings", error);
+      })
+      .always(() => {
+        resolve();
       });
-    })
-    .fail((error) => {
-      // reject(`unable to get site settings, ${error}`);
-      log("Failed to Load Website Settings", error);
-    })
-    .always(() => {
-      resolve();
-    });
   });
 
   /**
@@ -347,23 +353,23 @@ const Autofill = (function () {
     const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
 
     jQuery.get(siteSettingsURL, (data) => {
-      const myDiv = document.createElement("div");
-      myDiv.innerHTML = data;
-      defaultList["%PHONE%"] = myDiv.querySelector("input[name*='(__primary_).ctn']").value || "SEARCH_FOR_ME";
-      defaultList["%NEW_PHONE%"] = myDiv.querySelector("input[name*='(__new_).ctn']").value || "SEARCH_FOR_ME";
-      defaultList["%USED_PHONE%"] = myDiv.querySelector("input[name*='(__used_).ctn']").value || "SEARCH_FOR_ME";
-      defaultList["%SERVICE_PHONE%"] = myDiv.querySelector("input[name*='(__service_).ctn']").value || "SEARCH_FOR_ME";
-      defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value || "SEARCH_FOR_ME";
-    }, "html")
-    .done(() => {
-      log("Phone Numbers Loaded");
-    })
-    .fail(() => {
-      log("failed to get phone numbers");
-    })
-    .always(() => {
-      resolve();
-    });
+        const myDiv = document.createElement("div");
+        myDiv.innerHTML = data;
+        defaultList["%PHONE%"] = myDiv.querySelector("input[name*='(__primary_).ctn']").value || "SEARCH_FOR_ME";
+        defaultList["%NEW_PHONE%"] = myDiv.querySelector("input[name*='(__new_).ctn']").value || "SEARCH_FOR_ME";
+        defaultList["%USED_PHONE%"] = myDiv.querySelector("input[name*='(__used_).ctn']").value || "SEARCH_FOR_ME";
+        defaultList["%SERVICE_PHONE%"] = myDiv.querySelector("input[name*='(__service_).ctn']").value || "SEARCH_FOR_ME";
+        defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value || "SEARCH_FOR_ME";
+      }, "html")
+      .done(() => {
+        log("Phone Numbers Loaded");
+      })
+      .fail(() => {
+        log("failed to get phone numbers");
+      })
+      .always(() => {
+        resolve();
+      });
   });
 
   //
