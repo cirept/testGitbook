@@ -304,13 +304,15 @@ const Autofill = (function () {
         /**
          * Promise to get full state name from json files
          */
-        new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
 
           // consume promise and get the local abbreviation data
           // getLocalAbbreviationInformation.then((stateList) => {
           getLocalAbbreviationInformation.then((stateList) => {
             // filter the array of states down to the matching state.
             const filteredStates = stateList.filter((state) => {
+
+              // destructuring
               const {
                 abbreviation
               } = state;
@@ -334,6 +336,8 @@ const Autofill = (function () {
             log("Get state full name failed", error.responseText);
           });
         });
+
+
       })
       .fail((error) => {
         // reject(`unable to get site settings, ${error}`);
@@ -1035,7 +1039,7 @@ const Autofill = (function () {
    * loads tool styles and gets all the tool data from the website settings
    */
   function getToolData() {
-    Promise.all([loadAutofillStyles, getWebsiteGeneralInfo, getWebsitePhoneNumbers]).then(() => {
+    return Promise.all([loadAutofillStyles, getWebsiteGeneralInfo, getWebsitePhoneNumbers]).then(() => {
       log("All Settings Loaded");
       window.onload = setup;
     }, (error) => {
