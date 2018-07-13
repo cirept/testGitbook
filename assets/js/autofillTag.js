@@ -1,5 +1,3 @@
-/* global document, localStorage, NodeFilter, window, GM_getResourceURL, GM_getResourceURL, jQuery */
-
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
   const myStyles = GM_getResourceURL("toolStyles"); // eslint-disable-line new-cap
@@ -313,11 +311,12 @@ const Autofill = (function () {
             const filteredStates = stateList.filter((state) => {
 
               // destructuring
-              const {
-                abbreviation
-              } = state;
+              const { abbreviation } = state;
+              
+              // return value if it matches the current state.
               return defaultList["%STATE%"] === abbreviation;
             });
+
             // display console message that no match was found
             if (filteredStates.length > 1 || filteredStates.length < 1) {
               // set value to the default value
@@ -333,6 +332,7 @@ const Autofill = (function () {
             // resolve with success
             resolve("Success!");
           }, (error) => {
+            reject(error);
             log("Get state full name failed", error.responseText);
           });
         });
