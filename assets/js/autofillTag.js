@@ -244,8 +244,8 @@ const Autofill = (function () {
     log("3 Get Locale Abbreviation Information");
     return new Promise((resolve, reject) => {
       const options = {
-        url: `https://raw.githubusercontent.com/cirept/autofillReplacer/develop/assets/json/locale_${locale}.json`,
-        // url: `https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/locale_${locale}.json`,
+        // url: `https://raw.githubusercontent.com/cirept/autofillReplacer/develop/assets/json/locale_${locale}.json`,
+        url: `https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/locale_${locale}.json`,
         dataType: "json"
       };
 
