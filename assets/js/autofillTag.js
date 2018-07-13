@@ -1,5 +1,3 @@
-/* global GM_getResourceURL , GM_getResourceURL */ // eslint-disable-line space-after-keywords keyword-spacing
-
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
   const myStyles = GM_getResourceURL("toolStyles"); // eslint-disable-line new-cap
@@ -10,22 +8,22 @@ const Autofill = (function () {
   const defaultList = {
     "***How to Separate Words***": "Separate words with --> ;",
     "***Example***": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*",
-    "%DEALER_NAME%": "SEARCH_FOR_ME",
-    "%FRANCHISES%": "SEARCH_FOR_ME",
-    "%STREET%": "SEARCH_FOR_ME",
-    "%CITY%": "SEARCH_FOR_ME",
-    "%STATE%": "SEARCH_FOR_ME",
-    "%STATE_FULL_NAME%": "SEARCH_FOR_ME",
-    "%ZIP%": "SEARCH_FOR_ME",
-    "%PHONE%": "SEARCH_FOR_ME",
-    "%NEW_PHONE%": "SEARCH_FOR_ME",
-    "%USED_PHONE%": "SEARCH_FOR_ME",
-    "%SERVICE_PHONE%": "SEARCH_FOR_ME",
-    "%PARTS_PHONE%": "SEARCH_FOR_ME"
+    "%DEALER_NAME%": "",
+    "%FRANCHISES%": "",
+    "%STREET%": "",
+    "%CITY%": "",
+    "%STATE%": "",
+    "%STATE_FULL_NAME%": "",
+    "%ZIP%": "",
+    "%PHONE%": "",
+    "%NEW_PHONE%": "",
+    "%USED_PHONE%": "",
+    "%SERVICE_PHONE%": "",
+    "%PARTS_PHONE%": ""
   };
 
   /**
-   *
+   * Custom Tool Console Logging for debugging purposes
    * @param {string} message - Message to write to the console.
    * @param {object} obj - the object to display in the console message
    */
@@ -244,8 +242,8 @@ const Autofill = (function () {
     log("3 Get Locale Abbreviation Information");
     return new Promise((resolve, reject) => {
       const options = {
-        // url: `https://raw.githubusercontent.com/cirept/autofillReplacer/develop/assets/json/locale_${locale}.json`,
-        url: `https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/locale_${locale}.json`,
+        url: `https://raw.githubusercontent.com/cirept/autofillReplacer/develop/assets/json/locale_${locale}.json`,
+        // url: `https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/locale_${locale}.json`,
         dataType: "json"
       };
 
@@ -257,7 +255,7 @@ const Autofill = (function () {
         // return the STATE json object
         resolve(data);
       }).fail((error) => {
-        reject(`getLocaleAbbreviationInformation Failed : ${error}`);
+        reject(error.responseText);
       }).always();
     });
   }
@@ -321,41 +319,61 @@ const Autofill = (function () {
    * @param {object} data - the html data that was recieved from the Website Settings of DCC
    */
   function populateDefaultList(data) {
-    // log("2 Getting Website Settings Information");
-    // const populateDefaultList =(data) {
-    const myDiv = document.createElement("div");
-
-    // myDiv props
-    // attach data to div element in order to query elements within
-    myDiv.innerHTML = data;
-
-    const franchises = myDiv.querySelector("select#associatedFranchises").options;
-    const myLength = franchises.length;
-    const myFranchises = [];
-
-    // create franchises string
-    for (let x = 0; x < myLength; x += 1) {
-      myFranchises.push(franchises[x].textContent);
-    }
-
-    // fill out autofill list with website settings information
-    defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value || "SEARCH_FOR_ME";
-    defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value || "SEARCH_FOR_ME";
-    defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value || "SEARCH_FOR_ME";
-    defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value || "SEARCH_FOR_ME";
-    defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value || "SEARCH_FOR_ME";
-    defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value || "SEARCH_FOR_ME";
-    defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
-
-    // display confirmation message
-    // log("Website Settings Information Loaded", defaultList);
-
     return new Promise((resolve, reject) => {
+      // log("2 Getting Website Settings Information");
+      // const populateDefaultList =(data) {
+      const myDiv = document.createElement("div");
+
+      // myDiv props
+      // attach data to div element in order to query elements within
+      myDiv.innerHTML = data;
+
+      const franchises = myDiv.querySelector("select#associatedFranchises").options;
+      const myLength = franchises.length;
+      const myFranchises = [];
+
+      // create franchises string
+      for (let x = 0; x < myLength; x += 1) {
+        myFranchises.push(franchises[x].textContent);
+      }
+
+      // fill out autofill list with website settings information
+      defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value;
+      defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value;
+      defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value;
+      defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value;
+      defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value;
+      defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value;
+      defaultList["%FRANCHISES%"] = myFranchises.join(", ");
+
+      // display confirmation message
+      // log("Website Settings Information Loaded", defaultList);
+
+
       if (data) {
         resolve("Website Settings Set");
       } else {
         reject("populateDefaultList failed : Website Settings Not Received");
       }
+    });
+  }
+
+  /**
+   * Fill in the default autofill list with a default value
+   */
+  function verifyDefaultListValues() {
+    return new Promise((resolve) => {
+      const myKeys = Object.keys(defaultList);
+
+      log("default List", defaultList);
+      // set the default value to SEARCH_FOR_ME if values are blank
+      myKeys.map((autofill) => {
+        if (defaultList[autofill] === "") {
+          defaultList[autofill] = "SEARCH_FOR_ME";
+        }
+      });
+
+      resolve("Default Values Verified");
     });
   }
 
@@ -375,36 +393,40 @@ const Autofill = (function () {
       // Get Website Information
       log("Running Fetch");
       fetch(options)
-        .then(websiteSettingsData => populateDefaultList(websiteSettingsData))
+        .then((websiteSettingsData) => populateDefaultList(websiteSettingsData))
         .then(() => getLocaleAbbreviationInformation())
-        .then(stateListObject => setFullStateName(stateListObject))
+        .then((stateListObject) => setFullStateName(stateListObject))
         .then(() => resolve("Default Website Settings Set"))
         .catch((error) => {
-          // log("Error while Loading Website Information");
-          // window.alert(error);
-          log("error encountered", error);
-          reject(error);
+          log("Issue with Website Information Encountered", error);
+
+          // Display message that local is not supported by tool
+          if (error.includes("404")) {
+            log("Locale Not Supported");
+          }
+
+          log("Return Promise");
+          resolve("Default Settings Loaded without Full State Name");
         });
     });
   }
 
   /**
-   * 
+   * Fill in the values for the default phone number autofill tags
    * @param {object} data - the HTML code for the Phone numbers section of the settings in WSM
    */
   function populateDefaultPhoneNumbers(data) {
-
     const myDiv = document.createElement("div");
 
     // attach data to div in order to query elements
     myDiv.innerHTML = data;
 
     // save query information to tool variable
-    defaultList["%PHONE%"] = myDiv.querySelector("input[name*='(__primary_).ctn']").value || "SEARCH_FOR_ME";
-    defaultList["%NEW_PHONE%"] = myDiv.querySelector("input[name*='(__new_).ctn']").value || "SEARCH_FOR_ME";
-    defaultList["%USED_PHONE%"] = myDiv.querySelector("input[name*='(__used_).ctn']").value || "SEARCH_FOR_ME";
-    defaultList["%SERVICE_PHONE%"] = myDiv.querySelector("input[name*='(__service_).ctn']").value || "SEARCH_FOR_ME";
-    defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value || "SEARCH_FOR_ME";
+    defaultList["%PHONE%"] = myDiv.querySelector("input[name*='(__primary_).ctn']").value;
+    defaultList["%NEW_PHONE%"] = myDiv.querySelector("input[name*='(__new_).ctn']").value;
+    defaultList["%USED_PHONE%"] = myDiv.querySelector("input[name*='(__used_).ctn']").value;
+    defaultList["%SERVICE_PHONE%"] = myDiv.querySelector("input[name*='(__service_).ctn']").value;
+    defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value;
 
     // resolve
     return new Promise((resolve) => {
@@ -416,6 +438,7 @@ const Autofill = (function () {
    *   Get Phone Numbers from website settings
    */
   function setPhoneNumbers() {
+    log("Get Phone Numbers");
     return new Promise((resolve) => {
       // build website settings URL path
       const webID = document.getElementById("siWebId").querySelector("label.displayValue").textContent;
@@ -1058,14 +1081,6 @@ const Autofill = (function () {
   }
 
   /**
-   * main function to start the program
-   */
-  function main() {
-    // run tool
-    getToolData();
-  }
-
-  /**
    * Attach events to tool buttons
    */
   function attachButtonEvents() {
@@ -1080,6 +1095,26 @@ const Autofill = (function () {
   }
 
   /**
+   * main function to start the program
+   */
+  function main() {
+    // run tool
+    // Load Tool Styles
+    loadAutofillStyles()
+      .then(() => setGeneralInfo())
+      .then(() => setPhoneNumbers())
+      .then(() => verifyDefaultListValues())
+      .then(() => {
+        log("Tool Settings Loaded");
+        window.onload = setup;
+      })
+      .catch(error => {
+        log("Failed to Load Tool Styles", error);
+        // window.alert(error)
+      });
+  }
+
+  /**
    * Sets up autofill tool
    */
   function setup() {
@@ -1089,24 +1124,6 @@ const Autofill = (function () {
     buildAutofillOptions();
     getAutofillList();
     webIDToolReset();
-  }
-
-  /**
-   * loads tool styles and gets all the tool data from the website settings
-   */
-  function getToolData() {
-    // Load Tool Styles
-    loadAutofillStyles()
-      .then(() => setGeneralInfo())
-      .then(() => setPhoneNumbers())
-      .then(() => {
-        log("Tool Settings Loaded");
-        window.onload = setup;
-      })
-      .catch(error => {
-        log("Failed to Load Tool Styles", error);
-        // window.alert(error)
-      });
   }
 
   //
