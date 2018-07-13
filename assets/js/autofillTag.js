@@ -1,10 +1,12 @@
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
-  const myStyles = GM_getResourceURL("toolStyles"); // eslint-disable-line new-cap no-undef
-  const lastestChanges = GM_getResourceURL("changeLog"); // eslint-disable-line new-cap no-undef
+  /*eslint-disable */
+  const myStyles = GM_getResourceURL("toolStyles");
+  const lastestChanges = GM_getResourceURL("changeLog");
+  const toolInstructions = GM_getResourceURL("toolInstructions");
+  /*eslint-enable */
   const webID = document.getElementById("_webId").value;
   const locale = document.getElementById("_locale").value;
-  const toolInstructions = GM_getResourceURL("toolInstructions"); // eslint-disable-line new-cap no-undef
   const defaultList = {
     "***How to Separate Words***": "Separate words with --> ;",
     "***Example***": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*",
@@ -460,7 +462,7 @@ const Autofill = (function () {
   jQuery.fn.extend({
     animateCss(animationName) {
       const animationEnd = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
-      this.addClass(`animated ${animationName}`).one(animationEnd, function () {
+      this.addClass(`animated ${animationName}`).one(animationEnd, () => {
         jQuery(this).removeClass(`animated ${animationName}`);
       });
       return this;
@@ -515,26 +517,33 @@ const Autofill = (function () {
     }
 
     const listElement = document.createElement("li");
+    const label = document.createElement("div");
+    const myInput = document.createElement("input");
+    const myPointer = document.createElement("i");
+    const removeMeContainer = document.createElement("div");
+    const removeMe = document.createElement("i");
+
+    // main list element props
     listElement.classList.add("autofillEntry");
     listElement.classList.add("row");
 
-    const label = document.createElement("div");
+    // label element props
     label.classList.add("autofillTag");
     label.textContent = autofill;
 
-    const myInput = document.createElement("input");
+    // input area props
     myInput.type = "text";
     myInput.classList.add("regEx");
     myInput.title = text;
     myInput.value = text;
 
-    const myPointer = document.createElement("i");
+    // arrow icon props
     myPointer.classList.add("fas");
     myPointer.classList.add("fa-long-arrow-alt-right");
     myPointer.classList.add("fa-lg");
     myPointer.classList.add("arrow");
 
-    const removeMeContainer = document.createElement("div");
+    // remove element props
     removeMeContainer.classList.add("js-remove");
     removeMeContainer.title = "click to remove";
     removeMeContainer.onclick = (e) => {
@@ -548,7 +557,7 @@ const Autofill = (function () {
       removeDisable(e.currentTarget.parentElement);
     };
 
-    const removeMe = document.createElement("i");
+    // remove me font icon
     removeMe.classList.add("fas");
     removeMe.classList.add("fa-times");
     removeMe.classList.add("fa-lg");
