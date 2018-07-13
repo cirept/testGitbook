@@ -218,7 +218,8 @@ const Autofill = (function () {
    */
   const loadAutofillStyles = new Promise((resolve, reject) => {
     // default styles
-    let autofillStyles = document.createElement("link");
+    const autofillStyles = document.createElement("link");
+    
     autofillStyles.id = "autofill-styles";
     autofillStyles.rel = "stylesheet";
     autofillStyles.href = myStyles;
@@ -258,10 +259,11 @@ const Autofill = (function () {
     jQuery.get(siteSettingsURL, (data) => {
       if (data) {
         const myDiv = document.createElement("div");
-        myDiv.innerHTML = data;
         const franchises = myDiv.querySelector("select#associatedFranchises").options;
         const myLength = franchises.length;
         const myFranchises = [];
+
+        myDiv.innerHTML = data;
 
         // create franchises string
         for (let x = 0; x < myLength; x += 1) {
@@ -269,10 +271,10 @@ const Autofill = (function () {
         }
         // fill out autofill list with website settings information
         defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value || "SEARCH_FOR_ME";
-        defaultList["%STREET%"] = myDiv.querySelector('input#contact_address_street1').value || "SEARCH_FOR_ME";
-        defaultList["%CITY%"] = myDiv.querySelector('input#contact_address_city').value || "SEARCH_FOR_ME";
-        defaultList["%ZIP%"] = myDiv.querySelector('input#contact_address_postalCode').value || "SEARCH_FOR_ME";
-        defaultList["%STATE%"] = myDiv.querySelector('select#contact_address_state').value || "SEARCH_FOR_ME";
+        defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value || "SEARCH_FOR_ME";
+        defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value || "SEARCH_FOR_ME";
+        defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value || "SEARCH_FOR_ME";
+        defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value || "SEARCH_FOR_ME";
         defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value || "SEARCH_FOR_ME";
         defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
 
@@ -285,6 +287,7 @@ const Autofill = (function () {
         reject("Unable to get site settings.");
       }
     }, "html")
+
     /**
      * Once the Website Settings have been loaded, Start the process of finding the FULL STATE NAME of the
      * STATE abbreviation
