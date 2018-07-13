@@ -31,9 +31,10 @@ const Autofill = (function () {
    */
   function log(message, obj) {
     if (obj) {
-      //   console.log(`Autofill Tool : ${message}`, obj);
+      // remove comment to enable console logs
+      // console.log(`Autofill Tool : ${message}`, obj);
     } else {
-      //   console.log(`Autofill Tool : ${message}`);
+      // console.log(`Autofill Tool : ${message}`);
     }
   }
 
@@ -210,256 +211,225 @@ const Autofill = (function () {
   wsmEditorTools.appendChild(autofillOptionsContainer);
 
   //
-  // Promises
+  // Functions
   //
 
   /**
    * Loads all the tool styles
    */
-  const loadAutofillStyles = new Promise((resolve, reject) => {
-    // default styles
-    const autofillStyles = document.createElement("link");
+  function loadAutofillStyles() {
+    return new Promise((resolve, reject) => {
+      // default styles
+      const autofillStyles = document.createElement("link");
 
-    // default style link props
-    autofillStyles.id = "autofill-styles";
-    autofillStyles.rel = "stylesheet";
-    autofillStyles.href = myStyles;
-    document.head.appendChild(autofillStyles);
-    // resolve or reject
-    if (document.getElementById("autofill-styles")) {
-      resolve("Success!");
-    } else {
-      reject("Autofill Tool styles were not attached.");
-    }
-  });
+      // default style link props
+      autofillStyles.id = "autofill-styles";
+      autofillStyles.rel = "stylesheet";
+      autofillStyles.href = myStyles;
+      document.head.appendChild(autofillStyles);
+      // resolve or reject
+      if (document.getElementById("autofill-styles")) {
+        resolve("Success!");
+      } else {
+        reject("Autofill Tool styles were not attached.");
+      }
+    });
+  }
 
   /**
    * Gets the state JSON information
    * Resolves an array of state objects with the name and abbreviations
    */
-  const getLocalAbbreviationInformation = new Promise((resolve, reject) => {
-    const options = {
-      url: `https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/locale_${locale}.json`,
-      dataType: "json"
-    };
+  function getLocaleAbbreviationInformation() {
+    log("3 Get Locale Abbreviation Information");
+    return new Promise((resolve, reject) => {
+      const options = {
+        // url: `https://raw.githubusercontent.com/cirept/autofillReplacer/develop/assets/json/locale_${locale}.json`,
+        url: `https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/locale_${locale}.json`,
+        dataType: "json"
+      };
 
-    // get file data
-    jQuery.ajax(options).done((data) => {
-      // return the STATE json object
-      resolve(data);
-    }).fail((error) => {
-      reject(error);
-    }).always();
-  });
+      // get file data
+      jQuery.ajax(options).done((data) => {
+
+        log("Locale Information Received", data);
+
+        // return the STATE json object
+        resolve(data);
+      }).fail((error) => {
+        reject(`getLocaleAbbreviationInformation Failed : ${error}`);
+      }).always();
+    });
+  }
+
+  /**
+   * Set the Full State Name
+   */
+  function setFullStateName(stateList) {
+
+    log("4 Fill in State Full Name", stateList);
+    // filter the array of states down to the matching state.
+    const filteredStates = stateList.filter((state) => {
+
+      // destructuring
+      const {
+        abbreviation
+      } = state;
+
+      // return value if it matches the current state.
+      return defaultList["%STATE%"] === abbreviation;
+    });
+
+    // display console message that no match was found
+    if (filteredStates.length > 1 || filteredStates.length < 1) {
+      // set value to the default value
+      log("Region not supported by the tool");
+      // reject("No Match Found");
+    }
+    // set STATE FULL NAME to matched state
+    if (filteredStates.length === 1) {
+      defaultList["%STATE_FULL_NAME%"] = filteredStates[0].name;
+
+      // display confirmation message
+      log("State Full Name Added", filteredStates);
+    }
+
+    return new Promise((resolve) => {
+      resolve("Full State Name Set");
+    })
+  }
+
+  /**
+   *  Generic function to perform ajax requests.  I wanted to make my own.  =]
+   *
+   * @param {object} options - the ajax request options
+   * @returns the data that is recieved from the ajax request
+   */
+  function fetch(options) {
+    log("1 fetching");
+    return new Promise((resolve, reject) => {
+      jQuery.ajax(options).done((data) => {
+        resolve(data);
+      }).fail((error) => {
+        reject(error);
+      }).always();
+    });
+  }
+
+  /**
+   * 
+   * @param {object} data - the html data that was recieved from the Website Settings of DCC
+   */
+  function populateDefaultList(data) {
+    log('2 Getting Website Settings Information');
+    // const populateDefaultList =(data) {
+    const myDiv = document.createElement("div");
+
+    // myDiv props
+    // attach data to div element in order to query elements within
+    myDiv.innerHTML = data;
+
+    const franchises = myDiv.querySelector("select#associatedFranchises").options;
+    const myLength = franchises.length;
+    const myFranchises = [];
+
+    // create franchises string
+    for (let x = 0; x < myLength; x += 1) {
+      myFranchises.push(franchises[x].textContent);
+    }
+
+    // fill out autofill list with website settings information
+    defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value || "SEARCH_FOR_ME";
+    defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value || "SEARCH_FOR_ME";
+    defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value || "SEARCH_FOR_ME";
+    defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value || "SEARCH_FOR_ME";
+    defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value || "SEARCH_FOR_ME";
+    defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value || "SEARCH_FOR_ME";
+    defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
+
+    // display confirmation message
+    log("Website Settings Information Loaded", defaultList);
+
+    return new Promise((resolve, reject) => {
+      if (data) {
+        resolve('Website Settings Set');
+      } else {
+        reject('populateDefaultList failed : Website Settings Not Received');
+      }
+    });
+  }
 
   /**
    * Get data from "Settings" to autofill into the defaults list
    */
-  const getWebsiteGeneralInfo = new Promise((resolve, reject) => {
-    // path to open the website settings tab
-    const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
-    const options = {
-      url: siteSettingsURL,
-      dataType: "html"
-    };
+  function setGeneralInfo() {
+    return new Promise((resolve, reject) => {
+      // path to open the website settings tab
+      const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
+      const options = {
+        url: siteSettingsURL,
+        dataType: "html"
+      };
 
-    // get website settings information
-    jQuery.ajax(options).done((data) => {
-      console.log("data", data);
-      // if (data) {
-      const myDiv = document.createElement("div");
-      const franchises = myDiv.querySelector("select#associatedFranchises").options;
-      const myLength = franchises.length;
-      const myFranchises = [];
-
-      // myDiv props
-      myDiv.innerHTML = data;
-
-      // create franchises string
-      for (let x = 0; x < myLength; x += 1) {
-        myFranchises.push(franchises[x].textContent);
-      }
-
-      // fill out autofill list with website settings information
-      defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value || "SEARCH_FOR_ME";
-      defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value || "SEARCH_FOR_ME";
-      defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value || "SEARCH_FOR_ME";
-      defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value || "SEARCH_FOR_ME";
-      defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value || "SEARCH_FOR_ME";
-      defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value || "SEARCH_FOR_ME";
-      defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
-
-      // display confirmation message
-      log("Website Settings Information Loaded");
-
-      /**
-       * Promise to get full state name from json files
-       */
-      return new Promise((resolve, reject) => {
-
-        // consume promise and get the local abbreviation data
-        // getLocalAbbreviationInformation.then((stateList) => {
-        getLocalAbbreviationInformation.then((stateList) => {
-          // filter the array of states down to the matching state.
-          const filteredStates = stateList.filter((state) => {
-
-            // destructuring
-            const {
-              abbreviation
-            } = state;
-
-            // return value if it matches the current state.
-            return defaultList["%STATE%"] === abbreviation;
-          });
-
-          // display console message that no match was found
-          if (filteredStates.length > 1 || filteredStates.length < 1) {
-            // set value to the default value
-            log("Region not supported by the tool");
-          }
-          // set STATE FULL NAME to matched state
-          if (filteredStates.length === 1) {
-            defaultList["%STATE_FULL_NAME%"] = filteredStates[0].name;
-
-            // display confirmation message
-            log("State Full Name Loaded");
-          }
-          // resolve with success
-          resolve("Success!");
-        }, (error) => {
+      // getLocaleAbbreviationInformation
+      // Get Website Information
+      log('Running Fetch');
+      fetch(options)
+        .then(websiteSettingsData => populateDefaultList(websiteSettingsData))
+        .then(() => getLocaleAbbreviationInformation())
+        .then(stateListObject => setFullStateName(stateListObject))
+        .then(() => resolve("Default Website Settings Set"))
+        .catch((error) => {
+          // log('Error while Loading Website Information');
+          // window.alert(error);
+          log("error encountered", error);
           reject(error);
-          log("Get state full name failed", error.responseText);
         });
-      });
-    }).fail((error) => {
-      reject(`Unable to get site settings : ${error}`);
-    }).always(() => {
-      // resolve promise
-      resolve("Site Settings Loaded");
     });
+  }
 
-    // siteSettingsURL, (data) => {
-    //   if (data) {
-    //     const myDiv = document.createElement("div");
-    //     const franchises = myDiv.querySelector("select#associatedFranchises").options;
-    //     const myLength = franchises.length;
-    //     const myFranchises = [];
+  /**
+   * 
+   * @param {object} data - the HTML code for the Phone numbers section of the settings in WSM
+   */
+  function populateDefaultPhoneNumbers(data) {
 
-    //     // myDiv props
-    //     myDiv.innerHTML = data;
+    const myDiv = document.createElement("div");
 
-    //     // create franchises string
-    //     for (let x = 0; x < myLength; x += 1) {
-    //       myFranchises.push(franchises[x].textContent);
-    //     }
+    // attach data to div in order to query elements
+    myDiv.innerHTML = data;
 
-    //     // fill out autofill list with website settings information
-    //     defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value || "SEARCH_FOR_ME";
-    //     defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value || "SEARCH_FOR_ME";
-    //     defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value || "SEARCH_FOR_ME";
-    //     defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value || "SEARCH_FOR_ME";
-    //     defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value || "SEARCH_FOR_ME";
-    //     defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value || "SEARCH_FOR_ME";
-    //     defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
+    // save query information to tool variable
+    defaultList["%PHONE%"] = myDiv.querySelector("input[name*='(__primary_).ctn']").value || "SEARCH_FOR_ME";
+    defaultList["%NEW_PHONE%"] = myDiv.querySelector("input[name*='(__new_).ctn']").value || "SEARCH_FOR_ME";
+    defaultList["%USED_PHONE%"] = myDiv.querySelector("input[name*='(__used_).ctn']").value || "SEARCH_FOR_ME";
+    defaultList["%SERVICE_PHONE%"] = myDiv.querySelector("input[name*='(__service_).ctn']").value || "SEARCH_FOR_ME";
+    defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value || "SEARCH_FOR_ME";
 
-    //     // display confirmation message
-    //     log("Website Settings Information Loaded");
-
-    //     // resolve promise
-    //     resolve("Site Settings Loaded");
-    //   } else {
-    //     reject("Unable to get site settings.");
-    //   }
-    // }, "html")
-
-    // /**
-    //  * Once the Website Settings have been loaded, Start the process of finding the FULL STATE NAME of the
-    //  * STATE abbreviation
-    //  */
-    // .done(() => {
-
-    //     /**
-    //      * Promise to get full state name from json files
-    //      */
-    //     return new Promise((resolve, reject) => {
-
-    //       // consume promise and get the local abbreviation data
-    //       // getLocalAbbreviationInformation.then((stateList) => {
-    //       getLocalAbbreviationInformation.then((stateList) => {
-    //         // filter the array of states down to the matching state.
-    //         const filteredStates = stateList.filter((state) => {
-
-    //           // destructuring
-    //           const {
-    //             abbreviation
-    //           } = state;
-
-    //           // return value if it matches the current state.
-    //           return defaultList["%STATE%"] === abbreviation;
-    //         });
-
-    //         // display console message that no match was found
-    //         if (filteredStates.length > 1 || filteredStates.length < 1) {
-    //           // set value to the default value
-    //           log("Region not supported by the tool");
-    //         }
-    //         // set STATE FULL NAME to matched state
-    //         if (filteredStates.length === 1) {
-    //           defaultList["%STATE_FULL_NAME%"] = filteredStates[0].name;
-
-    //           // display confirmation message
-    //           log("State Full Name Loaded");
-    //         }
-    //         // resolve with success
-    //         resolve("Success!");
-    //       }, (error) => {
-    //         reject(error);
-    //         log("Get state full name failed", error.responseText);
-    //       });
-    //     });
-
-
-    //   })
-    //   .fail((error) => {
-    //     // reject(`unable to get site settings, ${error}`);
-    //     log("Failed to Load Website Settings", error);
-    //   })
-    //   .always(() => {
-    //     resolve();
-    //   });
-  });
+    // resolve
+    return new Promise((resolve) => {
+      resolve("Phone Numbers Set");
+    });
+  }
 
   /**
    *   Get Phone Numbers from website settings
    */
-  const getWebsitePhoneNumbers = new Promise((resolve, reject) => {
-    // build website settings URL path
-    const webID = document.getElementById("siWebId").querySelector("label.displayValue").textContent;
-    const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
+  function setPhoneNumbers() {
+    return new Promise((resolve) => {
+      // build website settings URL path
+      const webID = document.getElementById("siWebId").querySelector("label.displayValue").textContent;
+      const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
+      const options = {
+        url: siteSettingsURL,
+        dataType: "html"
+      };
 
-    jQuery.get(siteSettingsURL, (data) => {
-        const myDiv = document.createElement("div");
-        myDiv.innerHTML = data;
-        defaultList["%PHONE%"] = myDiv.querySelector("input[name*='(__primary_).ctn']").value || "SEARCH_FOR_ME";
-        defaultList["%NEW_PHONE%"] = myDiv.querySelector("input[name*='(__new_).ctn']").value || "SEARCH_FOR_ME";
-        defaultList["%USED_PHONE%"] = myDiv.querySelector("input[name*='(__used_).ctn']").value || "SEARCH_FOR_ME";
-        defaultList["%SERVICE_PHONE%"] = myDiv.querySelector("input[name*='(__service_).ctn']").value || "SEARCH_FOR_ME";
-        defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value || "SEARCH_FOR_ME";
-      }, "html")
-      .done(() => {
-        log("Phone Numbers Loaded");
-      })
-      .fail(() => {
-        log("failed to get phone numbers");
-      })
-      .always(() => {
-        resolve();
-      });
-  });
-
-  //
-  // Functions
-  //
+      fetch(options)
+        .then(phoneNumberInfo => populateDefaultPhoneNumbers(phoneNumberInfo))
+        .then(resolve("Phone Numbers Added"));
+    });
+  }
 
   /**
    * jQuery functions for animate css
@@ -647,7 +617,9 @@ const Autofill = (function () {
    * disabled "magic" button if an entry is blank
    */
   function toggleMagicButton() {
-    autofillOptionsList.getElementsByClassName("myError").length >= 1 ? applyAutofills_button.classList.add("disabled") : applyAutofills_button.classList.remove("disabled");
+    autofillOptionsList.getElementsByClassName("myError").length >= 1 ?
+      applyAutofills_button.classList.add("disabled") :
+      applyAutofills_button.classList.remove("disabled");
   }
 
   /**
@@ -1010,7 +982,8 @@ const Autofill = (function () {
     const regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
 
     // run CMS Content Pop Up edit window IF WINDOW IS OPEN
-    if (window.location.pathname.indexOf("editSite") >= 0 && siteEditorIframe.find("div#hiddenContentPopUpOuter").hasClass("opened")) {
+    if (window.location.pathname.indexOf("editSite") >= 0 &&
+      siteEditorIframe.find("div#hiddenContentPopUpOuter").hasClass("opened")) {
       // save contents of cms content edit frame
       cmsIframe = siteEditorIframe.find("iframe#cmsContentEditorIframe").contents();
 
@@ -1019,7 +992,8 @@ const Autofill = (function () {
 
       // pass elements with children as base element for autofill replacing
       replaceTextCMS(recordEditWindow, regReplace);
-    } else if (window.location.pathname.indexOf("editSite") >= 0 && !siteEditorIframe.find("div#hiddenContentPopUpOuter").hasClass("opened")) {
+    } else if (window.location.pathname.indexOf("editSite") >= 0 &&
+      !siteEditorIframe.find("div#hiddenContentPopUpOuter").hasClass("opened")) {
       // get contens of iframe
       viewerIframe = siteEditorIframe.find("iframe#viewer").contents();
 
@@ -1070,7 +1044,9 @@ const Autofill = (function () {
    * @return the value for the data item or "No Data Found" message
    */
   function getItemFromLocalStorage(name) {
-    return window.localStorage.getItem(name) === null ? "No Data Found in Local Storage" : window.localStorage.getItem(name);
+    return window.localStorage.getItem(name) === null ?
+      "No Data Found in Local Storage" :
+      window.localStorage.getItem(name);
   }
 
   /**
@@ -1112,21 +1088,25 @@ const Autofill = (function () {
     attachModals();
     buildAutofillOptions();
     getAutofillList();
-    webIDToolReset(); // Added 7/8/2018
+    webIDToolReset();
   }
-
 
   /**
    * loads tool styles and gets all the tool data from the website settings
    */
   function getToolData() {
-    return Promise.all([loadAutofillStyles, getWebsiteGeneralInfo, getWebsitePhoneNumbers]).then(() => {
-      log("All Settings Loaded");
-      window.onload = setup;
-    }, (error) => {
-      // tool failed to load
-      log("Autofill Tool Failed to Load data, resorting to default values", error);
-    });
+    // Load Tool Styles
+    loadAutofillStyles()
+      .then(() => setGeneralInfo())
+      .then(() => setPhoneNumbers())
+      .then(() => {
+        log("Tool Settings Loaded");
+        window.onload = setup;
+      })
+      .catch(error => {
+        log("Failed to Load Tool Styles", error);
+        // window.alert(error)
+      });
   }
 
   //
