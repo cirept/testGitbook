@@ -1,5 +1,5 @@
 const Autofill = (function () {
-  const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
+  const autofillTagListURL = "https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/autofill_list.json";
   /* eslint-disable */
   const myStyles = GM_getResourceURL("toolStyles");
   const lastestChanges = GM_getResourceURL("changeLog");
@@ -203,7 +203,7 @@ const Autofill = (function () {
   autofillOptionsContainer.appendChild(messageDisplay);
   autofillOptionsContainer.appendChild(listContainer);
   autofillOptionsContainer.appendChild(actionContainer);
-  autofillOptionsContainer.appendChild(autofillsList);
+  // autofillOptionsContainer.appendChild(autofillsList);
 
   // attach tool container to main tool container
   wsmEditorTools.appendChild(applyAutofills_button);
@@ -793,8 +793,11 @@ const Autofill = (function () {
    * Creates an active menu item that the tool will use to replace text with autofill tags
    * @param {object} elem - element that will get it"s onclick event binded
    */
-  function createAutofillDropdownMenu(elem) {
-    elem.onclick = function () {
+  function addAutofillToList(elem) {
+    console.log("binding onclick listener for", elem);
+    elem.onclick = () => {
+      // return () => {
+      console.log("Clicked Option Item");
       const listElement = listItem(elem.textContent);
       const listLength = listElement.children.length;
 
@@ -819,34 +822,52 @@ const Autofill = (function () {
   }
 
   /**
-   * SUCCESS BINDING EVENT
-   * Build out drop down list with data gathered from JSON file
-   * @param {object} data - the autofill data that will be used to populate the options
+   * Create the list elements for the autofill options list modal
+   * @param {object} autofillListData - the autofill object containing all the autofill options
    */
-  function buildAutofillList(data) {
-    const localData = localDataToString();
-    // build out drop down menu
-    for (const myKey in data[0]) {
-      if (data[0].hasOwnProperty(myKey)) {
+  function createAutofillListOptions(autofillListData) {
+    return new Promise((resolve, reject) => {
+      // get local storage data
+      const localData = localDataToString();
+
+      // loop through each autofill object and add it to the list.
+      autofillListData.map((autofill) => {
+        const {
+          autofill: tag,
+          description,
+        } = autofill;
+
         // create "li" for each autofill tag in the list
         const myListItem = document.createElement("li");
-        myListItem.textContent = myKey;
+        // attach new "li" to main list
+        const tooltipText = description ? description : "**No tooltip information available**";
+
+        // list item props
+        myListItem.textContent = tag;
         myListItem.classList.add("btn");
         myListItem.classList.add("btn-light");
         myListItem.classList.add("autofill-list-item");
+        myListItem.title = tooltipText;
         // if autofill tag is present in the active list, disable it
-        if (localData.includes(myKey)) {
+        if (localData.includes(tag)) {
           myListItem.classList.add("disabled");
         }
+
+        // bind listener to "li" item
+        // myListItem.onclick = addAutofillToList(myListItem);
+        addAutofillToList(myListItem);
+
         // add the list element to the "drop down" list
         autofillsList.appendChild(myListItem);
-        // bind listener to "li" item
-        createAutofillDropdownMenu(myListItem);
-        // attach new "li" to main list
-        const tooltipText = data[0][myKey] ? data[0][myKey] : "**No tooltip infor available**";
-        myListItem.title = tooltipText;
+      });
+
+      // resolve or reject
+      if (autofillsList.childElementCount > 0) {
+        resolve("Autofill Selection List Created");
+      } else {
+        reject("Autofill List Selection was not create");
       }
-    }
+    });
   }
 
   /**
@@ -876,19 +897,40 @@ const Autofill = (function () {
   }
 
   /**
+   * Attachs the completed modal to the web page
+   */
+  function attachAutofillListModal() {
+    // build autofill modal
+    const autofillModal = document.createElement("div");
+    console.log('autofill list', autofillsList);
+
+    autofillModal.innerHTML = `
+        <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+              ${autofillsList.innerHTML}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    // attach modal to page
+    document.body.appendChild(autofillModal);
+  }
+
+  /**
    * Start events to build the autofill "drop down menu"
    */
-  function getAutofillList() {
+  function buildAutofillListModal() {
     const options = {
-      url: myURL,
+      url: autofillTagListURL,
       dataType: "json"
     };
-    jQuery.ajax(options).done((data) => {
-      // log("data", data);
-      buildAutofillList(data);
-    }).fail((error) => {
-      log("Autofill List Failed to Load, reverting to manual Autofill Entry Method", error);
-    }).always();
+
+    fetch(options)
+      .then(data => createAutofillListOptions(data))
+      .then(() => attachAutofillListModal());
   }
 
   /**
@@ -1129,17 +1171,77 @@ const Autofill = (function () {
    * Sets up autofill tool
    */
   function setup() {
+    buildAutofillListModal();
+    // buildLatestChangesModal();
+    // buildInstructionsModal();
     attachButtonEvents();
     attachToolToPage();
-    attachModals();
+    // attachModals();
     buildAutofillOptions();
-    getAutofillList();
     webIDToolReset();
   }
 
   //
   // Modals
   //
+
+  function attachLatestChangesModal(data) {
+    const conv = new showdown.Converter();
+    showdown.setFlavor("github");
+    const changeLogData = conv.makeHtml(data);
+
+    // build latest changes modal
+    const lastestChangesModal = document.createElement("div");
+    // add the modal content + the Latest Changes Markdown Doc Content
+    lastestChangesModal.innerHTML = `
+        <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                ${changeLogData}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+    // attach modal to page
+    document.body.appendChild(lastestChangesModal);
+  }
+
+  function getLatestChanges() {
+    const options = {
+      url: lastestChanges,
+      dataType: "text"
+    };
+
+    fetch(options)
+      .then(data => attachLatestChangesModal(data));
+    // // get latest changes markdown doc.
+    // jQuery.get(lastestChanges, (data) => {
+    //   const conv = new showdown.Converter();
+    //   showdown.setFlavor("github");
+    //   const changeLogData = conv.makeHtml(data);
+
+    //   // build latest changes modal
+    //   const lastestChangesModal = document.createElement("div");
+    //   // add the modal content + the Latest Changes Markdown Doc Content
+    //   lastestChangesModal.innerHTML = `
+    //   <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
+    //     <div class="modal-dialog modal-dialog-centered" role="document">
+    //       <div class="modal-content">
+    //         <div class="modal-body">
+    //           ${changeLogData}
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // `;
+
+    //   // attach modal to page
+    //   document.body.appendChild(lastestChangesModal);
+    // }, "text");
+  }
 
   /**
    * attach modals
@@ -1149,22 +1251,24 @@ const Autofill = (function () {
     // Autofill Modal
     //
 
-    // build autofill modal
-    const autofillModal = document.createElement("div");
-    autofillModal.innerHTML = `
-        <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-body">
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    // attach modal to page
-    document.body.appendChild(autofillModal);
+    // // build autofill modal
+    // const autofillModal = document.createElement("div");
+
+    // autofillModal.innerHTML = `
+    //     <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
+    //       <div class="modal-dialog" role="document">
+    //         <div class="modal-content">
+    //           <div class="modal-body">
+    //           ${autofillsList}
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   `;
+    // // attach modal to page
+    // document.body.appendChild(autofillModal);
     // fill autofill modal with content
-    document.querySelector("#autofillModal .modal-body").appendChild(autofillsList);
+    // document.querySelector("#autofillModal .modal-body").appendChild(autofillsList);
 
     //
     // Latest Changes Modal
