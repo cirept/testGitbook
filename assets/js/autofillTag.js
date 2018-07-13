@@ -1,10 +1,10 @@
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
-  /*eslint-disable */
+  /* eslint-disable */
   const myStyles = GM_getResourceURL("toolStyles");
   const lastestChanges = GM_getResourceURL("changeLog");
   const toolInstructions = GM_getResourceURL("toolInstructions");
-  /*eslint-enable */
+  /* eslint-enable */
   const webID = document.getElementById("_webId").value;
   const locale = document.getElementById("_locale").value;
   const defaultList = {
@@ -451,7 +451,7 @@ const Autofill = (function () {
       };
 
       fetch(options)
-        .then(phoneNumberInfo => populateDefaultPhoneNumbers(phoneNumberInfo))
+        .then((phoneNumberInfo) => populateDefaultPhoneNumbers(phoneNumberInfo))
         .then(resolve("Phone Numbers Added"));
     });
   }
@@ -649,9 +649,11 @@ const Autofill = (function () {
    * disabled "magic" button if an entry is blank
    */
   function toggleMagicButton() {
-    autofillOptionsList.getElementsByClassName("myError").length >= 1 ?
-      applyAutofills_button.classList.add("disabled") :
+    if (autofillOptionsList.getElementsByClassName("myError").length >= 1) {
+      applyAutofills_button.classList.add("disabled");
+    } else {
       applyAutofills_button.classList.remove("disabled");
+    }
   }
 
   /**
