@@ -8,7 +8,7 @@ const Autofill = (function () {
   const locale = document.getElementById("_locale").value;
   const toolInstructions = GM_getResourceURL("toolInstructions"); // eslint-disable-line new-cap
   const defaultList = {
-    "***How to Seperate Words***": "Seperate words with --> ;",
+    "***How to Separate Words***": "Separate words with --> ;",
     "***Example***": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*",
     "%DEALER_NAME%": "SEARCH_FOR_ME",
     "%FRANCHISES%": "SEARCH_FOR_ME",
