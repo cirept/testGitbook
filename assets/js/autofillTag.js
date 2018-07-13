@@ -1,5 +1,4 @@
-/* global document, localStorage, NodeFilter, window,
-GM_getResourceURL, GM_getResourceURL, jQuery */
+/* global document, localStorage, NodeFilter, window, GM_getResourceURL, GM_getResourceURL, jQuery */
 
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
@@ -22,7 +21,7 @@ const Autofill = (function () {
     "%NEW_PHONE%": "SEARCH_FOR_ME",
     "%USED_PHONE%": "SEARCH_FOR_ME",
     "%SERVICE_PHONE%": "SEARCH_FOR_ME",
-    "%PARTS_PHONE%": "SEARCH_FOR_ME",
+    "%PARTS_PHONE%": "SEARCH_FOR_ME"
   };
 
   /**
@@ -43,83 +42,101 @@ const Autofill = (function () {
   //
 
   const wsmEditorTools = document.createElement("div");
+  const autofillOptionsContainer = document.createElement("div");
+  const messageDisplay = document.createElement("div");
+  const buttonOptions_row1 = document.createElement("div");
+  const buttonOptions_row2 = document.createElement("div");
+  const actionContainer = document.createElement("div");
+  const listContainer = document.createElement("div");
+  const autofillOptionsList = document.createElement("ul");
+  const autofillsList = document.createElement("ul");
+  const minimizeList_button = document.createElement("button");
+  const defaultReset_button = document.createElement("button");
+  const applyAutofills_button = document.createElement("button");
+  const addAutofill_button = document.createElement("button");
+  const changeLog_button = document.createElement("button");
+  const instructions_button = document.createElement("button");
+  const reportBug = document.createElement("a");
+  const requestEnhancement = document.createElement("a");
+  
+
+  // wsm editor tools props
   wsmEditorTools.classList.add("customEditorTools");
 
-  const autofillOptionsContainer = document.createElement("div");
+  // autofill options container props
   autofillOptionsContainer.classList.add("autofillOptionsContainer");
   autofillOptionsContainer.classList.add("hide");
 
-  // minimize list element
-  const minimizeList = document.createElement("button");
-  minimizeList.classList.add("minimizeList");
-  minimizeList.classList.add("btn");
-  minimizeList.classList.add("btn-sm");
-  minimizeList.classList.add("btn-wd");
-  minimizeList.classList.add("btn-autofill-tool");
-  minimizeList.title = "show list";
-  minimizeList.type = "button";
-  minimizeList.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
-  minimizeList.onclick = toggleToolPanel;
+  // minimize list element props
+  minimizeList_button.classList.add("minimizeList");
+  minimizeList_button.classList.add("btn");
+  minimizeList_button.classList.add("btn-sm");
+  minimizeList_button.classList.add("btn-wd");
+  minimizeList_button.classList.add("btn-autofill-tool");
+  minimizeList_button.title = "show list";
+  minimizeList_button.type = "button";
+  minimizeList_button.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
+  minimizeList_button.onclick = toggleToolPanel;
 
-  const autofillOptionsList = document.createElement("ul");
+// autofill options list props
   autofillOptionsList.id = "autofillOptions";
   autofillOptionsList.classList.add("autofillOptions");
 
-  const messageDisplay = document.createElement("div");
+  // message display props
   messageDisplay.id = "toolMessageDisplay";
   messageDisplay.classList.add("container-fluid");
   messageDisplay.textContent = `Autofill tag text replacer tool - version ${GM_info.script.version}`;
 
-  const defaultReset = document.createElement("button");
-  defaultReset.id = "defaultReset";
-  defaultReset.classList.add("btn");
-  defaultReset.classList.add("btn-sm");
-  defaultReset.classList.add("btn-danger");
-  defaultReset.classList.add("m-1");
-  defaultReset.classList.add("col");
-  defaultReset.title = "Reset Values";
-  defaultReset.innerHTML = "<i class='fas fa-redo fa-lg'></i>";
-  defaultReset.onclick = () => {
+  // default reset button props
+  defaultReset_button.id = "defaultReset";
+  defaultReset_button.classList.add("btn");
+  defaultReset_button.classList.add("btn-sm");
+  defaultReset_button.classList.add("btn-danger");
+  defaultReset_button.classList.add("m-1");
+  defaultReset_button.classList.add("col");
+  defaultReset_button.title = "Reset Values";
+  defaultReset_button.innerHTML = "<i class='fas fa-redo fa-lg'></i>";
+  defaultReset_button.onclick = () => {
     resetValues(true, "Values Reset");
   };
 
-  const applyAutofills = document.createElement("button");
-  applyAutofills.id = "applyAutofills";
-  applyAutofills.classList.add("btn");
-  applyAutofills.classList.add("btn-sm");
-  applyAutofills.classList.add("btn-wd");
-  applyAutofills.classList.add("btn-success");
-  applyAutofills.type = "button";
-  applyAutofills.title = "apply autofills";
-  applyAutofills.innerHTML = "<i class='fas fa-magic fa-lg'></i>";
-  applyAutofills.onclick = autofills;
+  // apply autofill button props
+  applyAutofills_button.id = "applyAutofills";
+  applyAutofills_button.classList.add("btn");
+  applyAutofills_button.classList.add("btn-sm");
+  applyAutofills_button.classList.add("btn-wd");
+  applyAutofills_button.classList.add("btn-success");
+  applyAutofills_button.type = "button";
+  applyAutofills_button.title = "apply autofills";
+  applyAutofills_button.innerHTML = "<i class='fas fa-magic fa-lg'></i>";
+  applyAutofills_button.onclick = autofills;
 
-  const addButton = document.createElement("button");
-  addButton.id = "addAutofill";
-  addButton.classList.add("btn");
-  addButton.classList.add("btn-sm");
-  addButton.classList.add("btn-autofill-tool");
-  addButton.classList.add("m-1");
-  addButton.classList.add("col");
-  addButton.dataset.toggle = "modal";
-  addButton.dataset.target = "#autofillModal";
-  addButton.value = "addAutofill";
-  addButton.title = "Add Autofill";
-  addButton.innerHTML = "<i class='fas fa-plus fa-lg'></i>";
+  // add button props
+  addAutofill_button.id = "addAutofill";
+  addAutofill_button.classList.add("btn");
+  addAutofill_button.classList.add("btn-sm");
+  addAutofill_button.classList.add("btn-autofill-tool");
+  addAutofill_button.classList.add("m-1");
+  addAutofill_button.classList.add("col");
+  addAutofill_button.dataset.toggle = "modal";
+  addAutofill_button.dataset.target = "#autofillModal";
+  addAutofill_button.value = "addAutofill";
+  addAutofill_button.title = "Add Autofill";
+  addAutofill_button.innerHTML = "<i class='fas fa-plus fa-lg'></i>";
 
-  const changeLogButton = document.createElement("button");
-  changeLogButton.id = "addAutofill";
-  changeLogButton.classList.add("btn");
-  changeLogButton.classList.add("btn-sm");
-  changeLogButton.classList.add("btn-info");
-  changeLogButton.classList.add("col");
-  changeLogButton.classList.add("m-1");
-  changeLogButton.dataset.toggle = "modal";
-  changeLogButton.dataset.target = "#lastestChangesModal";
-  changeLogButton.innerHTML = "<i class='fas fa-file-alt'></i>";
-  changeLogButton.title = "Latest Changes";
+  // change log button props
+  changeLog_button.id = "viewLatestChanges";
+  changeLog_button.classList.add("btn");
+  changeLog_button.classList.add("btn-sm");
+  changeLog_button.classList.add("btn-info");
+  changeLog_button.classList.add("col");
+  changeLog_button.classList.add("m-1");
+  changeLog_button.dataset.toggle = "modal";
+  changeLog_button.dataset.target = "#lastestChangesModal";
+  changeLog_button.innerHTML = "<i class='fas fa-file-alt'></i>";
+  changeLog_button.title = "Latest Changes";
 
-  const reportBug = document.createElement("a");
+  // report bug link props
   reportBug.id = "reportBug";
   reportBug.classList.add("btn");
   reportBug.classList.add("btn-sm");
@@ -131,7 +148,7 @@ const Autofill = (function () {
   reportBug.target = "_blank";
   reportBug.title = "Report Bug";
 
-  const requestEnhancement = document.createElement("a");
+  // request enhancement link props
   requestEnhancement.id = "requestEnhancement";
   requestEnhancement.classList.add("btn");
   requestEnhancement.classList.add("btn-sm");
@@ -143,55 +160,59 @@ const Autofill = (function () {
   requestEnhancement.title = "Request Enhancement";
   requestEnhancement.target = "_blank";
 
-  const instructions = document.createElement("button");
-  instructions.id = "toolInstructions";
-  instructions.classList.add("btn");
-  instructions.classList.add("btn-sm");
-  instructions.classList.add("btn-info");
-  instructions.classList.add("col");
-  instructions.classList.add("m-1");
-  instructions.dataset.toggle = "modal";
-  instructions.dataset.target = "#toolInstructionsModal";
-  instructions.innerHTML = "<i class='fas fa-info'></i>";
-  instructions.title = "Instructions";
+  // view instructions button props
+  instructions_button.id = "toolInstructions";
+  instructions_button.classList.add("btn");
+  instructions_button.classList.add("btn-sm");
+  instructions_button.classList.add("btn-info");
+  instructions_button.classList.add("col");
+  instructions_button.classList.add("m-1");
+  instructions_button.dataset.toggle = "modal";
+  instructions_button.dataset.target = "#toolInstructionsModal";
+  instructions_button.innerHTML = "<i class='fas fa-info'></i>";
+  instructions_button.title = "Instructions";
 
-  const row1 = document.createElement("div");
-  row1.classList.add("row");
+  // button options container row 1 props
+  buttonOptions_row1.classList.add("row");
 
-  const row2 = document.createElement("div");
-  row2.classList.add("row");
+  // button options container row 2 props
+  buttonOptions_row2.classList.add("row");
 
-  const actionContainer = document.createElement("div");
+  // tool button actions container props
   actionContainer.classList.add("list-action-container");
   actionContainer.classList.add("container-fluid");
 
-  const autofillDropdown = document.createElement("ul");
-  autofillDropdown.tabIndex = "4";
+  // autofill list props
+  autofillsList.tabIndex = "4";
 
-  const listContainer = document.createElement("div");
+  // list container props
   listContainer.classList.add("list-container");
   listContainer.classList.add("container-fluid");
 
   // attach bottom buttons
-  row1.appendChild(addButton);
-  row1.appendChild(defaultReset);
-  row2.appendChild(reportBug);
-  row2.appendChild(requestEnhancement);
-  row2.appendChild(changeLogButton);
-  row2.appendChild(instructions);
+  buttonOptions_row1.appendChild(addAutofill_button);
+  buttonOptions_row1.appendChild(defaultReset_button);
+  buttonOptions_row2.appendChild(reportBug);
+  buttonOptions_row2.appendChild(requestEnhancement);
+  buttonOptions_row2.appendChild(changeLog_button);
+  buttonOptions_row2.appendChild(instructions_button);
+
   // attach button container to container wrapper
-  actionContainer.appendChild(row1);
-  actionContainer.appendChild(row2);
+  actionContainer.appendChild(buttonOptions_row1);
+  actionContainer.appendChild(buttonOptions_row2);
+
   // attach autofill list to list container
   listContainer.appendChild(autofillOptionsList);
+
   // attach all elements to "toggable" container
   autofillOptionsContainer.appendChild(messageDisplay);
   autofillOptionsContainer.appendChild(listContainer);
   autofillOptionsContainer.appendChild(actionContainer);
-  autofillOptionsContainer.appendChild(autofillDropdown);
+  autofillOptionsContainer.appendChild(autofillsList);
+
   // attach tool container to main tool container
-  wsmEditorTools.appendChild(applyAutofills);
-  wsmEditorTools.appendChild(minimizeList);
+  wsmEditorTools.appendChild(applyAutofills_button);
+  wsmEditorTools.appendChild(minimizeList_button);
   wsmEditorTools.appendChild(autofillOptionsContainer);
 
   //
@@ -369,11 +390,11 @@ const Autofill = (function () {
     autofillOptionsContainer.classList.toggle("hide");
 
     if (autofillOptionsContainer.classList.contains("hide")) {
-      minimizeList.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
-      minimizeList.title = "show list";
+      minimizeList_button.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
+      minimizeList_button.title = "show list";
     } else {
-      minimizeList.innerHTML = "<i class='fas fa-eye-slash fa-lg'></i>";
-      minimizeList.title = "hide list";
+      minimizeList_button.innerHTML = "<i class='fas fa-eye-slash fa-lg'></i>";
+      minimizeList_button.title = "hide list";
     }
   }
 
@@ -498,7 +519,7 @@ const Autofill = (function () {
       // do not save until input  empty
       if (myRegex === "") {
         autofillOptionsList.children[z].classList.add("myError");
-        applyAutofills.classList.add("disabled");
+        applyAutofills_button.classList.add("disabled");
         messageDisplay.textContent = "Please enter a word to search for.";
         continue;
       } else if (autofillOptionsList.children[z].classList.contains("myError")) {
@@ -519,7 +540,7 @@ const Autofill = (function () {
    */
   function removeDisable(elem) {
     const autofillTag = elem.querySelector(".autofillTag").innerText;
-    const dropDown = autofillDropdown.querySelectorAll(".disabled");
+    const dropDown = autofillsList.querySelectorAll(".disabled");
     const dropDownLength = dropDown.length;
 
     for (let z = 0; z < dropDownLength; z += 1) {
@@ -533,7 +554,7 @@ const Autofill = (function () {
    * disabled "magic" button if an entry is blank
    */
   function toggleMagicButton() {
-    autofillOptionsList.getElementsByClassName("myError").length >= 1 ? applyAutofills.classList.add("disabled") : applyAutofills.classList.remove("disabled");
+    autofillOptionsList.getElementsByClassName("myError").length >= 1 ? applyAutofills_button.classList.add("disabled") : applyAutofills_button.classList.remove("disabled");
   }
 
   /**
@@ -543,8 +564,8 @@ const Autofill = (function () {
     if (autofillOptionsList.getElementsByClassName("myError").length > 0) {
       updateDisplayMessage("Please enter a word to search for.", "flash");
     } else {
-      if (applyAutofills.classList.contains("disabled")) {
-        applyAutofills.classList.remove("disabled");
+      if (applyAutofills_button.classList.contains("disabled")) {
+        applyAutofills_button.classList.remove("disabled");
       }
 
       if (messageDisplay.textContent !== "") {
@@ -719,7 +740,7 @@ const Autofill = (function () {
           myListItem.classList.add("disabled");
         }
         // add the list element to the "drop down" list
-        autofillDropdown.appendChild(myListItem);
+        autofillsList.appendChild(myListItem);
         // bind listener to "li" item
         createAutofillDropdownMenu(myListItem);
         // attach new "li" to main list
@@ -1027,7 +1048,7 @@ const Autofill = (function () {
     // attach modal to page
     document.body.appendChild(autofillModal);
     // fill autofill modal with content
-    document.querySelector("#autofillModal .modal-body").appendChild(autofillDropdown);
+    document.querySelector("#autofillModal .modal-body").appendChild(autofillsList);
 
     //
     // Latest Changes Modal
