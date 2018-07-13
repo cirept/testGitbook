@@ -296,7 +296,7 @@ const Autofill = (function () {
 
     return new Promise((resolve) => {
       resolve("Full State Name Set");
-    })
+    });
   }
 
   /**
@@ -317,11 +317,11 @@ const Autofill = (function () {
   }
 
   /**
-   * 
+   * Populate the values for the default autofill tags
    * @param {object} data - the html data that was recieved from the Website Settings of DCC
    */
   function populateDefaultList(data) {
-    log('2 Getting Website Settings Information');
+    // log("2 Getting Website Settings Information");
     // const populateDefaultList =(data) {
     const myDiv = document.createElement("div");
 
@@ -348,13 +348,13 @@ const Autofill = (function () {
     defaultList["%FRANCHISES%"] = myFranchises.join(", ") || "SEARCH_FOR_ME";
 
     // display confirmation message
-    log("Website Settings Information Loaded", defaultList);
+    // log("Website Settings Information Loaded", defaultList);
 
     return new Promise((resolve, reject) => {
       if (data) {
-        resolve('Website Settings Set');
+        resolve("Website Settings Set");
       } else {
-        reject('populateDefaultList failed : Website Settings Not Received');
+        reject("populateDefaultList failed : Website Settings Not Received");
       }
     });
   }
@@ -373,14 +373,14 @@ const Autofill = (function () {
 
       // getLocaleAbbreviationInformation
       // Get Website Information
-      log('Running Fetch');
+      log("Running Fetch");
       fetch(options)
         .then(websiteSettingsData => populateDefaultList(websiteSettingsData))
         .then(() => getLocaleAbbreviationInformation())
         .then(stateListObject => setFullStateName(stateListObject))
         .then(() => resolve("Default Website Settings Set"))
         .catch((error) => {
-          // log('Error while Loading Website Information');
+          // log("Error while Loading Website Information");
           // window.alert(error);
           log("error encountered", error);
           reject(error);
