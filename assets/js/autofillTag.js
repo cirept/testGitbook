@@ -1,3 +1,5 @@
+/* global GM_getResourceURL , GM_getResourceURL */
+
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
   const myStyles = GM_getResourceURL("toolStyles"); // eslint-disable-line new-cap
@@ -260,7 +262,7 @@ const Autofill = (function () {
       url: siteSettingsURL,
       data: data,
       dataType: "html"
-    }
+    };
 
     // get website settings information
     jQuery.ajax(options).done((data) => {
