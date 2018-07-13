@@ -58,7 +58,6 @@ const Autofill = (function () {
   const instructions_button = document.createElement("button");
   const reportBug = document.createElement("a");
   const requestEnhancement = document.createElement("a");
-  
 
   // wsm editor tools props
   wsmEditorTools.classList.add("customEditorTools");
