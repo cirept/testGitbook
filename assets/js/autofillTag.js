@@ -31,9 +31,9 @@ const Autofill = (function () {
    */
   function log(message, obj) {
     if (obj) {
-    //   console.log(`Autofill Tool : ${message}`, obj);
+      //   console.log(`Autofill Tool : ${message}`, obj);
     } else {
-    //   console.log(`Autofill Tool : ${message}`);
+      //   console.log(`Autofill Tool : ${message}`);
     }
   }
 
@@ -219,7 +219,8 @@ const Autofill = (function () {
   const loadAutofillStyles = new Promise((resolve, reject) => {
     // default styles
     const autofillStyles = document.createElement("link");
-    
+
+    // default style link props
     autofillStyles.id = "autofill-styles";
     autofillStyles.rel = "stylesheet";
     autofillStyles.href = myStyles;
@@ -263,12 +264,14 @@ const Autofill = (function () {
         const myLength = franchises.length;
         const myFranchises = [];
 
+        // myDiv props
         myDiv.innerHTML = data;
 
         // create franchises string
         for (let x = 0; x < myLength; x += 1) {
           myFranchises.push(franchises[x].textContent);
         }
+
         // fill out autofill list with website settings information
         defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value || "SEARCH_FOR_ME";
         defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value || "SEARCH_FOR_ME";
@@ -298,7 +301,8 @@ const Autofill = (function () {
        */
       const getFullState = new Promise((resolve, reject) => {
         // consume promise and get the local abbreviation data
-        getLocalAbbreviationInformation.then((stateList) => {
+        // getLocalAbbreviationInformation.then((stateList) => {
+          getLocalAbbreviationInformation.then((stateList) => {
           // filter the array of states down to the matching state.
           const filteredStates = stateList.filter((state) => {
             const {
@@ -320,9 +324,9 @@ const Autofill = (function () {
           }
           // resolve with success
           resolve("Success!");
-        }, (error) => {
-          log("Get state full name failed", error.responseText);
-        });
+          }, (error) => {
+            log("Get state full name failed", error.responseText);
+          });
       });
     })
     .fail((error) => {
@@ -376,24 +380,25 @@ const Autofill = (function () {
         jQuery(this).removeClass(`animated ${animationName}`);
       });
       return this;
-    },
+    }
   });
 
-  // /**
-  //  * Will show or hide the tool"s panel
-  //  * will also update the button"s icon and hover text
-  //  */
-  // function toggleToolPanel() {
-  //   autofillOptionsContainer.classList.toggle("hide");
+  /**
+   * Will show or hide the tool"s panel
+   * will also update the button"s icon and hover text
+   */
+  function toggleToolPanel() {
+    // toggle panel
+    autofillOptionsContainer.classList.toggle("hide");
 
-  //   if (autofillOptionsContainer.classList.contains("hide")) {
-  //     minimizeList_button.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
-  //     minimizeList_button.title = "show list";
-  //   } else {
-  //     minimizeList_button.innerHTML = "<i class='fas fa-eye-slash fa-lg'></i>";
-  //     minimizeList_button.title = "hide list";
-  //   }
-  // }
+    if (autofillOptionsContainer.classList.contains("hide")) {
+      minimizeList_button.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
+      minimizeList_button.title = "show list";
+    } else {
+      minimizeList_button.innerHTML = "<i class='fas fa-eye-slash fa-lg'></i>";
+      minimizeList_button.title = "hide list";
+    }
+  }
 
   /**
    * save current state of the list, only if the configured list
