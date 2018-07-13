@@ -1,12 +1,12 @@
-/* global document, location, localStorage, Sortable, NodeFilter, window, GM_getResourceURL, GM_getResourceURL */
+/* global document, location, localStorage, NodeFilter, window, GM_getResourceURL, GM_getResourceURL */ // eslint-disable-line new-cap
 
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
-  const myStyles = GM_getResourceURL("toolStyles"); // Tampermonkey function
-  const lastestChanges = GM_getResourceURL("changeLog"); // Tampermonkey function
+  const myStyles = GM_getResourceURL("toolStyles"); // eslint-disable-line new-cap
+  const lastestChanges = GM_getResourceURL("changeLog"); // eslint-disable-line new-cap
   const webID = document.getElementById("_webId").value;
   const locale = document.getElementById("_locale").value;
-  const toolInstructions = GM_getResourceURL("toolInstructions"); // Tampermonkey function
+  const toolInstructions = GM_getResourceURL("toolInstructions"); // eslint-disable-line new-cap
   const defaultList = {
     "***How to Seperate Words***": "Seperate words with --> ;",
     "***Example***": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*",
@@ -201,18 +201,14 @@ const Autofill = (function () {
    * Loads all the tool styles
    */
   const loadAutofillStyles = new Promise((resolve, reject) => {
-    try {
       // default styles
       let autofillStyles = document.createElement("link");
       autofillStyles.id = "autofill-styles";
       autofillStyles.rel = "stylesheet";
       autofillStyles.href = myStyles;
       document.head.appendChild(autofillStyles);
-      // send resolve
-      resolve("Sucess!");
-    } catch (error) {
-      reject(error);
-    }
+    // resolve or reject
+      document.getElementById('autofill-styles') ? resolve("Sucess!") : reject(error);
   });
 
   /**
@@ -288,9 +284,7 @@ const Autofill = (function () {
 
             // filter the array of states down to the matching state.
             const filteredStates = stateList.filter((state) => {
-              const {
-                abbreviation
-              } = state;
+              const {abbreviation} = state;
               return defaultList["%STATE%"] === abbreviation;
             });
             // display console message that no match was found
