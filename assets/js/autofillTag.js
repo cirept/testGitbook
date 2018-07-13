@@ -42,8 +42,8 @@ const Autofill = (function () {
   // Tool Elements
   //
 
-  const wsmEditerTools = document.createElement("div");
-  wsmEditerTools.classList.add("customEditorTools");
+  const wsmEditorTools = document.createElement("div");
+  wsmEditorTools.classList.add("customEditorTools");
 
   const autofillOptionsContainer = document.createElement("div");
   autofillOptionsContainer.classList.add("autofillOptionsContainer");
@@ -190,9 +190,9 @@ const Autofill = (function () {
   autofillOptionsContainer.appendChild(actionContainer);
   autofillOptionsContainer.appendChild(autofillDropdown);
   // attach tool container to main tool container
-  wsmEditerTools.appendChild(applyAutofills);
-  wsmEditerTools.appendChild(minimizeList);
-  wsmEditerTools.appendChild(autofillOptionsContainer);
+  wsmEditorTools.appendChild(applyAutofills);
+  wsmEditorTools.appendChild(minimizeList);
+  wsmEditorTools.appendChild(autofillOptionsContainer);
 
   //
   // Promises
@@ -964,7 +964,7 @@ const Autofill = (function () {
    */
   function attachToolToPage() {
     // attach tool elements to page
-    document.querySelector("header.wsmMainHeader").appendChild(wsmEditerTools);
+    document.querySelector("header.wsmMainHeader").appendChild(wsmEditorTools);
   }
 
   /**
