@@ -1,10 +1,10 @@
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
-  const myStyles = GM_getResourceURL("toolStyles"); // eslint-disable-line new-cap
-  const lastestChanges = GM_getResourceURL("changeLog"); // eslint-disable-line new-cap
+  const myStyles = GM_getResourceURL("toolStyles"); // eslint-disable-line new-cap no-undef
+  const lastestChanges = GM_getResourceURL("changeLog"); // eslint-disable-line new-cap no-undef
   const webID = document.getElementById("_webId").value;
   const locale = document.getElementById("_locale").value;
-  const toolInstructions = GM_getResourceURL("toolInstructions"); // eslint-disable-line new-cap
+  const toolInstructions = GM_getResourceURL("toolInstructions"); // eslint-disable-line new-cap no-undef
   const defaultList = {
     "***How to Separate Words***": "Separate words with --> ;",
     "***Example***": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*",
@@ -368,8 +368,8 @@ const Autofill = (function () {
       log("default List", defaultList);
       // set the default value to SEARCH_FOR_ME if values are blank
       myKeys.map((autofill) => {
-        if (defaultList[autofill] === "") {
-          defaultList[autofill] = "SEARCH_FOR_ME";
+        if (defaultList[String(autofill)] === "") {
+          defaultList[String(autofill)] = "SEARCH_FOR_ME";
         }
       });
 
@@ -381,7 +381,7 @@ const Autofill = (function () {
    * Get data from "Settings" to autofill into the defaults list
    */
   function setGeneralInfo() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       // path to open the website settings tab
       const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
       const options = {
