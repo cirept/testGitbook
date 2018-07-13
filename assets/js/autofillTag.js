@@ -30,11 +30,11 @@ const Autofill = (function () {
    * @param {object} obj - the object to display in the console message
    */
   function log(message, obj) {
-    if (obj) {
-      console.log(`Autofill Tool : ${message}`, obj);
-    } else {
-      console.log(`Autofill Tool : ${message}`);
-    }
+    // if (obj) {
+    //   console.log(`Autofill Tool : ${message}`, obj);
+    // } else {
+    //   console.log(`Autofill Tool : ${message}`);
+    // }
   }
 
   //
@@ -75,9 +75,8 @@ const Autofill = (function () {
   minimizeList_button.title = "show list";
   minimizeList_button.type = "button";
   minimizeList_button.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
-  minimizeList_button.onclick = toggleToolPanel;
 
-// autofill options list props
+  // autofill options list props
   autofillOptionsList.id = "autofillOptions";
   autofillOptionsList.classList.add("autofillOptions");
 
@@ -95,9 +94,6 @@ const Autofill = (function () {
   defaultReset_button.classList.add("col");
   defaultReset_button.title = "Reset Values";
   defaultReset_button.innerHTML = "<i class='fas fa-redo fa-lg'></i>";
-  defaultReset_button.onclick = () => {
-    resetValues(true, "Values Reset");
-  };
 
   // apply autofill button props
   applyAutofills_button.id = "applyAutofills";
@@ -108,7 +104,6 @@ const Autofill = (function () {
   applyAutofills_button.type = "button";
   applyAutofills_button.title = "apply autofills";
   applyAutofills_button.innerHTML = "<i class='fas fa-magic fa-lg'></i>";
-  applyAutofills_button.onclick = autofills;
 
   // add button props
   addAutofill_button.id = "addAutofill";
@@ -229,7 +224,7 @@ const Autofill = (function () {
     autofillStyles.href = myStyles;
     document.head.appendChild(autofillStyles);
     // resolve or reject
-    document.getElementById("autofill-styles") ? resolve("Sucess!") : reject(error);
+    document.getElementById("autofill-styles") ? resolve("Success!") : reject("Autofill Tool styles were not attached.");
   });
 
   /**
@@ -381,21 +376,21 @@ const Autofill = (function () {
     },
   });
 
-  /**
-   * Will show or hide the tool"s panel
-   * will also update the button"s icon and hover text
-   */
-  function toggleToolPanel() {
-    autofillOptionsContainer.classList.toggle("hide");
+  // /**
+  //  * Will show or hide the tool"s panel
+  //  * will also update the button"s icon and hover text
+  //  */
+  // function toggleToolPanel() {
+  //   autofillOptionsContainer.classList.toggle("hide");
 
-    if (autofillOptionsContainer.classList.contains("hide")) {
-      minimizeList_button.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
-      minimizeList_button.title = "show list";
-    } else {
-      minimizeList_button.innerHTML = "<i class='fas fa-eye-slash fa-lg'></i>";
-      minimizeList_button.title = "hide list";
-    }
-  }
+  //   if (autofillOptionsContainer.classList.contains("hide")) {
+  //     minimizeList_button.innerHTML = "<i class='fas fa-eye fa-lg'></i>";
+  //     minimizeList_button.title = "show list";
+  //   } else {
+  //     minimizeList_button.innerHTML = "<i class='fas fa-eye-slash fa-lg'></i>";
+  //     minimizeList_button.title = "hide list";
+  //   }
+  // }
 
   /**
    * save current state of the list, only if the configured list
@@ -996,9 +991,24 @@ const Autofill = (function () {
   }
 
   /**
+   * Attach events to tool buttons
+   */
+  function attachButtonEvents() {
+    // minimize list button
+    minimizeList_button.onclick = toggleToolPanel;
+    // reset tool button
+    defaultReset_button.onclick = () => {
+      resetValues(true, "Values Reset");
+    };
+    // apply autofill button
+    applyAutofills_button.onclick = autofills;
+  }
+
+  /**
    * Sets up autofill tool
    */
   function setup() {
+    attachButtonEvents();
     attachToolToPage();
     attachModals();
     buildAutofillOptions();
