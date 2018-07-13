@@ -1,4 +1,4 @@
-/* global GM_getResourceURL , GM_getResourceURL */
+/* global GM_getResourceURL , GM_getResourceURL */ // eslint-disable-line space-after-keywords keyword-spacing
 
 const Autofill = (function () {
   const myURL = "https://raw.githubusercontent.com/cirept/WSMupgrades/master/json/autofillTags2.json";
@@ -260,7 +260,6 @@ const Autofill = (function () {
     const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
     const options = {
       url: siteSettingsURL,
-      data: data,
       dataType: "html"
     };
 
@@ -293,11 +292,51 @@ const Autofill = (function () {
       // display confirmation message
       log("Website Settings Information Loaded");
 
-      // resolve promise
-      resolve("Site Settings Loaded");
+      /**
+       * Promise to get full state name from json files
+       */
+      return new Promise((resolve, reject) => {
+
+        // consume promise and get the local abbreviation data
+        // getLocalAbbreviationInformation.then((stateList) => {
+        getLocalAbbreviationInformation.then((stateList) => {
+          // filter the array of states down to the matching state.
+          const filteredStates = stateList.filter((state) => {
+
+            // destructuring
+            const {
+              abbreviation
+            } = state;
+
+            // return value if it matches the current state.
+            return defaultList["%STATE%"] === abbreviation;
+          });
+
+          // display console message that no match was found
+          if (filteredStates.length > 1 || filteredStates.length < 1) {
+            // set value to the default value
+            log("Region not supported by the tool");
+          }
+          // set STATE FULL NAME to matched state
+          if (filteredStates.length === 1) {
+            defaultList["%STATE_FULL_NAME%"] = filteredStates[0].name;
+
+            // display confirmation message
+            log("State Full Name Loaded");
+          }
+          // resolve with success
+          resolve("Success!");
+        }, (error) => {
+          reject(error);
+          log("Get state full name failed", error.responseText);
+        });
+      });
     }).fail((error) => {
       reject(`Unable to get site settings : ${error}`);
-    }).always();
+    }).always(() => {
+      // resolve promise
+      resolve("Site Settings Loaded");
+    });
 
     // siteSettingsURL, (data) => {
     //   if (data) {
