@@ -1,4 +1,4 @@
-const Autofill = (function () {
+const AutofillReplacerTool = (function () {
   const autofillTagListURL = "https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/autofill_list.json";
   /* eslint-disable */
   const myStyles = GM_getResourceURL("toolStyles");
@@ -7,22 +7,63 @@ const Autofill = (function () {
   /* eslint-enable */
   const webID = document.getElementById("_webId").value;
   const locale = document.getElementById("_locale").value;
-  const defaultList = {
-    "***How to Separate Words***": "Separate words with --> ;",
-    "***Example***": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*",
-    "%DEALER_NAME%": "",
-    "%FRANCHISES%": "",
-    "%STREET%": "",
-    "%CITY%": "",
-    "%STATE%": "",
-    "%STATE_FULL_NAME%": "",
-    "%ZIP%": "",
-    "%PHONE%": "",
-    "%NEW_PHONE%": "",
-    "%USED_PHONE%": "",
-    "%SERVICE_PHONE%": "",
-    "%PARTS_PHONE%": ""
-  };
+  const activeAutofillList = [{
+      "autofillTag": "***How to Separate Words***",
+      "searchTerms": "Separate words with --> ;"
+    },
+    {
+      "autofillTag": "***Example***",
+      "searchTerms": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*"
+    },
+    {
+      "autofillTag": "%DEALER_NAME%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%FRANCHISES%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%STREET%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%CITY%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%STATE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%STATE_FULL_NAME%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%ZIP%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%NEW_PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%USED_PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%SERVICE_PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%PARTS_PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    }
+  ];
 
   /**
    * Custom Tool Console Logging for debugging purposes
@@ -30,12 +71,14 @@ const Autofill = (function () {
    * @param {object} obj - the object to display in the console message
    */
   function log(message, obj) {
+    /* eslint-disable */
     if (obj) {
       // remove comment to enable console logs
-      // console.log(`Autofill Tool : ${message}`, obj);
+      console.log(`Autofill Tool : ${message}`, obj);
     } else {
-      // console.log(`Autofill Tool : ${message}`);
+      console.log(`Autofill Tool : ${message}`);
     }
+    /* eslint-enable */
   }
 
   //
@@ -114,7 +157,7 @@ const Autofill = (function () {
   addAutofill_button.classList.add("m-1");
   addAutofill_button.classList.add("col");
   addAutofill_button.dataset.toggle = "modal";
-  addAutofill_button.dataset.target = "#autofillModal";
+  addAutofill_button.dataset.target = "#autofillListModal";
   addAutofill_button.value = "addAutofill";
   addAutofill_button.title = "Add Autofill";
   addAutofill_button.innerHTML = "<i class='fas fa-plus fa-lg'></i>";
@@ -241,7 +284,6 @@ const Autofill = (function () {
    * Resolves an array of state objects with the name and abbreviations
    */
   function getLocaleAbbreviationInformation() {
-    log("3 Get Locale Abbreviation Information");
     return new Promise((resolve, reject) => {
       const options = {
         // url: `https://raw.githubusercontent.com/cirept/autofillReplacer/develop/assets/json/locale_${locale}.json`,
@@ -251,9 +293,6 @@ const Autofill = (function () {
 
       // get file data
       jQuery.ajax(options).done((data) => {
-
-        log("Locale Information Received", data);
-
         // return the STATE json object
         resolve(data);
       }).fail((error) => {
@@ -266,8 +305,6 @@ const Autofill = (function () {
    * Set the Full State Name
    */
   function setFullStateName(stateList) {
-
-    log("4 Fill in State Full Name", stateList);
     // filter the array of states down to the matching state.
     const filteredStates = stateList.filter((state) => {
 
@@ -277,7 +314,7 @@ const Autofill = (function () {
       } = state;
 
       // return value if it matches the current state.
-      return defaultList["%STATE%"] === abbreviation;
+      return getActiveAutofillEntryByTag("%STATE%").searchTerms === abbreviation;
     });
 
     // display console message that no match was found
@@ -287,11 +324,11 @@ const Autofill = (function () {
       // reject("No Match Found");
     }
     // set STATE FULL NAME to matched state
-    if (filteredStates.length === 1) {
-      defaultList["%STATE_FULL_NAME%"] = filteredStates[0].name;
+    else /*if(filteredStates.length === 1)*/ {
+      getActiveAutofillEntryByTag("%STATE_FULL_NAME%").searchTerms = filteredStates[0].name;
 
       // display confirmation message
-      log("State Full Name Added", filteredStates);
+      log("State Full Name Added");
     }
 
     return new Promise((resolve) => {
@@ -306,7 +343,6 @@ const Autofill = (function () {
    * @returns the data that is recieved from the ajax request
    */
   function fetch(options) {
-    log("1 fetching");
     return new Promise((resolve, reject) => {
       jQuery.ajax(options).done((data) => {
         resolve(data);
@@ -317,13 +353,19 @@ const Autofill = (function () {
   }
 
   /**
+   * Returns the autofill tag entry from the active list
+   * @param {object} autofillTag - the autofill tag to return from default list
+   */
+  function getActiveAutofillEntryByTag(autofillTag) {
+    return activeAutofillList.find(autofill => autofill.autofillTag === autofillTag);
+  }
+
+  /**
    * Populate the values for the default autofill tags
    * @param {object} data - the html data that was recieved from the Website Settings of DCC
    */
-  function populateDefaultList(data) {
+  function populateActiveAutofillList(data) {
     return new Promise((resolve, reject) => {
-      // log("2 Getting Website Settings Information");
-      // const populateDefaultList =(data) {
       const myDiv = document.createElement("div");
 
       // myDiv props
@@ -340,22 +382,19 @@ const Autofill = (function () {
       }
 
       // fill out autofill list with website settings information
-      defaultList["%DEALER_NAME%"] = myDiv.querySelector("input[name='name']").value;
-      defaultList["%STREET%"] = myDiv.querySelector("input#contact_address_street1").value;
-      defaultList["%CITY%"] = myDiv.querySelector("input#contact_address_city").value;
-      defaultList["%ZIP%"] = myDiv.querySelector("input#contact_address_postalCode").value;
-      defaultList["%STATE%"] = myDiv.querySelector("select#contact_address_state").value;
-      defaultList["%PHONE%"] = myDiv.querySelector("input[name='contact_phone_number']").value;
-      defaultList["%FRANCHISES%"] = myFranchises.join(", ");
-
-      // display confirmation message
-      // log("Website Settings Information Loaded", defaultList);
-
+      getActiveAutofillEntryByTag("%DEALER_NAME%").searchTerms = myDiv.querySelector("input[name='name']").value;
+      getActiveAutofillEntryByTag("%STREET%").searchTerms = myDiv.querySelector("input#contact_address_street1").value;
+      getActiveAutofillEntryByTag("%CITY%").searchTerms = myDiv.querySelector("input#contact_address_city").value;
+      getActiveAutofillEntryByTag("%ZIP%").searchTerms = myDiv.querySelector("input#contact_address_postalCode").value;
+      getActiveAutofillEntryByTag("%STATE%").searchTerms = myDiv.querySelector("select#contact_address_state").value;
+      getActiveAutofillEntryByTag("%PHONE%").searchTerms = myDiv.querySelector("input[name='contact_phone_number']").value;
 
       if (data) {
+        // display confirmation message
+        log("Website Settings Information Loaded");
         resolve("Website Settings Set");
       } else {
-        reject("populateDefaultList failed : Website Settings Not Received");
+        reject("populateActiveAutofillList failed : Website Settings Not Received");
       }
     });
   }
@@ -363,15 +402,14 @@ const Autofill = (function () {
   /**
    * Fill in the default autofill list with a default value
    */
-  function verifyDefaultListValues() {
+  function verifyActiveAutofillListValues() {
     return new Promise((resolve) => {
-      const myKeys = Object.keys(defaultList);
+      const myKeys = Object.keys(activeAutofillList);
 
-      log("default List", defaultList);
       // set the default value to SEARCH_FOR_ME if values are blank
       myKeys.map((autofill) => {
-        if (defaultList[String(autofill)] === "") {
-          defaultList[String(autofill)] = "SEARCH_FOR_ME";
+        if (activeAutofillList[String(autofill)] === "") {
+          activeAutofillList[String(autofill)] = "SEARCH_FOR_ME";
         }
       });
 
@@ -393,9 +431,8 @@ const Autofill = (function () {
 
       // getLocaleAbbreviationInformation
       // Get Website Information
-      log("Running Fetch");
       fetch(options)
-        .then((websiteSettingsData) => populateDefaultList(websiteSettingsData))
+        .then((websiteSettingsData) => populateActiveAutofillList(websiteSettingsData))
         .then(() => getLocaleAbbreviationInformation())
         .then((stateListObject) => setFullStateName(stateListObject))
         .then(() => resolve("Default Website Settings Set"))
@@ -424,11 +461,11 @@ const Autofill = (function () {
     myDiv.innerHTML = data;
 
     // save query information to tool variable
-    defaultList["%PHONE%"] = myDiv.querySelector("input[name*='(__primary_).ctn']").value;
-    defaultList["%NEW_PHONE%"] = myDiv.querySelector("input[name*='(__new_).ctn']").value;
-    defaultList["%USED_PHONE%"] = myDiv.querySelector("input[name*='(__used_).ctn']").value;
-    defaultList["%SERVICE_PHONE%"] = myDiv.querySelector("input[name*='(__service_).ctn']").value;
-    defaultList["%PARTS_PHONE%"] = myDiv.querySelector("input[name*='(__parts_).ctn']").value;
+    getActiveAutofillEntryByTag("%PHONE%").searchTerms = myDiv.querySelector("input[name*='(__primary_).ctn']").value;
+    getActiveAutofillEntryByTag("%NEW_PHONE%").searchTerms = myDiv.querySelector("input[name*='(__new_).ctn']").value;
+    getActiveAutofillEntryByTag("%USED_PHONE%").searchTerms = myDiv.querySelector("input[name*='(__used_).ctn']").value;
+    getActiveAutofillEntryByTag("%SERVICE_PHONE%").searchTerms = myDiv.querySelector("input[name*='(__service_).ctn']").value;
+    getActiveAutofillEntryByTag("%PARTS_PHONE%").searchTerms = myDiv.querySelector("input[name*='(__parts_).ctn']").value;
 
     // resolve
     return new Promise((resolve) => {
@@ -440,7 +477,6 @@ const Autofill = (function () {
    *   Get Phone Numbers from website settings
    */
   function setPhoneNumbers() {
-    log("Get Phone Numbers");
     return new Promise((resolve) => {
       // build website settings URL path
       const webID = document.getElementById("siWebId").querySelector("label.displayValue").textContent;
@@ -452,7 +488,10 @@ const Autofill = (function () {
 
       fetch(options)
         .then((phoneNumberInfo) => populateDefaultPhoneNumbers(phoneNumberInfo))
-        .then(resolve("Phone Numbers Added"));
+        .then(() => {
+          log("Phone Numbers Added");
+          resolve("Phone Numbers Added")
+        });
     });
   }
 
@@ -484,14 +523,6 @@ const Autofill = (function () {
       minimizeList_button.innerHTML = "<i class='fas fa-eye-slash fa-lg'></i>";
       minimizeList_button.title = "hide list";
     }
-  }
-
-  /**
-   * save current state of the list, only if the configured list
-   * has no errors
-   */
-  function saveState() {
-    saveAutofillParameters(createArray());
   }
 
   /**
@@ -550,7 +581,7 @@ const Autofill = (function () {
       // removes list item from tool
       e.currentTarget.parentElement.remove();
       // saves state
-      saveState();
+      saveAutofillParameters();
       // display message to user that item was removed
       updateDisplayMessage("Item Removed");
       // remove disabled from the autofill options list
@@ -576,9 +607,10 @@ const Autofill = (function () {
    * save autofill parameter list to local storage
    * @param {Object} obj - parameter list to save
    */
-  function saveAutofillParameters(myObj) {
-    const saveMe = JSON.stringify(myObj);
-    saveToLocalStorage("autofillVariables", saveMe);
+  function saveAutofillParameters() {
+    const myArrayObj = convertActiveListToObject();
+    const saveMe = JSON.stringify(myArrayObj);
+    saveToLocalStorage("AutofillReplacerTool", saveMe);
   }
 
   /**
@@ -593,40 +625,32 @@ const Autofill = (function () {
   /**
    * creating an array of the configured autofill tags
    * Also performs simple validation to prevent empty values being saved
-   * return {object} myObj - returns object array of autofill entries in list
+   * @return {object} myArrayObj - returns object array of autofill entries in list
    */
-  function createArray() {
-    const myObj = [];
-    const saveAutofill = {};
-    let autofillTag = "";
-    let myRegex = "";
-    let regexInput;
-    let $myThis;
+  function convertActiveListToObject() {
+    let myArrayObj = [];
 
     // loop through configured autofills
-    for (let z = 0; z < autofillOptionsList.children.length; z += 1) {
-      $myThis = jQuery(autofillOptionsList.children[z]);
-      autofillTag = jQuery.trim($myThis.find(".autofillTag").text()); // trim it just in case the manual autofill input is triggerd
-      regexInput = $myThis.find(".regEx");
-      myRegex = regexInput.val().trim();
+    Array.from(autofillOptionsList.children).map((element) => {
+      let autofillTag = element.querySelector(".autofillTag").innerText; // trim it just in case the manual autofill input is triggerd
+      let regexInput = element.querySelector(".regEx").value.trim();
+      let saveAutofill = {};
 
       // validate input
-      // do not save until input  empty
-      if (myRegex === "") {
-        autofillOptionsList.children[z].classList.add("myError");
-        applyAutofills_button.classList.add("disabled");
-        messageDisplay.textContent = "Please enter a word to search for.";
-        continue;
-      } else if (autofillOptionsList.children[z].classList.contains("myError")) {
-        autofillOptionsList.children[z].classList.remove("myError");
+      // use default phrase if autofill is empty
+      if (regexInput === "") {
+        regexInput = "SEARCH_FOR_ME";
       }
 
-      saveAutofill[autofillTag] = myRegex;
-    }
+      // add data to autofill object to save
+      saveAutofill["autofillTag"] = autofillTag;
+      saveAutofill["searchTerms"] = regexInput;
 
-    myObj.push(saveAutofill);
+      // add autofill entry to the save array
+      myArrayObj.push(saveAutofill);
+    });
 
-    return myObj;
+    return myArrayObj;
   }
 
   /**
@@ -687,7 +711,7 @@ const Autofill = (function () {
    * @param {element} elem - new autofill list option
    */
   function bindTextChangeListener(elem) {
-    jQuery(elem).find("input").on("keyup", saveState);
+    jQuery(elem).find("input").on("keyup", saveAutofillParameters);
     jQuery(elem).find("input").on("keyup", updateInputTitle);
     jQuery(elem).find("input").on("keyup", toggleMagicButton);
     jQuery(elem).find("input").on("keyup", validateList);
@@ -702,14 +726,10 @@ const Autofill = (function () {
    * @param {object} obj - object to be saved into local storage
    */
   function getFromLocalStorage() {
-    let returnMe;
-    if (localStorage.getItem("autofillVariables") === null) {
-      returnMe = defaultList;
-    } else {
-      returnMe = JSON.parse(localStorage.getItem("autofillVariables"));
-      returnMe = returnMe[0];
+    if (localStorage.getItem("AutofillReplacerTool")) {
+      return JSON.parse(localStorage.getItem("AutofillReplacerTool"));
     }
-    return returnMe;
+    return activeAutofillList;
   }
 
   /**
@@ -717,26 +737,29 @@ const Autofill = (function () {
    * Will use data in local storage, if it exists
    * Otherwise defaults to Website information
    */
-  function buildAutofillOptions() {
-    const regReplace = getFromLocalStorage();
-    let listElement;
+  function buildActiveAutofillList() {
+    const localStorageAutofillList = getFromLocalStorage();
 
     // build autofill list options IF there is a list that already exists
-    if (regReplace) {
+    if (localStorageAutofillList) {
+
       // loop through Legend Content list
-      for (const key in regReplace) {
-        if (regReplace.hasOwnProperty(key)) {
-          if (key === "") {
-            continue;
-          }
-          listElement = listItem(key, regReplace[key]);
-          // attach to legend list
-          autofillOptionsList.append(listElement);
-          // bind list item elements
-          bindTextChangeListener(listElement);
-        }
-      }
+      localStorageAutofillList.map((autofill) => {
+        const {
+          autofillTag,
+          searchTerms
+        } = autofill;
+        let listElement = listItem(autofillTag, searchTerms);
+
+        // bind list item elements
+        bindTextChangeListener(listElement);
+
+        // attach to legend list
+        autofillOptionsList.append(listElement);
+      });
     }
+
+    log("Active Autofill List Built");
   }
 
   /**
@@ -747,15 +770,15 @@ const Autofill = (function () {
     // erase current list
     autofillOptionsList.innerHTML = "";
     // remove stored variables from memory
-    localStorage.removeItem("autofillVariables");
+    localStorage.removeItem("AutofillReplacerTool");
     // build default list
-    buildAutofillOptions();
+    buildActiveAutofillList();
     // reset apply button if it is disabled
     toggleMagicButton();
     // update display message
     updateDisplayMessage(message);
     // save new values
-    saveState();
+    saveAutofillParameters();
   }
 
   /**
@@ -782,6 +805,8 @@ const Autofill = (function () {
     const autofill = [];
     const keys = Object.keys(localData);
 
+    log("localDataToString", localData);
+
     keys.map((value) => {
       autofill.push(value);
     });
@@ -790,15 +815,16 @@ const Autofill = (function () {
   }
 
   /**
+   * Actions to be performed after the user selects an Autofill Options from the Auotfill Modal
+   * 
    * Creates an active menu item that the tool will use to replace text with autofill tags
    * @param {object} elem - element that will get it"s onclick event binded
    */
-  function addAutofillToList(elem) {
-    console.log("binding onclick listener for", elem);
-    elem.onclick = () => {
-      // return () => {
-      console.log("Clicked Option Item");
-      const listElement = listItem(elem.textContent);
+  function addSelectedAutofillToList(elem) {  // TODO get this to work
+    // // elem.onclick = () => {
+    return () => {
+      // console.log("Clicked Option Item");
+      const listElement = listItem(elem.textContent); // create the LI element in memory
       const listLength = listElement.children.length;
 
       elem.classList.add("disabled");
@@ -814,11 +840,58 @@ const Autofill = (function () {
       bindTextChangeListener(listElement);
 
       // save state of new list
-      saveState();
+      saveAutofillParameters();
 
       // confirmation message
       updateDisplayMessage("Autofill Added to List");
     };
+
+    // console.log("binding onclick listener for", elem.onclick);
+  }
+
+  /**
+   * Scans the autofill options list and disables items already
+   * added to the active list
+   */
+  function attachAddToActiveEvent() {
+
+    activeAutofillList.map((autofill) => {
+      const {
+        autofillTag
+      } = autofill;
+
+      // Apply disable class to autofill list items already in the active list
+      Array.from(autofillsList.children).map((autofillsListOption) => {
+        // autofillsListOption.innerText === autofillTag && autofillsListOption.classList.add("disabled");
+        console.log("auotfill", autofillsListOption);
+
+        autofillsListOption.onclick = addSelectedAutofillToList(autofillsListOption);
+      });
+    });
+
+    return new Promise((resolve) => {
+      resolve("Autofills Disabled");
+    });
+  }
+
+  /**
+   * Scans the autofill options list and disables items already
+   * added to the active list
+   */
+  function disableActiveAutofillOptions() {
+    return new Promise((resolve) => {
+      activeAutofillList.map((autofill) => {
+        const {
+          autofillTag
+        } = autofill;
+
+        // Apply disable class to autofill list items already in the active list
+        Array.from(autofillsList.children).find((autofillsListOption) => {
+          autofillsListOption.innerText === autofillTag && autofillsListOption.classList.add("disabled");
+        });
+      });
+      resolve("Autofills Disabled");
+    });
   }
 
   /**
@@ -827,9 +900,6 @@ const Autofill = (function () {
    */
   function createAutofillListOptions(autofillListData) {
     return new Promise((resolve, reject) => {
-      // get local storage data
-      const localData = localDataToString();
-
       // loop through each autofill object and add it to the list.
       autofillListData.map((autofill) => {
         const {
@@ -848,14 +918,6 @@ const Autofill = (function () {
         myListItem.classList.add("btn-light");
         myListItem.classList.add("autofill-list-item");
         myListItem.title = tooltipText;
-        // if autofill tag is present in the active list, disable it
-        if (localData.includes(tag)) {
-          myListItem.classList.add("disabled");
-        }
-
-        // bind listener to "li" item
-        // myListItem.onclick = addAutofillToList(myListItem);
-        addAutofillToList(myListItem);
 
         // add the list element to the "drop down" list
         autofillsList.appendChild(myListItem);
@@ -868,69 +930,6 @@ const Autofill = (function () {
         reject("Autofill List Selection was not create");
       }
     });
-  }
-
-  /**
-   * FAILURE BINDING EVENT
-   * Will display a prompt message that the user can manually input the autofill tag
-   * @return {function} Prompts user for input, upon successfull input, will bind event listeners and save
-   */
-  function bindAddAutofill() {
-    return function () {
-      const autofillTag = window.prompt("Enter autofill tag for the new feild.", "%AUTOFILL_TAG_HERE%");
-
-      if (autofillTag === null || autofillTag === "") {
-        window.alert("please try again, please enter an autofill tag");
-      } else if (localDataToString().includes(autofillTag)) {
-        window.alert("please try again, autofill tag already present on list");
-      } else {
-        const listElement = listItem(autofillTag);
-        autofillOptionsList.appendChild(listElement);
-
-        // bind list item elements
-        bindTextChangeListener(listElement);
-
-        // save state of new list
-        saveState();
-      }
-    };
-  }
-
-  /**
-   * Attachs the completed modal to the web page
-   */
-  function attachAutofillListModal() {
-    // build autofill modal
-    const autofillModal = document.createElement("div");
-    console.log('autofill list', autofillsList);
-
-    autofillModal.innerHTML = `
-        <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-body">
-              ${autofillsList.innerHTML}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    // attach modal to page
-    document.body.appendChild(autofillModal);
-  }
-
-  /**
-   * Start events to build the autofill "drop down menu"
-   */
-  function buildAutofillListModal() {
-    const options = {
-      url: autofillTagListURL,
-      dataType: "json"
-    };
-
-    fetch(options)
-      .then(data => createAutofillListOptions(data))
-      .then(() => attachAutofillListModal());
   }
 
   /**
@@ -1093,6 +1092,22 @@ const Autofill = (function () {
     }
   }
 
+  // /**
+  //  * Gets and saves the default autofill list
+  //  */
+  // function getActiveAutofillList() {
+  //   return new Promise((resolve) => {
+  //     fetch({
+  //       url: "https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/default_list.json",
+  //       dataType: "json"
+  //     }).then(activeAutofillList => {
+  //       activeAutofillList = activeAutofillList;
+  //       log("default list got", activeAutofillList);
+  //       resolve("Default List Retrieved");
+  //     });
+  //   });
+  // }
+
   /**
    * Determine if the current website is different
    */
@@ -1148,23 +1163,99 @@ const Autofill = (function () {
   }
 
   /**
-   * main function to start the program
+   * Converts a markdown string (github flavored) into HTML
+   * @param {string} data - the markdown string text to be converted into HTML
    */
-  function main() {
-    // run tool
-    // Load Tool Styles
-    loadAutofillStyles()
-      .then(() => setGeneralInfo())
-      .then(() => setPhoneNumbers())
-      .then(() => verifyDefaultListValues())
-      .then(() => {
-        log("Tool Settings Loaded");
-        window.onload = setup;
-      })
-      .catch(error => {
-        log("Failed to Load Tool Styles", error);
-        // window.alert(error)
-      });
+  function convertMarkdownToHTML(data) {
+    return new Promise((resolve) => {
+      const conv = new showdown.Converter();
+      showdown.setFlavor("github");
+      const changeLogData = conv.makeHtml(data);
+      // resolve converted data
+      resolve(changeLogData);
+    });
+  }
+
+  /**
+   * Builds a modal and attaches it to the webpage.
+   * @param {string} name - the name of the modal
+   * @param {string} html - the content of the modal
+   */
+  function attachModal(name, html) {
+    return new Promise((resolve, reject) => {
+      // build latest changes modal
+      const myModal = document.createElement("div");
+      // add the modal content + the Latest Changes Markdown Doc Content
+      myModal.innerHTML = `
+        <div class="modal fade" id="${name}Modal" tabindex="-1" role="dialog" aria-labelledby="${name}Title" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                ${html}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // attach modal to page
+      document.body.appendChild(myModal);
+
+      if (document.getElementById(`${name}Modal`)) {
+        resolve(`${name} Modal Attached`);
+      } else {
+        reject(`${name} Modal Not Attached`);
+      }
+    });
+  }
+
+  /**
+   * Start events to build the autofill "drop down menu"
+   */
+  function buildAutofillListModal() {
+    const options = {
+      url: autofillTagListURL,
+      dataType: "json"
+    };
+
+    fetch(options)
+      .then(data => createAutofillListOptions(data))
+      .then(() => attachAddToActiveEvent())
+      .then(() => disableActiveAutofillOptions())
+      .then(() => attachModal("autofillList", autofillsList.innerHTML))
+      .then(result => log(result));
+  }
+
+  /**
+   * builds and attaches the latest changes modal to the webpage.
+   */
+  function buildLatestChangesModal() {
+    const options = {
+      url: lastestChanges,
+      dataType: "text"
+    };
+
+    // get latest changes data
+    fetch(options)
+      .then(data => convertMarkdownToHTML(data))
+      .then(HTMLdata => attachModal("lastestChanges", HTMLdata))
+      .then(result => log(result));
+  }
+
+  /**
+   * builds and attaches the latest changes modal to the webpage.
+   */
+  function buildInstructionsModal() {
+    const options = {
+      url: toolInstructions,
+      dataType: "text"
+    };
+
+    // get latest changes data
+    fetch(options)
+      .then(data => convertMarkdownToHTML(data))
+      .then(HTMLdata => attachModal("toolInstructions", HTMLdata))
+      .then(result => log(result));
   }
 
   /**
@@ -1172,167 +1263,33 @@ const Autofill = (function () {
    */
   function setup() {
     buildAutofillListModal();
-    // buildLatestChangesModal();
-    // buildInstructionsModal();
+    buildLatestChangesModal();
+    buildInstructionsModal();
+    buildActiveAutofillList();
     attachButtonEvents();
     attachToolToPage();
-    // attachModals();
-    buildAutofillOptions();
     webIDToolReset();
   }
 
-  //
-  // Modals
-  //
-
-  function attachLatestChangesModal(data) {
-    const conv = new showdown.Converter();
-    showdown.setFlavor("github");
-    const changeLogData = conv.makeHtml(data);
-
-    // build latest changes modal
-    const lastestChangesModal = document.createElement("div");
-    // add the modal content + the Latest Changes Markdown Doc Content
-    lastestChangesModal.innerHTML = `
-        <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-body">
-                ${changeLogData}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-    // attach modal to page
-    document.body.appendChild(lastestChangesModal);
-  }
-
-  function getLatestChanges() {
-    const options = {
-      url: lastestChanges,
-      dataType: "text"
-    };
-
-    fetch(options)
-      .then(data => attachLatestChangesModal(data));
-    // // get latest changes markdown doc.
-    // jQuery.get(lastestChanges, (data) => {
-    //   const conv = new showdown.Converter();
-    //   showdown.setFlavor("github");
-    //   const changeLogData = conv.makeHtml(data);
-
-    //   // build latest changes modal
-    //   const lastestChangesModal = document.createElement("div");
-    //   // add the modal content + the Latest Changes Markdown Doc Content
-    //   lastestChangesModal.innerHTML = `
-    //   <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
-    //     <div class="modal-dialog modal-dialog-centered" role="document">
-    //       <div class="modal-content">
-    //         <div class="modal-body">
-    //           ${changeLogData}
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // `;
-
-    //   // attach modal to page
-    //   document.body.appendChild(lastestChangesModal);
-    // }, "text");
-  }
-
   /**
-   * attach modals
+   * main function to start the program
    */
-  function attachModals() {
-    //
-    // Autofill Modal
-    //
-
-    // // build autofill modal
-    // const autofillModal = document.createElement("div");
-
-    // autofillModal.innerHTML = `
-    //     <div class="modal fade" id="autofillModal" tabindex="-1" role="dialog" aria-labelledby="autofillModalTitle" aria-hidden="true">
-    //       <div class="modal-dialog" role="document">
-    //         <div class="modal-content">
-    //           <div class="modal-body">
-    //           ${autofillsList}
-    //           </div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   `;
-    // // attach modal to page
-    // document.body.appendChild(autofillModal);
-    // fill autofill modal with content
-    // document.querySelector("#autofillModal .modal-body").appendChild(autofillsList);
-
-    //
-    // Latest Changes Modal
-    //
-
-    // get latest changes markdown doc.
-    jQuery.get(lastestChanges, (data) => {
-      const conv = new showdown.Converter();
-      showdown.setFlavor("github");
-      const changeLogData = conv.makeHtml(data);
-
-      // build latest changes modal
-      const lastestChangesModal = document.createElement("div");
-      // add the modal content + the Latest Changes Markdown Doc Content
-      lastestChangesModal.innerHTML = `
-        <div class="modal fade" id="lastestChangesModal" tabindex="-1" role="dialog" aria-labelledby="lastestChangesModalTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-body">
-                ${changeLogData}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // attach modal to page
-      document.body.appendChild(lastestChangesModal);
-    }, "text");
-
-    //
-    // Instructions Modal
-    //
-
-    // get latest changes markdown doc.
-    jQuery.get(toolInstructions, (data) => {
-      const conv = new showdown.Converter();
-      showdown.setFlavor("github");
-      const toolInstructionsData = conv.makeHtml(data);
-
-      // build latest changes modal
-      const toolInstructionsModal = document.createElement("div");
-      // add the modal content + the Latest Changes Markdown Doc Content
-      toolInstructionsModal.innerHTML = `
-        <div class="modal fade" id="toolInstructionsModal" tabindex="-1" role="dialog" aria-labelledby="toolInstructionsModalTitle" aria-hidden="true">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Tool Instructions</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                ${toolInstructionsData}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // attach modal to page
-      document.body.appendChild(toolInstructionsModal);
-    }, "text");
+  function main() {
+    // run tool
+    // getActiveAutofillList();
+    // Load Tool Styles
+    loadAutofillStyles()
+      // .then(() => getActiveAutofillList())
+      .then(() => setGeneralInfo())
+      .then(() => setPhoneNumbers())
+      .then(() => verifyActiveAutofillListValues())
+      .then(() => {
+        window.onload = setup;
+      })
+      .catch(error => {
+        log("Failed to Load Tool Styles", error);
+        // window.alert(error)
+      });
   }
 
   //
