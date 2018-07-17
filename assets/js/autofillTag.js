@@ -1,9 +1,4 @@
 const AutofillReplacerTool = (function () {
-
-  //https://sso.cdk.com/adfs/ls/idpinitiatedsignon.aspx
-  //okta
-
-
   const autofillTagListURL = "https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/autofill_list.json";
   /* eslint-disable */
   const myStyles = GM_getResourceURL("toolStyles");
@@ -69,7 +64,7 @@ const AutofillReplacerTool = (function () {
       "searchTerms": "SEARCH_FOR_ME"
     }
   ];
-  const activeAutofillList = [];  // TODO fix all issue resulting from moving this to a its own object
+  let activeAutofillList = getFromLocalStorage() || defaultAutofillList;
 
   /**
    * Custom Tool Console Logging for debugging purposes
@@ -80,9 +75,10 @@ const AutofillReplacerTool = (function () {
     /* eslint-disable */
     if (obj) {
       // remove comment to enable console logs
-      console.log(`Autofill Tool : ${message}`, obj);
+      // console.log(`Autofill Tool : ${message}`, obj);
     } else {
-      console.log(`Autofill Tool : ${message}`);
+      // remove comment to enable console logs
+      // console.log(`Autofill Tool : ${message}`);
     }
     /* eslint-enable */
   }
@@ -93,14 +89,15 @@ const AutofillReplacerTool = (function () {
    * @param {boolen} returnResolve - returns resolved
    * @return {object} if resolve is true, returns empty resolve
    */
-  function log(message, returnResolve = false) {
+  function logReturn(message, returnResolve = false) {
     /* eslint-disable */
     if (returnResolve) {
       // remove comment to enable console logs
-      console.log(`Autofill Tool : ${message}`);
+      // console.log(`Autofill Tool : ${message}`);
       return Promise.resolve();
     } else {
-      console.log(`Autofill Tool : ${message}`);
+      // remove comment to enable console logs
+      // console.log(`Autofill Tool : ${message}`);
     }
     /* eslint-enable */
   }
@@ -287,6 +284,7 @@ const AutofillReplacerTool = (function () {
    */
   function loadAutofillStyles() {
     return new Promise((resolve, reject) => {
+      log("load autofill styles");
       // default styles
       const autofillStyles = document.createElement("link");
 
@@ -310,6 +308,7 @@ const AutofillReplacerTool = (function () {
    */
   function getLocaleAbbreviationInformation() {
     return new Promise((resolve, reject) => {
+      log("get locale abb information");
       const options = {
         // url: `https://raw.githubusercontent.com/cirept/autofillReplacer/develop/assets/json/locale_${locale}.json`,
         url: `https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/locale_${locale}.json`,
@@ -327,9 +326,15 @@ const AutofillReplacerTool = (function () {
   }
 
   /**
-   * Set the Full State Name
+   * Traverse state list to find the abbreviation match
+   * and set the full state name
+   * 
+   * @param {object} stateList - the full state object array
    */
   function setFullStateName(stateList) {
+    log("set full state name", stateList);
+    const currentStateAbbreviation = getActiveAutofillEntryByTag("%STATE%").searchTerms;
+
     // filter the array of states down to the matching state.
     const filteredStates = stateList.filter((state) => {
 
@@ -339,24 +344,22 @@ const AutofillReplacerTool = (function () {
       } = state;
 
       // return value if it matches the current state.
-      return getActiveAutofillEntryByTag("%STATE%").searchTerms === abbreviation;
+      return currentStateAbbreviation === abbreviation;
     });
 
     // display console message that no match was found
     if (filteredStates.length > 1 || filteredStates.length < 1) {
       // set value to the default value
       log("Region not supported by the tool");
-      // reject("No Match Found");
-    }
-    // set STATE FULL NAME to matched state
-    else /*if(filteredStates.length === 1)*/ {
+    } else {
+      // set STATE FULL NAME to matched state
       getActiveAutofillEntryByTag("%STATE_FULL_NAME%").searchTerms = filteredStates[0].name;
 
       // display confirmation message
-      log("State Full Name Added");
+      log("State Full Name Added", getActiveAutofillEntryByTag("%STATE_FULL_NAME%"));
     }
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       resolve("Full State Name Set");
     });
   }
@@ -369,6 +372,7 @@ const AutofillReplacerTool = (function () {
    */
   function fetch(options) {
     return new Promise((resolve, reject) => {
+      log("fetching URL");
       jQuery.ajax(options).done((data) => {
         resolve(data);
       }).fail((error) => {
@@ -382,7 +386,25 @@ const AutofillReplacerTool = (function () {
    * @param {object} autofillTag - the autofill tag to return from default list
    */
   function getActiveAutofillEntryByTag(autofillTag) {
+    // log("get active autofill entry", autofillTag);
+    log(`get active autofill entry ${autofillTag}`);
     return activeAutofillList.find(autofill => autofill.autofillTag === autofillTag);
+  }
+
+  /**
+   * Returns the autofill tag entry from the active list
+   * @param {object} autofillTag - the autofill tag to return from default list
+   * @param {string} searchTerm - the string to set the searchTerm too
+   */
+  function setActiveAutofillEntry(autofillTag, searchTerm) {
+    log("set active autofill entry", (autofillTag + " " + searchTerm));
+    const match = activeAutofillList.find(autofill => autofill.autofillTag === autofillTag);
+
+    // if match is found, set the searchTerms to the parameter value
+    if (match) {
+      match.searchTerms = searchTerm;
+    }
+    log("match found", match);
   }
 
   /**
@@ -391,6 +413,7 @@ const AutofillReplacerTool = (function () {
    */
   function populateActiveAutofillList(data) {
     return new Promise((resolve, reject) => {
+      log("populate active autofill list");
       const myDiv = document.createElement("div");
 
       // myDiv props
@@ -407,12 +430,12 @@ const AutofillReplacerTool = (function () {
       }
 
       // fill out autofill list with website settings information
-      getActiveAutofillEntryByTag("%DEALER_NAME%").searchTerms = myDiv.querySelector("input[name='name']").value;
-      getActiveAutofillEntryByTag("%STREET%").searchTerms = myDiv.querySelector("input#contact_address_street1").value;
-      getActiveAutofillEntryByTag("%CITY%").searchTerms = myDiv.querySelector("input#contact_address_city").value;
-      getActiveAutofillEntryByTag("%ZIP%").searchTerms = myDiv.querySelector("input#contact_address_postalCode").value;
-      getActiveAutofillEntryByTag("%STATE%").searchTerms = myDiv.querySelector("select#contact_address_state").value;
-      getActiveAutofillEntryByTag("%PHONE%").searchTerms = myDiv.querySelector("input[name='contact_phone_number']").value;
+      setActiveAutofillEntry("%DEALER_NAME%", myDiv.querySelector("input[name='name']").value);
+      setActiveAutofillEntry("%STREET%", myDiv.querySelector("input#contact_address_street1").value);
+      setActiveAutofillEntry("%CITY%", myDiv.querySelector("input#contact_address_city").value);
+      setActiveAutofillEntry("%ZIP%", myDiv.querySelector("input#contact_address_postalCode").value);
+      setActiveAutofillEntry("%STATE%", myDiv.querySelector("select#contact_address_state").value);
+      setActiveAutofillEntry("%PHONE%", myDiv.querySelector("input[name='contact_phone_number']").value);
 
       if (data) {
         // display confirmation message
@@ -428,18 +451,25 @@ const AutofillReplacerTool = (function () {
    * Fill in the default autofill list with a default value
    */
   function verifyActiveAutofillListValues() {
-    return new Promise((resolve) => {
-      const myKeys = Object.keys(activeAutofillList);
-
-      // set the default value to SEARCH_FOR_ME if values are blank
-      myKeys.map((autofill) => {
-        if (activeAutofillList[String(autofill)] === "") {
-          activeAutofillList[String(autofill)] = "SEARCH_FOR_ME";
-        }
-      });
-
-      resolve("Default Values Verified");
+    log("verify active autofill list values");
+    // set the default value to SEARCH_FOR_ME if values are blank
+    activeAutofillList.map((autofill) => {
+      if (autofill.searchTerms === "") {
+        autofill.searchTerms = "SEARCH_FOR_ME";
+      }
     });
+  }
+
+  /**
+   * Log error for troubleshooting purposes and
+   * return a reject promise
+   *
+   * @param {string} error - error message to log in the console
+   * @returns Promise.reject()
+   */
+  function rejectError(error) {
+    log("ERROR", error);
+    return Promise.reject();
   }
 
   /**
@@ -447,6 +477,7 @@ const AutofillReplacerTool = (function () {
    */
   function setGeneralInfo() {
     return new Promise((resolve) => {
+      log("set general info");
       // path to open the website settings tab
       const siteSettingsURL = `editSiteSettings.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
       const options = {
@@ -457,15 +488,15 @@ const AutofillReplacerTool = (function () {
       // getLocaleAbbreviationInformation
       // Get Website Information
       fetch(options)
-        .then((websiteSettingsData) => populateActiveAutofillList(websiteSettingsData))
-        .then(() => getLocaleAbbreviationInformation())
-        .then((stateListObject) => setFullStateName(stateListObject))
-        .then(() => resolve("Default Website Settings Set"))
+        .then((websiteSettingsData) => populateActiveAutofillList(websiteSettingsData), error => rejectError(error))
+        .then(() => getLocaleAbbreviationInformation(), error => rejectError(error))
+        .then((stateListObject) => setFullStateName(stateListObject), error => rejectError(error))
+        .then(() => resolve("Default Website Settings Set"), error => rejectError(error))
         .catch((error) => {
           log("Issue with Website Information Encountered", error);
 
           // Display message that local is not supported by tool
-          if (error.includes("404")) {
+          if (error && error.includes("404")) {
             log("Locale Not Supported");
           }
 
@@ -480,17 +511,18 @@ const AutofillReplacerTool = (function () {
    * @param {object} data - the HTML code for the Phone numbers section of the settings in WSM
    */
   function populateDefaultPhoneNumbers(data) {
+    log("populate default phone numbers");
     const myDiv = document.createElement("div");
 
     // attach data to div in order to query elements
     myDiv.innerHTML = data;
 
     // save query information to tool variable
-    getActiveAutofillEntryByTag("%PHONE%").searchTerms = myDiv.querySelector("input[name*='(__primary_).ctn']").value;
-    getActiveAutofillEntryByTag("%NEW_PHONE%").searchTerms = myDiv.querySelector("input[name*='(__new_).ctn']").value;
-    getActiveAutofillEntryByTag("%USED_PHONE%").searchTerms = myDiv.querySelector("input[name*='(__used_).ctn']").value;
-    getActiveAutofillEntryByTag("%SERVICE_PHONE%").searchTerms = myDiv.querySelector("input[name*='(__service_).ctn']").value;
-    getActiveAutofillEntryByTag("%PARTS_PHONE%").searchTerms = myDiv.querySelector("input[name*='(__parts_).ctn']").value;
+    setActiveAutofillEntry("%PHONE%", myDiv.querySelector("input[name*='(__primary_).ctn']").value);
+    setActiveAutofillEntry("%NEW_PHONE%", myDiv.querySelector("input[name*='(__new_).ctn']").value);
+    setActiveAutofillEntry("%USED_PHONE%", myDiv.querySelector("input[name*='(__used_).ctn']").value);
+    setActiveAutofillEntry("%SERVICE_PHONE%", myDiv.querySelector("input[name*='(__service_).ctn']").value);
+    setActiveAutofillEntry("%PARTS_PHONE%", myDiv.querySelector("input[name*='(__parts_).ctn']").value);
 
     // resolve
     return new Promise((resolve) => {
@@ -503,6 +535,7 @@ const AutofillReplacerTool = (function () {
    */
   function setPhoneNumbers() {
     return new Promise((resolve) => {
+      log("set phone numbers");
       // build website settings URL path
       const webID = document.getElementById("siWebId").querySelector("label.displayValue").textContent;
       const siteSettingsURL = `editDealerPhoneNumbers.do?webId=${webID}&locale=${locale}&pathName=editSettings`;
@@ -538,6 +571,7 @@ const AutofillReplacerTool = (function () {
    * will also update the button"s icon and hover text
    */
   function toggleToolPanel() {
+    log("toggle tool panel");
     // toggle panel
     autofillOptionsContainer.classList.toggle("hide");
 
@@ -557,6 +591,7 @@ const AutofillReplacerTool = (function () {
    * @param {string} animationType - the type of animation to use
    */
   function updateDisplayMessage(message, animationType = "tada") {
+    log("perform animation", animationType);
     // update display message
     messageDisplay.innerText = message;
     jQuery("#toolMessageDisplay").animateCss(animationType);
@@ -568,7 +603,8 @@ const AutofillReplacerTool = (function () {
    * @param {string} text - the text that will be used as the input value, DEFAULT value = "SEARCH_FOR_ME"
    */
   function listItem(autofill, text = "SEARCH_FOR_ME") {
-    console.log("creating listItem", text);
+    log("list item", (autofill + " " + text));
+    const textInput = text || "SEARCH_FOR_ME"; // set default text if saved search terms are empty
     const listElement = document.createElement("li");
     const label = document.createElement("div");
     const myInput = document.createElement("input");
@@ -588,8 +624,8 @@ const AutofillReplacerTool = (function () {
     // input area props
     myInput.type = "text";
     myInput.classList.add("regEx");
-    myInput.title = text;
-    myInput.value = text;
+    myInput.title = textInput;
+    myInput.value = textInput;
 
     // arrow icon props
     myPointer.classList.add("fas");
@@ -623,8 +659,6 @@ const AutofillReplacerTool = (function () {
     listElement.appendChild(label);
     listElement.appendChild(removeMeContainer);
 
-    console.log("creating listItem complete");
-
     return listElement;
   }
 
@@ -633,6 +667,7 @@ const AutofillReplacerTool = (function () {
    * @param {Object} obj - parameter list to save
    */
   function saveAutofillParameters() {
+    log("save autofill parameters");
     const myArrayObj = convertActiveListToObject();
     const saveMe = JSON.stringify(myArrayObj);
     saveToLocalStorage("AutofillReplacerTool", saveMe);
@@ -653,6 +688,7 @@ const AutofillReplacerTool = (function () {
    * @return {object} myArrayObj - returns object array of autofill entries in list
    */
   function convertActiveListToObject() {
+    log("convert active list to object");
     let myArrayObj = [];
 
     // loop through configured autofills
@@ -683,6 +719,7 @@ const AutofillReplacerTool = (function () {
    * @param {object} elem - element being removed from the configured list
    */
   function removeDisable(elem) {
+    log("remove disable calsses");
     const autofillTag = elem.dataset.autofillTag;
     const disabledAutofills = document.getElementById("allAutofillsList")
       .querySelectorAll(".autofill-list-item.disabled"); // query page for all disabled autofill elements
@@ -698,6 +735,7 @@ const AutofillReplacerTool = (function () {
    * disabled "magic" button if an entry is blank
    */
   function toggleMagicButton() {
+    log("toggle magic button");
     if (autofillOptionsList.getElementsByClassName("myError").length >= 1) {
       applyAutofills_button.classList.add("disabled");
     } else {
@@ -709,6 +747,7 @@ const AutofillReplacerTool = (function () {
    * Show error if input search field is empty
    */
   function validateList() {
+    log("validate list");
     if (autofillOptionsList.getElementsByClassName("myError").length > 0) {
       updateDisplayMessage("Please enter a word to search for.", "flash");
     } else {
@@ -728,6 +767,7 @@ const AutofillReplacerTool = (function () {
    *
    */
   function updateInputTitle(e) {
+    log("update input title");
     e.target.title = e.target.value;
   }
 
@@ -736,6 +776,7 @@ const AutofillReplacerTool = (function () {
    * @param {element} elem - new autofill list option
    */
   function bindTextChangeListener(elem) {
+    log("bind text change listener");
     jQuery(elem).find("input").on("keyup", saveAutofillParameters);
     jQuery(elem).find("input").on("keyup", updateInputTitle);
     jQuery(elem).find("input").on("keyup", toggleMagicButton);
@@ -747,15 +788,15 @@ const AutofillReplacerTool = (function () {
 
   /**
    * retrive object from local storage
-   * retrive object from local storage
    * @param {object} obj - object to be saved into local storage
    * @return {object} the ACTIVE Autofill list retrived from localStorage
    */
   function getFromLocalStorage() {
+    log("get from local storage");
     if (localStorage.getItem("AutofillReplacerTool")) {
       return JSON.parse(localStorage.getItem("AutofillReplacerTool"));
     }
-    return activeAutofillList;
+    return null;
   }
 
   /**
@@ -765,18 +806,15 @@ const AutofillReplacerTool = (function () {
    * @return {object} Promise.resolve
    */
   function buildActiveAutofillList() {
-    console.log("build active autofill list start");
-    // set the array to either data from Local Storage OR the default active list
-    const mapME = getFromLocalStorage() || defaultAutofillList;
-
-    console.log("mapping these autofills", mapME);
-
+    log("build active autofill list");
     // build autofill list options
-    mapME.map((autofill) => {
+    activeAutofillList.map((autofill) => {
       const {
         autofillTag,
         searchTerms
       } = autofill;
+
+      // create list element
       let listElement = listItem(autofillTag, searchTerms);
 
       // bind list item elements
@@ -786,8 +824,7 @@ const AutofillReplacerTool = (function () {
       autofillOptionsList.append(listElement);
     });
 
-    console.log("build active autofill list complete");
-
+    // return promise resolve
     return Promise.resolve("Active Autofill List Built");
   }
 
@@ -796,11 +833,12 @@ const AutofillReplacerTool = (function () {
    * @param {string} message - the message to show when the tool resets
    */
   function resetAutofills(message) {
+    log("reset autofills");
     // erase current list
     autofillOptionsList.innerHTML = "";
     // remove stored variables from memory
     localStorage.removeItem("AutofillReplacerTool");
-    console.log("current local storage for autoreplace tool", localStorage.AutofillReplacerTool);
+    log("reset autofills : build autofill list");
     // build default list
     buildActiveAutofillList();
     // reset apply button if it is disabled
@@ -809,20 +847,15 @@ const AutofillReplacerTool = (function () {
     updateDisplayMessage(message);
     // save new values
     saveAutofillParameters();
-
-    // 
-    // disabledAutofills();
-    // disableActiveAutofillOptions();
   }
 
   /**
    * Reset all disabled autofills in the Autofills List Modal
    */
   function resetAllDisabledAutofills() {
-    console.log("reset all disabled autofills");
+    log("reset all disabled autofills");
     const disabledElements = document.getElementById("autofillListModal").querySelectorAll(".autofill-list-item.disabled");
 
-    console.log(disabledElements);
     // remove all disabled classes from the autofills list
     if (disabledElements.length > 0) {
       // loop through HTML collection of query results
@@ -831,8 +864,6 @@ const AutofillReplacerTool = (function () {
         disabledElements[z].classList.remove("disabled");
       }
     }
-
-    console.log("reset all disabled autofills complete");
   }
 
   /**
@@ -841,35 +872,12 @@ const AutofillReplacerTool = (function () {
    * @param {string} message - the message to show when the tool resets
    */
   function resetValues(confirm, message) {
+    log("reset values");
     if (confirm && window.confirm("Reset Values?")) {
       resetAutofills(message);
       resetAllDisabledAutofills();
       disableActiveAutofillOptions();
     }
-
-    if (!confirm) {
-      resetAutofills(message);
-      resetAllDisabledAutofills();
-      disableActiveAutofillOptions();
-    }
-  }
-
-  /**
-   * Converts the autofill tags in local memory to simple array
-   * @return {object} autofill - contains a simple array with AUTOFILL tags ONLY
-   */
-  function localDataToString() {
-    const localData = getFromLocalStorage();
-    const autofill = [];
-    const keys = Object.keys(localData);
-
-    log("localDataToString", localData);
-
-    keys.map((value) => {
-      autofill.push(value);
-    });
-
-    return autofill;
   }
 
   /**
@@ -880,6 +888,7 @@ const AutofillReplacerTool = (function () {
    * @param {string} tag - the autofill tag for the ACTIVE list element
    */
   function addSelectedAutofillToList(liElement, tag) {
+    log("add selected autofill to list");
     const listElement = listItem(tag); // create the LI element in memory
 
     // disabled the li element in the options modal
@@ -899,6 +908,7 @@ const AutofillReplacerTool = (function () {
    * added to the active list
    */
   function attachAddToActiveEvent() {
+    log("attach click event listeners");
     const allAutofillsList = document.querySelectorAll("li.autofill-list-item");
 
     // loop through HTML collection and attach onclick event listener
@@ -920,7 +930,7 @@ const AutofillReplacerTool = (function () {
    * added to the active list
    */
   function disableActiveAutofillOptions() {
-    console.log("disabled active autofills");
+    log("disabled active autofills");
     // query DOM for elements
     const autofillListItems = document.getElementById("allAutofillsList").querySelectorAll("li.autofill-list-item");
 
@@ -938,8 +948,6 @@ const AutofillReplacerTool = (function () {
 
     }
 
-    console.log("disabled active autofills complete");
-
     // return resolve
     return Promise.resolve("Autofills Disabled");
   }
@@ -950,6 +958,7 @@ const AutofillReplacerTool = (function () {
    */
   function createAutofillListOptions(autofillListData) {
     return new Promise((resolve, reject) => {
+      log("create autofill list options");
       // loop through each autofill object and add it to the list.
       autofillListData.map((autofill) => {
         const {
@@ -989,6 +998,7 @@ const AutofillReplacerTool = (function () {
    * @return {array} wordArray - array containing all text nodes on the page
    */
   function treeWalk(base) {
+    log("tree walk");
     const treeWalker = document.createTreeWalker(base, NodeFilter.SHOW_TEXT, null, false);
     const wordArray = [];
 
@@ -1013,6 +1023,7 @@ const AutofillReplacerTool = (function () {
    * @param {string} text - the text to verify
    */
   function phoneNumberText(text) {
+    log("verify phone number");
     const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
 
     if (phoneRegex.test(text)) {
@@ -1027,6 +1038,7 @@ const AutofillReplacerTool = (function () {
    * @param {string} regReplace - text string to search for
    */
   function replaceText(wordList, regReplace) {
+    log("replace text");
     wordList.forEach((n) => {
       let text = n.nodeValue;
 
@@ -1039,6 +1051,7 @@ const AutofillReplacerTool = (function () {
         if (findMe.indexOf(";") > -1) {
           const findArray = findMe.split(";");
           const arrayLength = findArray.length;
+
           for (let a = 0; a < arrayLength; a += 1) {
             const searchText = findArray[a].trim();
             const findThis = phoneNumberText(searchText);
@@ -1053,6 +1066,7 @@ const AutofillReplacerTool = (function () {
         } else {
           const findThis = phoneNumberText(findMe);
           const myRegex = new RegExp(findThis, "gi");
+
           text = text.replace(myRegex, autofillTag);
         }
       }
@@ -1067,6 +1081,7 @@ const AutofillReplacerTool = (function () {
    * @param {array} regReplace - object array that contains the regExpressions and corresponding autofill tags
    */
   function useAutofillTags(baseElem, regReplace) {
+    log("use autofill tags");
     let wordList;
     const baseLength = baseElem.length;
 
@@ -1083,6 +1098,7 @@ const AutofillReplacerTool = (function () {
    * @param {regex} regReplace - list of regex values
    */
   function replaceTextCMS(recordEditWindow, regReplace) {
+    log("replace text CMS");
     // pass elements with children as base element for autofill replacing
     useAutofillTags(recordEditWindow, regReplace);
 
@@ -1098,6 +1114,7 @@ const AutofillReplacerTool = (function () {
    * replacing with data contained in the list area of tool
    */
   function autofills() {
+    log("main autofill function");
     // WSM MAIN WINDOW LOGIC
     const contentFrame = jQuery("iframe#cblt_content").contents();
     const siteEditorIframe = contentFrame.find("iframe#siteEditorIframe").contents();
@@ -1147,21 +1164,36 @@ const AutofillReplacerTool = (function () {
    * Determine if the current website is different
    */
   function webIDToolReset() {
-    const currentWebID = getWebID();
-    if (getItemFromLocalStorage("webID") !== currentWebID) {
-      resetValues(false, "New Web ID Detected, Values Reset");
-      // save webid
-      saveToLocalStorage("webID", currentWebID);
-    }
-  }
+    log("check for different WEB ID", (webID + " : " + getItemFromLocalStorage("webID")));
+    const savedWebID = getItemFromLocalStorage("webID");
+    let resetValues;
 
-  /**
-   * Grabs the web id from the input at the top right
-   * of the WSM page.
-   * @return {string} the web id for the current site.
-   */
-  function getWebID() {
-    return document.querySelector("#siWebId .displayValue").innerText;
+    // if current web id is different
+    if (savedWebID !== webID) {
+      // save webid
+      saveToLocalStorage("webID", webID);
+      // reset active autofill
+      activeAutofillList = defaultAutofillList;
+      resetValues = true;
+    } else {
+      resetValues = false;
+    }
+
+    return new Promise((resolve) => {
+      if (typeof resetValues === "null") {
+        resolve("Web ID Detection Reset Failed");
+      }
+
+      if (resetValues) {
+        // update display message
+        updateDisplayMessage("New Web ID Detected, Values Reset");
+        log("Current Web ID is Different as Saved Web ID");
+        resolve("Current Web ID is Different as Saved Web ID");
+      } else {
+        log("Current Web ID is Same as Saved Web ID");
+        resolve("Current Web ID is Same as Saved Web ID");
+      }
+    });
   }
 
   /**
@@ -1170,6 +1202,7 @@ const AutofillReplacerTool = (function () {
    * @return the value for the data item or "No Data Found" message
    */
   function getItemFromLocalStorage(name) {
+    log("get item from local storage");
     return window.localStorage.getItem(name) === null ?
       "No Data Found in Local Storage" :
       window.localStorage.getItem(name);
@@ -1179,6 +1212,7 @@ const AutofillReplacerTool = (function () {
    * Attach events to tool buttons
    */
   function attachButtonEvents() {
+    log("attach button events");
     // minimize list button
     minimizeList_button.onclick = toggleToolPanel;
     // reset tool button
@@ -1195,6 +1229,7 @@ const AutofillReplacerTool = (function () {
    */
   function convertMarkdownToHTML(data) {
     return new Promise((resolve) => {
+      log("convert markdown to html");
       const conv = new showdown.Converter();
       showdown.setFlavor("github");
       const changeLogData = conv.makeHtml(data);
@@ -1210,6 +1245,7 @@ const AutofillReplacerTool = (function () {
    */
   function attachModal(name, html) {
     return new Promise((resolve, reject) => {
+      log("attach modal");
       // build latest changes modal
       const myModal = document.createElement("div");
       // add the modal content + the Latest Changes Markdown Doc Content
@@ -1241,6 +1277,7 @@ const AutofillReplacerTool = (function () {
    * @return {object} a Promise.resolve
    */
   function buildAutofillListModal() {
+    log("build autofill list modal");
     const options = {
       url: autofillTagListURL,
       dataType: "json"
@@ -1251,13 +1288,7 @@ const AutofillReplacerTool = (function () {
       .then(() => attachModal("autofillList", allAutofillsList.outerHTML))
       .then(() => disableActiveAutofillOptions())
       .then(() => attachAddToActiveEvent())
-      .then(() => log("Autofill Modal Complete", true))
-    // .resolve();
-    // .then(() => {
-    //   return () => Promise.resolve;
-    // });
-
-    // return Promise.resolve("Autofill Modal Complete");
+      .then(() => logReturn("Autofill Modal Complete", true));
   }
 
   /**
@@ -1265,6 +1296,7 @@ const AutofillReplacerTool = (function () {
    * @return {object} a Promise.resolve
    */
   function buildLatestChangesModal() {
+    log("build latest changes modal");
     const options = {
       url: lastestChanges,
       dataType: "text"
@@ -1274,12 +1306,7 @@ const AutofillReplacerTool = (function () {
     return fetch(options)
       .then(data => convertMarkdownToHTML(data))
       .then(HTMLdata => attachModal("lastestChanges", HTMLdata))
-      .then(() => log("Latest Changes Modal Complete", true))
-    // .then(() => {
-    //   return () => Promise.resolve;
-    // });
-
-    // return Promise.resolve("Latest Changes Modal Complete");
+      .then(() => logReturn("Latest Changes Modal Complete", true));
   }
 
   /**
@@ -1287,6 +1314,7 @@ const AutofillReplacerTool = (function () {
    * @return {object} a Promise.resolve
    */
   function buildInstructionsModal() {
+    log("build instructions modal");
     const options = {
       url: toolInstructions,
       dataType: "text"
@@ -1296,12 +1324,7 @@ const AutofillReplacerTool = (function () {
     return fetch(options)
       .then(data => convertMarkdownToHTML(data))
       .then(HTMLdata => attachModal("toolInstructions", HTMLdata))
-      .then(() => log("Instructions Modal Complete", true))
-    // .then(() => {
-    //   return () => Promise.resolve;
-    // });
-
-    // return Promise.resolve("Instructions Modal Complete");
+      .then(() => logReturn("Instructions Modal Complete", true));
   }
 
   /**
@@ -1310,13 +1333,12 @@ const AutofillReplacerTool = (function () {
    * @return {object} a Promise.resolve
    */
   function buildMainTool() {
-    // log("attacing tool to page");
+    log("build main tool");
     // attach tool elements to page
     document.querySelector("header.wsmMainHeader").appendChild(wsmEditorTools);
     // attach button events
     attachButtonEvents();
-
-    // console.log("attached to page", document.querySelector(".customEditorTools"));
+    // return resolve
     return Promise.resolve("Main Tool Complete");
   }
 
@@ -1324,49 +1346,27 @@ const AutofillReplacerTool = (function () {
    * Sets up autofill tool
    */
   function setup() {
-
-
+    log("set up tool");
+    verifyActiveAutofillListValues();
     buildAutofillListModal();
-    // .then(() => log("buildAutofillListModal resolve recieved"));
     buildLatestChangesModal();
-    // // .then(result => log(result));
-    // .then(() => log("buildLatestChangesModal resolve recieved"));
     buildInstructionsModal();
-    //   // .then(result => log(result));
-    // .then(() => log("buildInstructionsModal resolve recieved"));
     buildActiveAutofillList();
-    //   // .then(result => log(result));
-    // .then(result => log("buildActiveAutofillList resolve recieved"));
     buildMainTool();
-    // .then(result => log("buildMainTool resolve recieved"));
-    webIDToolReset();
-
-    // console.log("Autofill Tool Setup Complete");
-    // return Promise.all([buildAutofillListModal, buildLatestChangesModal, buildInstructionsModal, buildActiveAutofillList])
-    //   .then(() => buildMainTool())
-    //   .then(() => {
-    //     webIDToolReset();
-    //     return () => Promise.resolve;
-    //   });
-    // .then(() => Promise.resolve("Autofill Tool Setup Complete"));
-    // .then(() => console.log("Autofill Tool Setup Complete"));
   }
 
   /**
    * main function to start the program
    */
   function main() {
+    log("main tool");
     // run tool
     // Load Tool Styles
     loadAutofillStyles()
-      .then(() => setGeneralInfo())
-      .then(() => setPhoneNumbers())
-      .then(() => verifyActiveAutofillListValues())
-      .then(() => setup())
-      // .then(() => buildMainTool())
-      // .then(() => {
-      //   window.onload = setup;
-      // })
+      .then(() => webIDToolReset(), (error) => rejectError(error))
+      .then(() => setGeneralInfo(), (error) => rejectError(error))
+      .then(() => setPhoneNumbers(), (error) => rejectError(error))
+      .then(() => setup(), (error) => rejectError(error))
       .catch(error => {
         log("Failed to Load Tool Styles", error);
       });
