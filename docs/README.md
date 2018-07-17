@@ -80,9 +80,9 @@ Tool has been recently updated and some elements have been removed or modified.
 |-----------------------1---------------------|   |--------------2------------|  |--3--|
 
 This is comprised of three (3) parts.
-1. Autofill **text input area**. (purple background)
-2. **Autofill tag** that will replace text.
-3. **Delete autofill** entry.
+* 1 Autofill **text input area**. (purple background)
+* 2 **Autofill tag** that will replace text.
+* 3 **Delete autofill** entry.
 
 ----------------------------------------
 
