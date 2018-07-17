@@ -1,5 +1,21 @@
 # Change Log
 
+## v1.1.8
+
+### Functionality
+
+* Improved Tool Load Times.
+
+``Released (07/17/2018)``
+
+<br>
+<br>
+
+---
+
+<br>
+<br>
+
 ## v1.1.6
 
 ### Updated UI
