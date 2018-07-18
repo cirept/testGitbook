@@ -1,4 +1,4 @@
-const AutofillReplacerTool = (function () {
+const AutofillReplacerTool = (function AutofillReplacerTool() {
   const autofillTagListURL = "https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/autofill_list.json";
   /* eslint-disable */
   const myStyles = GM_getResourceURL("toolStyles");
@@ -7,6 +7,7 @@ const AutofillReplacerTool = (function () {
   /* eslint-enable */
   const webID = document.getElementById("_webId").value;
   const locale = document.getElementById("_locale").value;
+  let activeAutofillList;
   const defaultAutofillList = [{
       "autofillTag": "***How to Separate Words***",
       "searchTerms": "Separate words with --> ;"
@@ -64,7 +65,6 @@ const AutofillReplacerTool = (function () {
       "searchTerms": "SEARCH_FOR_ME"
     }
   ];
-  let activeAutofillList = getFromLocalStorage() || defaultAutofillList;
 
   /**
    * Custom Tool Console Logging for debugging purposes
@@ -326,9 +326,18 @@ const AutofillReplacerTool = (function () {
   }
 
   /**
+   * Returns the autofill tag entry from the active list
+   * @param {object} autofillTag - the autofill tag to return from default list
+   */
+  function getActiveAutofillEntryByTag(autofillTag) {
+    // log("get active autofill entry", autofillTag);
+    log(`get active autofill entry ${autofillTag}`);
+    return activeAutofillList.find(autofill => autofill.autofillTag === autofillTag);
+  }
+
+  /**
    * Traverse state list to find the abbreviation match
    * and set the full state name
-   * 
    * @param {object} stateList - the full state object array
    */
   function setFullStateName(stateList) {
@@ -359,8 +368,13 @@ const AutofillReplacerTool = (function () {
       log("State Full Name Added", getActiveAutofillEntryByTag("%STATE_FULL_NAME%"));
     }
 
-    return new Promise((resolve, reject) => {
-      resolve("Full State Name Set");
+    return new Promise((resolve) => {
+      if (getActiveAutofillEntryByTag("%STATE_FULL_NAME%") !== "" ||
+        getActiveAutofillEntryByTag("%STATE_FULL_NAME%") !== "SEARCH_FOR_ME") {
+        resolve("Full State Name Set");
+      } else {
+        resolve("Full State Name Not Set");
+      }
     });
   }
 
@@ -384,21 +398,11 @@ const AutofillReplacerTool = (function () {
   /**
    * Returns the autofill tag entry from the active list
    * @param {object} autofillTag - the autofill tag to return from default list
-   */
-  function getActiveAutofillEntryByTag(autofillTag) {
-    // log("get active autofill entry", autofillTag);
-    log(`get active autofill entry ${autofillTag}`);
-    return activeAutofillList.find(autofill => autofill.autofillTag === autofillTag);
-  }
-
-  /**
-   * Returns the autofill tag entry from the active list
-   * @param {object} autofillTag - the autofill tag to return from default list
    * @param {string} searchTerm - the string to set the searchTerm too
    */
   function setActiveAutofillEntry(autofillTag, searchTerm) {
-    log("set active autofill entry", (autofillTag + " " + searchTerm));
-    const match = activeAutofillList.find(autofill => autofill.autofillTag === autofillTag);
+    log(`set active autofill entry ${autofillTag} ${searchTerm})`);
+    const match = activeAutofillList.find((autofill) => autofill.autofillTag === autofillTag);
 
     // if match is found, set the searchTerms to the parameter value
     if (match) {
@@ -488,10 +492,10 @@ const AutofillReplacerTool = (function () {
       // getLocaleAbbreviationInformation
       // Get Website Information
       fetch(options)
-        .then((websiteSettingsData) => populateActiveAutofillList(websiteSettingsData), error => rejectError(error))
-        .then(() => getLocaleAbbreviationInformation(), error => rejectError(error))
-        .then((stateListObject) => setFullStateName(stateListObject), error => rejectError(error))
-        .then(() => resolve("Default Website Settings Set"), error => rejectError(error))
+        .then((websiteSettingsData) => populateActiveAutofillList(websiteSettingsData), (error) => rejectError(error))
+        .then(() => getLocaleAbbreviationInformation(), (error) => rejectError(error))
+        .then((stateListObject) => setFullStateName(stateListObject), (error) => rejectError(error))
+        .then(() => resolve("Default Website Settings Set"), (error) => rejectError(error))
         .catch((error) => {
           log("Issue with Website Information Encountered", error);
 
@@ -548,7 +552,7 @@ const AutofillReplacerTool = (function () {
         .then((phoneNumberInfo) => populateDefaultPhoneNumbers(phoneNumberInfo))
         .then(() => {
           log("Phone Numbers Added");
-          resolve("Phone Numbers Added")
+          resolve("Phone Numbers Added");
         });
     });
   }
@@ -598,12 +602,65 @@ const AutofillReplacerTool = (function () {
   }
 
   /**
+   * creating an array of the configured autofill tags
+   * Also performs simple validation to prevent empty values being saved
+   * @return {object} myArrayObj - returns object array of autofill entries in list
+   */
+  function convertActiveListToObject() {
+    log("convert active list to object");
+    const myArrayObj = [];
+
+    // loop through configured autofills
+    Array.from(autofillOptionsList.children).map((element) => {
+      const autofillTag = element.querySelector(".autofillTag").innerText; // trim it just in case the manual autofill input is triggerd
+      let regexInput = element.querySelector(".regEx").value.trim();
+      const saveAutofill = {};
+
+      // validate input
+      // use default phrase if autofill is empty
+      if (regexInput === "") {
+        regexInput = "SEARCH_FOR_ME";
+      }
+
+      // add data to autofill object to save
+      saveAutofill["autofillTag"] = autofillTag;
+      saveAutofill["searchTerms"] = regexInput;
+
+      // add autofill entry to the save array
+      myArrayObj.push(saveAutofill);
+    });
+
+    return myArrayObj;
+  }
+
+  /**
+   * save object to local storage
+   * @param {string} name - object to be saved into local storage
+   * @param value - the value to save
+   */
+  function saveToLocalStorage(name, value) {
+    localStorage.setItem(name, value);
+  }
+
+  /**
+   * save autofill parameter list to local storage
+   * @param {Object} obj - parameter list to save
+   */
+  function saveAutofillParameters() {
+    log("save autofill parameters");
+    const myArrayObj = convertActiveListToObject();
+    const saveMe = JSON.stringify(myArrayObj);
+
+    saveToLocalStorage("AutofillReplacerTool", saveMe);
+  }
+
+  /**
    * Build a generic list item to use through out the tool
    * @param {string} autofill - the text that will be used to fill in the autofillTag div
    * @param {string} text - the text that will be used as the input value, DEFAULT value = "SEARCH_FOR_ME"
    */
   function listItem(autofill, text = "SEARCH_FOR_ME") {
-    log("list item", (autofill + " " + text));
+    log(`list item ${autofill} ${text}`);
     const textInput = text || "SEARCH_FOR_ME"; // set default text if saved search terms are empty
     const listElement = document.createElement("li");
     const label = document.createElement("div");
@@ -663,58 +720,6 @@ const AutofillReplacerTool = (function () {
   }
 
   /**
-   * save autofill parameter list to local storage
-   * @param {Object} obj - parameter list to save
-   */
-  function saveAutofillParameters() {
-    log("save autofill parameters");
-    const myArrayObj = convertActiveListToObject();
-    const saveMe = JSON.stringify(myArrayObj);
-    saveToLocalStorage("AutofillReplacerTool", saveMe);
-  }
-
-  /**
-   * save object to local storage
-   * @param {string} name - object to be saved into local storage
-   * @param value - the value to save
-   */
-  function saveToLocalStorage(name, value) {
-    localStorage.setItem(name, value);
-  }
-
-  /**
-   * creating an array of the configured autofill tags
-   * Also performs simple validation to prevent empty values being saved
-   * @return {object} myArrayObj - returns object array of autofill entries in list
-   */
-  function convertActiveListToObject() {
-    log("convert active list to object");
-    let myArrayObj = [];
-
-    // loop through configured autofills
-    Array.from(autofillOptionsList.children).map((element) => {
-      let autofillTag = element.querySelector(".autofillTag").innerText; // trim it just in case the manual autofill input is triggerd
-      let regexInput = element.querySelector(".regEx").value.trim();
-      let saveAutofill = {};
-
-      // validate input
-      // use default phrase if autofill is empty
-      if (regexInput === "") {
-        regexInput = "SEARCH_FOR_ME";
-      }
-
-      // add data to autofill object to save
-      saveAutofill["autofillTag"] = autofillTag;
-      saveAutofill["searchTerms"] = regexInput;
-
-      // add autofill entry to the save array
-      myArrayObj.push(saveAutofill);
-    });
-
-    return myArrayObj;
-  }
-
-  /**
    * Scan autofill drop down list and remove disable class
    * @param {object} elem - element being removed from the configured list
    */
@@ -724,11 +729,13 @@ const AutofillReplacerTool = (function () {
     const disabledAutofills = document.getElementById("allAutofillsList")
       .querySelectorAll(".autofill-list-item.disabled"); // query page for all disabled autofill elements
     const match = Array.from(disabledAutofills)
-      .find(autofill => autofillTag === autofill.dataset.autofillTag); // search disabled autofills for match
+      .find((autofill) => autofillTag === autofill.dataset.autofillTag); // search disabled autofills for match
 
     // remove disabled class if there is a match
-    match && document.querySelector(`.autofill-list-item.disabled[data-autofill-tag="${match.dataset.autofillTag}"]`)
-      .classList.remove("disabled");
+    if (match) {
+      document.querySelector(`.autofill-list-item.disabled[data-autofill-tag="${match.dataset.autofillTag}"]`)
+        .classList.remove("disabled");
+    }
   }
 
   /**
@@ -815,7 +822,7 @@ const AutofillReplacerTool = (function () {
       } = autofill;
 
       // create list element
-      let listElement = listItem(autofillTag, searchTerms);
+      const listElement = listItem(autofillTag, searchTerms);
 
       // bind list item elements
       bindTextChangeListener(listElement);
@@ -867,6 +874,36 @@ const AutofillReplacerTool = (function () {
   }
 
   /**
+   * Scans the autofill options list and disables items in the
+   * ALL Autofill Tag Modal Pop up already
+   * added to the active list
+   */
+  function disableActiveAutofillOptions() {
+    log("disabled active autofills");
+    // query DOM for elements
+    const autofillListItems = document.getElementById("allAutofillsList").querySelectorAll("li.autofill-list-item");
+
+    // loop through the HTML collection query search results
+    for (let z = 0; z < autofillListItems.length; z += 1) {
+      // loop through active autofill list and disable it on the Modal Pop Up
+      activeAutofillList.map((autofill) => {
+        const {
+          autofillTag
+        } = autofill;
+
+        // apply disabled class to element
+        if (autofillListItems[z].innerText === autofillTag) {
+          autofillListItems[z].classList.add("disabled");
+        }
+      });
+
+    }
+
+    // return resolve
+    return Promise.resolve("Autofills Disabled");
+  }
+
+  /**
    * Reset configured autofill tags to the default list
    * @param {boolean} confirm - should the user be prompted before reset?
    * @param {string} message - the message to show when the tool resets
@@ -912,44 +949,16 @@ const AutofillReplacerTool = (function () {
     const allAutofillsList = document.querySelectorAll("li.autofill-list-item");
 
     // loop through HTML collection and attach onclick event listener
-    for (let option of allAutofillsList) {
+    for (const option of allAutofillsList) {
       option.onclick = () => {
         return addSelectedAutofillToList(option, option.dataset.autofillTag);
-      }
+      };
     }
 
     // resolve promise
     return new Promise((resolve) => {
       resolve("Autofills Click Events Attached");
     });
-  }
-
-  /**
-   * Scans the autofill options list and disables items in the
-   * ALL Autofill Tag Modal Pop up already
-   * added to the active list
-   */
-  function disableActiveAutofillOptions() {
-    log("disabled active autofills");
-    // query DOM for elements
-    const autofillListItems = document.getElementById("allAutofillsList").querySelectorAll("li.autofill-list-item");
-
-    // loop through the HTML collection query search results
-    for (let z = 0; z < autofillListItems.length; z += 1) {
-      // loop through active autofill list and disable it on the Modal Pop Up
-      activeAutofillList.map((autofill) => {
-        const {
-          autofillTag
-        } = autofill;
-
-        // apply disabled class to element
-        autofillListItems[z].innerText === autofillTag && autofillListItems[z].classList.add("disabled");
-      });
-
-    }
-
-    // return resolve
-    return Promise.resolve("Autofills Disabled");
   }
 
   /**
@@ -1343,6 +1352,13 @@ const AutofillReplacerTool = (function () {
   }
 
   /**
+   * Sets the default value for the active autofill list
+   */
+  function setInitialActiveAutofillList() {
+    activeAutofillList = getFromLocalStorage() || defaultAutofillList;
+  }
+
+  /**
    * Sets up autofill tool
    */
   function setup() {
@@ -1363,6 +1379,7 @@ const AutofillReplacerTool = (function () {
     // run tool
     // Load Tool Styles
     loadAutofillStyles()
+      .then(() => setInitialActiveAutofillList())
       .then(() => webIDToolReset(), (error) => rejectError(error))
       .then(() => setGeneralInfo(), (error) => rejectError(error))
       .then(() => setPhoneNumbers(), (error) => rejectError(error))
