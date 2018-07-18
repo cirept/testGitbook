@@ -1,13 +1,13 @@
 const AutofillReplacerTool = (function AutofillReplacerTool() {
+  let webID;
+  let locale;
+  let activeAutofillList;
   const autofillTagListURL = "https://raw.githubusercontent.com/cirept/autofillReplacer/master/assets/json/autofill_list.json";
   /* eslint-disable */
   const myStyles = GM_getResourceURL("toolStyles");
   const lastestChanges = GM_getResourceURL("changeLog");
   const toolInstructions = GM_getResourceURL("toolInstructions");
   /* eslint-enable */
-  const webID = document.getElementById("_webId").value;
-  const locale = document.getElementById("_locale").value;
-  let activeAutofillList;
   const defaultAutofillList = [{
       "autofillTag": "***How to Separate Words***",
       "searchTerms": "Separate words with --> ;"
@@ -65,42 +65,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       "searchTerms": "SEARCH_FOR_ME"
     }
   ];
-
-  /**
-   * Custom Tool Console Logging for debugging purposes
-   * @param {string} message - Message to write to the console.
-   * @param {object} obj - the object to display in the console message
-   */
-  function log(message, obj) {
-    /* eslint-disable */
-    if (obj) {
-      // remove comment to enable console logs
-      // console.log(`Autofill Tool : ${message}`, obj);
-    } else {
-      // remove comment to enable console logs
-      // console.log(`Autofill Tool : ${message}`);
-    }
-    /* eslint-enable */
-  }
-
-  /**
-   * Custom Tool Console Logging for debugging purposes
-   * @param {string} message - Message to write to the console.
-   * @param {boolen} returnResolve - returns resolved
-   * @return {object} if resolve is true, returns empty resolve
-   */
-  function logReturn(message, returnResolve = false) {
-    /* eslint-disable */
-    if (returnResolve) {
-      // remove comment to enable console logs
-      // console.log(`Autofill Tool : ${message}`);
-      return Promise.resolve();
-    } else {
-      // remove comment to enable console logs
-      // console.log(`Autofill Tool : ${message}`);
-    }
-    /* eslint-enable */
-  }
 
   //
   // Tool Elements
@@ -280,6 +244,73 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   //
 
   /**
+   * Sets the default value for the active autofill list
+   */
+  function setToolDependencies() {
+    log("set initial active autofill list");
+    activeAutofillList = getFromLocalStorage() || defaultAutofillList;
+
+
+    // const webID = document.getElementById("_webId").value;
+    webID = getUrlParameter("webId");
+    // const locale = document.getElementById("_locale").value;
+    locale = getUrlParameter("locale");
+
+    // getUrlParameter
+
+    return new Promise((resolve, reject) => {
+      activeAutofillList ? resolve("Autofill List Initialized") : reject("Autofill List Not Initialized");
+    });
+  }
+
+  /**
+   * Gets the value of a query variable in the URL
+   * @param {string} name - name of the parameter to return the value for
+   */
+  function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  };
+
+  /**
+   * Custom Tool Console Logging for debugging purposes
+   * @param {string} message - Message to write to the console.
+   * @param {object} obj - the object to display in the console message
+   */
+  function log(message, obj) {
+    /* eslint-disable */
+    if (obj) {
+      // remove comment to enable console logs
+      console.log(`Autofill Tool : ${message}`, obj);
+    } else {
+      // remove comment to enable console logs
+      console.log(`Autofill Tool : ${message}`);
+    }
+    /* eslint-enable */
+  }
+
+  /**
+   * Custom Tool Console Logging for debugging purposes
+   * @param {string} message - Message to write to the console.
+   * @param {boolen} returnResolve - returns resolved
+   * @return {object} if resolve is true, returns empty resolve
+   */
+  function logReturn(message, returnResolve = false) {
+    /* eslint-disable */
+    if (returnResolve) {
+      // remove comment to enable console logs
+      console.log(`Autofill Tool : ${message}`);
+      return Promise.resolve();
+    } else {
+      // remove comment to enable console logs
+      console.log(`Autofill Tool : ${message}`);
+    }
+    /* eslint-enable */
+  }
+
+  /**
    * Loads all the tool styles
    */
   function loadAutofillStyles() {
@@ -332,7 +363,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   function getActiveAutofillEntryByTag(autofillTag) {
     // log("get active autofill entry", autofillTag);
     log(`get active autofill entry ${autofillTag}`);
-    return activeAutofillList.find(autofill => autofill.autofillTag === autofillTag);
+    return activeAutofillList.find((autofill) => autofill.autofillTag === autofillTag);
   }
 
   /**
@@ -424,6 +455,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       // attach data to div element in order to query elements within
       myDiv.innerHTML = data;
 
+      // Get Franchises related to web id
       const franchises = myDiv.querySelector("select#associatedFranchises").options;
       const myLength = franchises.length;
       const myFranchises = [];
@@ -440,6 +472,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       setActiveAutofillEntry("%ZIP%", myDiv.querySelector("input#contact_address_postalCode").value);
       setActiveAutofillEntry("%STATE%", myDiv.querySelector("select#contact_address_state").value);
       setActiveAutofillEntry("%PHONE%", myDiv.querySelector("input[name='contact_phone_number']").value);
+      setActiveAutofillEntry("%FRANCHISES%", myFranchises.join(", "));
 
       if (data) {
         // display confirmation message
@@ -473,7 +506,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    */
   function rejectError(error) {
     log("ERROR", error);
-    return Promise.reject();
+    return Promise.reject(error);
   }
 
   /**
@@ -693,15 +726,15 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     // remove element props
     removeMeContainer.classList.add("js-remove");
     removeMeContainer.title = "click to remove";
-    removeMeContainer.onclick = (e) => {
+    removeMeContainer.onclick = (event) => {
       // removes list item from tool
-      e.currentTarget.parentElement.remove();
+      event.currentTarget.parentElement.remove();
       // saves state
       saveAutofillParameters();
       // display message to user that item was removed
       updateDisplayMessage("Item Removed");
       // remove disabled from the autofill options list
-      removeDisable(e.currentTarget.parentElement);
+      removeDisable(event.currentTarget.parentElement);
     };
 
     // remove me font icon
@@ -785,6 +818,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   function bindTextChangeListener(elem) {
     log("bind text change listener");
     jQuery(elem).find("input").on("keyup", saveAutofillParameters);
+    jQuery(elem).find("input").on("paste", saveAutofillParameters);
     jQuery(elem).find("input").on("keyup", updateInputTitle);
     jQuery(elem).find("input").on("keyup", toggleMagicButton);
     jQuery(elem).find("input").on("keyup", validateList);
@@ -867,8 +901,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     if (disabledElements.length > 0) {
       // loop through HTML collection of query results
       for (let z = 0; z < disabledElements.length; z += 1) {
-        // console.log(autofillElement);
+        /* eslint-disable */
         disabledElements[z].classList.remove("disabled");
+        /* eslint-enable */
       }
     }
   }
@@ -892,9 +927,11 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
         } = autofill;
 
         // apply disabled class to element
+        /* eslint-disable */
         if (autofillListItems[z].innerText === autofillTag) {
           autofillListItems[z].classList.add("disabled");
         }
+        /* eslint-enable */
       });
 
     }
@@ -919,7 +956,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * Actions to be performed after the user selects an Autofill Options from the Auotfill Modal
-   * 
    * Creates an active menu item that the tool will use to replace text with autofill tags
    * @param {object} liElement - liElement that will get it"s onclick event binded
    * @param {string} tag - the autofill tag for the ACTIVE list element
@@ -972,7 +1008,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       autofillListData.map((autofill) => {
         const {
           autofill: tag,
-          description,
+          description
         } = autofill;
 
         // create "li" for each autofill tag in the list
@@ -1008,21 +1044,45 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    */
   function treeWalk(base) {
     log("tree walk");
+    // const treeWalker = document.createTreeWalker(base, NodeFilter.SHOW_TEXT, null, false);
+    // const wordArray = [];
+
+    // while (treeWalker.nextNode()) {
+    //   if (treeWalker.currentNode.nodeType === 3 && treeWalker.currentNode.textContent.trim() !== "") {
+    //     wordArray.push(treeWalker.currentNode);
+    //   }
+    // }
+    // return wordArray;
+
     const treeWalker = document.createTreeWalker(base, NodeFilter.SHOW_TEXT, null, false);
     const wordArray = [];
 
+    // loop through node elements read by tree walker object
     while (treeWalker.nextNode()) {
-      if (treeWalker.currentNode.nodeType === 3 && treeWalker.currentNode.textContent.trim() !== "") {
-        wordArray.push(treeWalker.currentNode);
+      // save jquery element, parent node name of current node
+      let $pElementName = jQuery(treeWalker.currentNode)[0].parentNode.nodeName;
+      // check to see if the parent node is a SCRIPT, NOSCRIPT, or SYLE element
+      if ($pElementName !== 'NOSCRIPT' && $pElementName !== 'SCRIPT' && $pElementName !== 'STYLE') {
+
+        console.log("tree walk", treeWalker.currentNode.textContent);
+
+        if (treeWalker.currentNode.textContent.trim() !== "") {
+          // remember text node
+          wordArray.push(treeWalker.currentNode);
+        }
+
+        // remember text node
+        // wordArray.push(treeWalker.currentNode);
       }
     }
+
     return wordArray;
   }
 
-  /**
-   * Escape characters to prevent malacious input from user
-   */
-  RegExp.escape = function (s) {
+  // /**
+  //  * Escape characters to prevent malacious input from user
+  //  */
+  RegExp.escape = (s) => {
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
   };
 
@@ -1032,13 +1092,14 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    * @param {string} text - the text to verify
    */
   function phoneNumberText(text) {
-    log("verify phone number");
-    const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
+    log("verify phone number", text);
+    // const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
 
-    if (phoneRegex.test(text)) {
-      return RegExp.escape(text);
-    }
-    return `\\b${RegExp.escape(text)}\\b`;
+    // if (phoneRegex.test(text)) {
+    return RegExp.escape(text);
+    // return text.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    // }
+    // return `\\b${RegExp.escape(text)}\\b`;
   }
 
   /**
@@ -1048,40 +1109,137 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    */
   function replaceText(wordList, regReplace) {
     log("replace text");
-    wordList.forEach((n) => {
-      let text = n.nodeValue;
+    const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
+
+    // console.log(typeof wordList);
+    wordList.map((node) => {
+      console.log("node", node);
+      let text = node.nodeValue;
 
       // iterate through autofill array and replace matches in text
-      // replace all instances of "findMe" with "autofillTag"
+      // replace all instances of "searchTerms" with "autofillTag"
       for (const autofillTag in regReplace) {
-        const findMe = regReplace[autofillTag];
+        const {
+          autofillTag: tag,
+          searchTerms
+        } = regReplace[autofillTag];
+
+        console.log("search for this word ::::: ", searchTerms);
+
+        // skip iteration if Search Terms is blank
+        if (searchTerms === "") {
+          console.log("SEARCH TERM EMPTY -=- SKIP ITERATION", searchTerms);
+          continue;
+        }
 
         // if split phrases are needed
-        if (findMe.indexOf(";") > -1) {
-          const findArray = findMe.split(";");
+        if (searchTerms.indexOf(";") > -1) {
+          const findArray = searchTerms.split(";");
           const arrayLength = findArray.length;
 
           for (let a = 0; a < arrayLength; a += 1) {
             const searchText = findArray[a].trim();
-            const findThis = phoneNumberText(searchText);
+
+            console.log("word separated ::: search for this word ::::: ", searchText);
+            let findThis;
+
+            if (searchText !== "") {
+              findThis = phoneRegex.test(searchText) ? phoneNumberText(searchText) : `\\b${RegExp.escape(searchText)}\\b`;
+              console.log("word not empty ::: perform regex search with this ::::: ", searchText);
+            } else {
+              console.log("WORD EMPTY -=- SKIP ITERATION", searchText);
+              continue;
+            }
+            // const findThis = searchText && phoneNumberText(searchText);
+            console.log("word not empty ::: search for this word ::::: ", findThis);
             const myRegex = new RegExp(findThis, "gi");
 
             if (searchText === "") {
               continue;
             }
 
-            text = text.replace(myRegex, autofillTag);
+            text = text.replace(myRegex, tag);
+            // text = text.replace(myRegex, autofillTag);
           }
         } else {
-          const findThis = phoneNumberText(findMe);
+          // const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
+          const findThis = phoneRegex.test(searchTerms) ? phoneNumberText(searchTerms) : `\\b${RegExp.escape(searchTerms)}\\b`;
+
+          console.log("word not empty ::: search for this word ::::::: ", findThis);
+
+          // const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
+
+          // if (phoneRegex.test(text)) {
+          //   // return RegExp.escape(text);
+          //   return text.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+          // }
+
+          /**
+           * Test if phone number
+           * Checked format = 000-0000
+           * @param {string} text - the text to verify
+           */
+          // function phoneNumberText(text) {
+          // log("verify phone number");
+          // const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
+
+          // if (phoneRegex.test(text)) {
+          //   // return RegExp.escape(text);
+          //   return text.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+          // }
+          // return `\\b${RegExp.escape(text)}\\b`;
+          // }
+
           const myRegex = new RegExp(findThis, "gi");
 
-          text = text.replace(myRegex, autofillTag);
+          text = text.replace(myRegex, tag);
+          // text = text.replace(myRegex, autofillTag);
         }
       }
 
-      n.nodeValue = text;
+      node.nodeValue = text;
     });
+
+    // // loop through all the words on the page
+    // wordList.forEach((node) => {
+    //   let text = node.nodeValue;
+
+    //   // iterate through autofill array and replace matches in text
+    //   // replace all instances of "searchTerms" with "autofillTag"
+    //   for (const autofillTag in regReplace) {
+    //     const {
+    //       autofillTag: tag,
+    //       searchTerms
+    //     } = regReplace[autofillTag];
+
+    //     // if split phrases are needed
+    //     if (searchTerms.indexOf(";") > -1) {
+    //       const findArray = searchTerms.split(";");
+    //       const arrayLength = findArray.length;
+
+    //       for (let a = 0; a < arrayLength; a += 1) {
+    //         const searchText = findArray[a].trim();
+    //         const findThis = phoneNumberText(searchText);
+    //         const myRegex = new RegExp(findThis, "gi");
+
+    //         if (searchText === "") {
+    //           continue;
+    //         }
+
+    //         text = text.replace(myRegex, tag);
+    //         // text = text.replace(myRegex, autofillTag);
+    //       }
+    //     } else {
+    //       const findThis = phoneNumberText(searchTerms);
+    //       const myRegex = new RegExp(findThis, "gi");
+
+    //       text = text.replace(myRegex, tag);
+    //       // text = text.replace(myRegex, autofillTag);
+    //     }
+    //   }
+
+    //   node.nodeValue = text;
+    // });
   }
 
   /**
@@ -1112,10 +1270,67 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     useAutofillTags(recordEditWindow, regReplace);
 
     // change focus between text area to trigger text saving.
-    const recordLendth = recordEditWindow.length;
-    for (let z = 0; z < recordLendth; z += 1) {
+    const recordLength = recordEditWindow.length;
+
+    // loop through records
+    for (let z = 0; z < recordLength; z += 1) {
       jQuery(recordEditWindow[z]).focus();
     }
+  }
+
+
+  /**
+   * Replace text with autofills while on the main WSM window
+   * and with the content editor pop up open
+   */
+  function replaceTextInPopupCMS() {
+    const contentFrame = jQuery("iframe#cblt_content").contents();
+    const siteEditorIframe = contentFrame.find("iframe#siteEditorIframe").contents();
+    const regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
+
+    // save contents of cms content edit frame
+    const cmsIframe = siteEditorIframe.find("iframe#cmsContentEditorIframe").contents();
+
+    // if quick CMS editor is open
+    const recordEditWindow = cmsIframe.find("div.main-wrap").find(".input-field").find("div[data-which-field='copy']");
+
+    // pass elements with children as base element for autofill replacing
+    replaceTextCMS(recordEditWindow, regReplace);
+  }
+
+
+  /**
+   * Replace Text with Autofills while on the main WSM window
+   */
+  function replaceTextInMainWindow() {
+    const contentFrame = jQuery("iframe#cblt_content").contents();
+    const siteEditorIframe = contentFrame.find("iframe#siteEditorIframe").contents();
+    const regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
+
+    // get contents of iframe
+    let viewerIframe = siteEditorIframe.find("iframe#viewer").contents();
+
+    // return array of elements that have children
+    let myChild = viewerIframe.find("body").children().filter((index, value) => {
+      // only keep elements that are not empty
+      if (value.children.length !== 0) {
+        return value;
+      }
+    });
+    // pass elements with children as base element for autofill replacing
+    useAutofillTags(myChild, regReplace);
+  }
+
+  /**
+   * Replace Text with Autofills while on the CMS
+   */
+  function replaceTextInCMS() {
+    const contentFrame = jQuery("iframe#cblt_content").contents();
+    // get contens of iframe
+    const recordEditWindow = contentFrame.find("div.main-wrap").find(".input-field").find("div[data-which-field='copy']");
+
+    // pass elements with children as base element for autofill replacing
+    replaceTextCMS(recordEditWindow, regReplace);
   }
 
   /**
@@ -1127,82 +1342,25 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     // WSM MAIN WINDOW LOGIC
     const contentFrame = jQuery("iframe#cblt_content").contents();
     const siteEditorIframe = contentFrame.find("iframe#siteEditorIframe").contents();
-    let viewerIframe;
-    let cmsIframe;
-    let myChild;
-    let recordEditWindow;
-    const regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
+    // let viewerIframe;
+    // let cmsIframe;
+    // let myChild;
+    // let recordEditWindow;
+    // const regReplace = getFromLocalStorage(); // get stored autofill tags from local storage
 
     // run CMS Content Pop Up edit window IF WINDOW IS OPEN
     if (window.location.pathname.indexOf("editSite") >= 0 &&
       siteEditorIframe.find("div#hiddenContentPopUpOuter").hasClass("opened")) {
       // save contents of cms content edit frame
-      cmsIframe = siteEditorIframe.find("iframe#cmsContentEditorIframe").contents();
-
-      // if quick CMS editor is open
-      recordEditWindow = cmsIframe.find("div.main-wrap").find(".input-field").find("div[data-which-field='copy']");
-
-      // pass elements with children as base element for autofill replacing
-      replaceTextCMS(recordEditWindow, regReplace);
+      replaceTextInPopupCMS();
     } else if (window.location.pathname.indexOf("editSite") >= 0 &&
       !siteEditorIframe.find("div#hiddenContentPopUpOuter").hasClass("opened")) {
-      // get contens of iframe
-      viewerIframe = siteEditorIframe.find("iframe#viewer").contents();
-
-      // return array of elements that have children
-      myChild = viewerIframe.find("body").children().filter(function (index, value) {
-        if (value.children.length !== 0) {
-          return this;
-        }
-      });
-
-      // pass elements with children as base element for autofill replacing
-      useAutofillTags(myChild, regReplace);
+      // run tool on regular WSM window
+      replaceTextInMainWindow();
     } else if (window.location.pathname.indexOf("cms") >= 0) {
       // CMS LOGIC
-
-      // get contens of iframe
-      recordEditWindow = contentFrame.find("div.main-wrap").find(".input-field").find("div[data-which-field='copy']");
-
-      // pass elements with children as base element for autofill replacing
-      replaceTextCMS(recordEditWindow, regReplace);
+      replaceTextInCMS();
     }
-  }
-
-  /**
-   * Determine if the current website is different
-   */
-  function webIDToolReset() {
-    log("check for different WEB ID", (webID + " : " + getItemFromLocalStorage("webID")));
-    const savedWebID = getItemFromLocalStorage("webID");
-    let resetValues;
-
-    // if current web id is different
-    if (savedWebID !== webID) {
-      // save webid
-      saveToLocalStorage("webID", webID);
-      // reset active autofill
-      activeAutofillList = defaultAutofillList;
-      resetValues = true;
-    } else {
-      resetValues = false;
-    }
-
-    return new Promise((resolve) => {
-      if (typeof resetValues === "null") {
-        resolve("Web ID Detection Reset Failed");
-      }
-
-      if (resetValues) {
-        // update display message
-        updateDisplayMessage("New Web ID Detected, Values Reset");
-        log("Current Web ID is Different as Saved Web ID");
-        resolve("Current Web ID is Different as Saved Web ID");
-      } else {
-        log("Current Web ID is Same as Saved Web ID");
-        resolve("Current Web ID is Same as Saved Web ID");
-      }
-    });
   }
 
   /**
@@ -1215,6 +1373,45 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     return window.localStorage.getItem(name) === null ?
       "No Data Found in Local Storage" :
       window.localStorage.getItem(name);
+  }
+
+  /**
+   * Determine if the current website is different
+   */
+  function webIDToolReset() {
+    log(`check for different WEB ID ${webID} ${getItemFromLocalStorage("webID")}`);
+    const savedWebID = getItemFromLocalStorage("webID");
+    let resetValues;
+
+    // if current web id is different
+    if (savedWebID !== webID) {
+      log("reset Values because web ids are different");
+      // save webid
+      saveToLocalStorage("webID", webID);
+      // reset active autofill
+      activeAutofillList = defaultAutofillList;
+      resetValues = true;
+    } else {
+      log("do not reset values")
+      resetValues = false;
+    }
+
+    return new Promise((resolve, reject) => {
+      if (resetValues === null || typeof resetValues === "undefined") {
+        resolve("Web ID Detection Reset Failed");
+      }
+
+      if (resetValues) {
+        // update display message
+        updateDisplayMessage("New Web ID Detected, Values Reset");
+        log("Current Web ID is Different as Saved Web ID : resolve");
+        resolve("Different Web ID");
+      } else {
+        log("Current Web ID is Same as Saved Web ID : reject");
+        reject("Same Web ID");
+        // resolve("Current Web ID is Same as Saved Web ID");
+      }
+    });
   }
 
   /**
@@ -1240,8 +1437,11 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     return new Promise((resolve) => {
       log("convert markdown to html");
       const conv = new showdown.Converter();
+
       showdown.setFlavor("github");
+
       const changeLogData = conv.makeHtml(data);
+
       // resolve converted data
       resolve(changeLogData);
     });
@@ -1257,9 +1457,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       log("attach modal");
       // build latest changes modal
       const myModal = document.createElement("div");
-      // add the modal content + the Latest Changes Markdown Doc Content
-      myModal.innerHTML = `
-        <div class="modal fade" id="${name}Modal" tabindex="-1" role="dialog" aria-labelledby="${name}Title" aria-hidden="true">
+      const modalCode =
+        `<div class="modal fade" id="${name}Modal" tabindex="-1" role="dialog" aria-labelledby="${name}Title" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
               <div class="modal-body">
@@ -1267,8 +1466,10 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
               </div>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
+
+      // add the modal content + the Latest Changes Markdown Doc Content
+      myModal.innerHTML = modalCode
 
       // attach modal to page
       document.body.appendChild(myModal);
@@ -1293,7 +1494,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     };
 
     return fetch(options)
-      .then(data => createAutofillListOptions(data))
+      .then((data) => createAutofillListOptions(data))
       .then(() => attachModal("autofillList", allAutofillsList.outerHTML))
       .then(() => disableActiveAutofillOptions())
       .then(() => attachAddToActiveEvent())
@@ -1313,8 +1514,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
     // get latest changes data
     return fetch(options)
-      .then(data => convertMarkdownToHTML(data))
-      .then(HTMLdata => attachModal("lastestChanges", HTMLdata))
+      .then((data) => convertMarkdownToHTML(data))
+      .then((HTMLdata) => attachModal("lastestChanges", HTMLdata))
       .then(() => logReturn("Latest Changes Modal Complete", true));
   }
 
@@ -1331,8 +1532,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
     // get instructions data
     return fetch(options)
-      .then(data => convertMarkdownToHTML(data))
-      .then(HTMLdata => attachModal("toolInstructions", HTMLdata))
+      .then((data) => convertMarkdownToHTML(data))
+      .then((HTMLdata) => attachModal("toolInstructions", HTMLdata))
       .then(() => logReturn("Instructions Modal Complete", true));
   }
 
@@ -1352,13 +1553,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   * Sets the default value for the active autofill list
-   */
-  function setInitialActiveAutofillList() {
-    activeAutofillList = getFromLocalStorage() || defaultAutofillList;
-  }
-
-  /**
    * Sets up autofill tool
    */
   function setup() {
@@ -1374,18 +1568,21 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * main function to start the program
    */
-  function main() {
-    log("main tool");
+  function init() {
+    log("Initialize Autofill Tool");
     // run tool
     // Load Tool Styles
     loadAutofillStyles()
-      .then(() => setInitialActiveAutofillList())
+      .catch((error) => log("Failed to Load Tool Styles", error))
+      .then(() => setToolDependencies())
+      .catch((error) => log("Failed to Set Autofill variables", error))
       .then(() => webIDToolReset(), (error) => rejectError(error))
-      .then(() => setGeneralInfo(), (error) => rejectError(error))
-      .then(() => setPhoneNumbers(), (error) => rejectError(error))
-      .then(() => setup(), (error) => rejectError(error))
-      .catch(error => {
-        log("Failed to Load Tool Styles", error);
+      .then(() => setGeneralInfo())
+      .then(() => setPhoneNumbers())
+      .catch((error) => log("Skipped Getting Default Values", error))
+      .finally(() => {
+        log("Setup Autofill Tool UI")
+        setup();
       });
   }
 
@@ -1393,6 +1590,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   // Run Tool
   //
 
-  window.onload = main;
+  window.onload = init;
   // main();
 }());
