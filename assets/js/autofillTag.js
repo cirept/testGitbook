@@ -337,8 +337,10 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   function getUrlParameter(name) {
     const leftSquareBracket = /[\[]/;
     const rightSquareBracket = /[\]]/;
+
     name = name.replace(leftSquareBracket, "\\[").replace(rightSquareBracket, "\\]");
-    const regex = new RegExp(`[\\?&]${name}=([^&#]*)`);
+    const myString = `[\\?&]${name}=([^&#]*)`;
+    const regex = new RegExp(myString, "g");
     const results = regex.exec(location.search);
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
@@ -1405,7 +1407,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     return new Promise((resolve, reject) => {
       // build latest changes modal
       const myModal = document.createElement("div");
-      
+
       // const modalCode =
       myModal.innerHTML =
         `<div class="modal fade" id="${name}Modal" tabindex="-1" role="dialog" aria-labelledby="${name}Title" aria-hidden="true">
