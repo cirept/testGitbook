@@ -339,8 +339,20 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     const rightSquareBracket = /[\]]/;
 
     name = name.replace(leftSquareBracket, "\\[").replace(rightSquareBracket, "\\]");
+    const escapedText = RegExp.escape(name);
+    const myString2 = `[\\?&]${escapedText}=([^&#]*)`;
     const myString = `[\\?&]${name}=([^&#]*)`;
+
+    // console.log(myString2);
+    // console.log(myString);
+
     const regex = new RegExp(myString, "g");
+    const regex2 = new RegExp(myString2, "g");
+
+    // console.log(regex);
+    // console.log(regex2);
+
+    // const regex = new RegExp(RegExp.escape(myString), "g");
     const results = regex.exec(location.search);
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
@@ -1563,5 +1575,5 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   // Run Tool
   //
 
-  init();
+  window.onload = init;
 }());
