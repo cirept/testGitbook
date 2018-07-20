@@ -1,7 +1,9 @@
+
 /**
  * Builds a modal and attaches it to the webpage.
  * @param {string} name - the name of the modal
  * @param {string} html - the content of the modal
+ * @return {object} Promise.resolve or reject
  */
 function attachModal(name, html) {
   return new Promise((resolve, reject) => {
@@ -19,7 +21,7 @@ function attachModal(name, html) {
         </div>`;
 
     // add the modal content + the Latest Changes Markdown Doc Content
-    myModal.innerHTML = modalCode
+    myModal.innerHTML = modalCode;
 
     // attach modal to page
     document.body.appendChild(myModal);

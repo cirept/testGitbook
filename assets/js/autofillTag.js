@@ -246,9 +246,74 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   //
 
   /**
+   * Custom Tool Console Logging for debugging purposes
+   * @param {string} message - Message to write to the console.
+   * @param {Object} obj - the object to display in the console message
+   */
+  function log(message, obj) {
+    /* eslint-disable */
+    if (obj) {
+      // remove comment to enable console logs
+      // console.log(`Autofill Tool : ${message}`, obj);
+    } else {
+      // remove comment to enable console logs
+      // console.log(`Autofill Tool : ${message}`);
+    }
+    /* eslint-enable */
+  }
+
+  /**
+   * Custom Tool Console Logging for debugging purposes
+   * @param {string} message - Message to write to the console.
+   * @param {boolen} returnResolve - returns resolved
+   * @return {Object} if resolve is true, returns empty resolve
+   */
+  function logReturn(message, returnResolve = false) {
+    /* eslint-disable */
+    if (returnResolve) {
+      // remove comment to enable console logs
+      // console.log(`Autofill Tool : ${message}`);
+      return Promise.resolve();
+    } else {
+      // remove comment to enable console logs
+      // console.log(`Autofill Tool : ${message}`);
+    }
+    /* eslint-enable */
+  }
+
+  /**
+   * Loop through an array and perform a function
+   * @param {Object[]} array - the array to loop through
+   * @param {Object} functionToRun - the function to run through each element in the array
+   * @param {Object} thisArg - the object to reference as "this" keyword
+   */
+  function loopThroughArray(array, functionToRun, thisArg = this) {
+    log("looping through array");
+    array.forEach(functionToRun, thisArg);
+  };
+
+  /**
+   *  Generic function to perform ajax requests.  I wanted to make my own.  =]
+   * @param {Object} options - the ajax request options
+   * @param {string} options.url - the url to mkae the ajax request to
+   * @param {string} options.dataType - the data type to expect
+   * @returns {Promise} the data that is recieved from the ajax request
+   */
+  function fetch(options) {
+    return new Promise((resolve, reject) => {
+      log("fetching URL");
+      jQuery.ajax(options).done((data) => {
+        resolve(data);
+      }).fail((error) => {
+        reject(error);
+      }).always();
+    });
+  }
+
+  /**
    * retrive object from local storage
-   * @param {object} obj - object to be saved into local storage
-   * @return {object} the ACTIVE Autofill list retrived from localStorage
+   * @param {Object} obj - object to be saved into local storage
+   * @return {Object} the ACTIVE Autofill list retrived from localStorage
    */
   function getToolState() {
     log("get from local storage");
@@ -256,7 +321,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     const localData = localStorage.getItem("AutofillReplacerTool");
 
     if (localData) {
-      log("Saved State Found")
+      log("Saved State Found");
       toolState = JSON.parse(localData);
     } else {
       log("Local State Not Found, leaving default");
@@ -275,42 +340,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     const results = regex.exec(location.search);
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-  }
-
-  /**
-   * Custom Tool Console Logging for debugging purposes
-   * @param {string} message - Message to write to the console.
-   * @param {object} obj - the object to display in the console message
-   */
-  function log(message, obj) {
-    /* eslint-disable */
-    if (obj) {
-      // remove comment to enable console logs
-      console.log(`Autofill Tool : ${message}`, obj);
-    } else {
-      // remove comment to enable console logs
-      console.log(`Autofill Tool : ${message}`);
-    }
-    /* eslint-enable */
-  }
-
-  /**
-   * Custom Tool Console Logging for debugging purposes
-   * @param {string} message - Message to write to the console.
-   * @param {boolen} returnResolve - returns resolved
-   * @return {object} if resolve is true, returns empty resolve
-   */
-  function logReturn(message, returnResolve = false) {
-    /* eslint-disable */
-    if (returnResolve) {
-      // remove comment to enable console logs
-      console.log(`Autofill Tool : ${message}`);
-      return Promise.resolve();
-    } else {
-      // remove comment to enable console logs
-      console.log(`Autofill Tool : ${message}`);
-    }
-    /* eslint-enable */
   }
 
   /**
@@ -356,7 +385,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * Returns the autofill tag entry from the active list
-   * @param {object} autofillTag - the autofill tag to return from default list
+   * @param {string} autofillTag - the autofill tag to return from default list
    */
   function getActiveAutofillEntryByTag(autofillTag) {
     // log("get active autofill entry", autofillTag);
@@ -364,13 +393,25 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     const {
       activeList
     } = toolState;
+
     return activeList.find((autofill) => autofill.autofillTag === autofillTag);
+  }
+
+  /**
+   * save autofill parameter list to local storage
+   */
+  function saveStateToLocalStorage() {
+    log("save tool state to local storage", toolState);
+    const saveMe = JSON.stringify(toolState);
+
+    saveToLocalStorage("AutofillReplacerTool", saveMe);
   }
 
   /**
    * Traverse state list to find the abbreviation match
    * and set the full state name
-   * @param {object} stateList - the full state object array
+   * @param {Object[]} stateList - the full state object array
+   * @param {Promise} a promise message that shows if the State Full Name was filled in or not
    */
   function setFullStateName(stateList) {
     log("set full state name", stateList);
@@ -411,26 +452,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     });
   }
 
-  /**
-   *  Generic function to perform ajax requests.  I wanted to make my own.  =]
-   *
-   * @param {object} options - the ajax request options
-   * @returns the data that is recieved from the ajax request
-   */
-  function fetch(options) {
-    return new Promise((resolve, reject) => {
-      log("fetching URL");
-      jQuery.ajax(options).done((data) => {
-        resolve(data);
-      }).fail((error) => {
-        reject(error);
-      }).always();
-    });
-  }
-
   // /**
   //  * Returns the autofill tag entry from the active list
-  //  * @param {object} autofillTag - the autofill tag to return from default list
+  //  * @param {Object} autofillTag - the autofill tag to return from default list
   //  * @param {string} searchTerm - the string to set the searchTerm too
   //  */
   // function setActiveAutofillEntry(autofillTag, searchTerm) {
@@ -449,7 +473,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * Returns the autofill tag entry from the active list
-   * @param {object} autofillTag - the autofill tag to return from default list
+   * @param {string} autofillTag - the autofill tag to return from default list
    * @param {string} searchTerm - the string to set the searchTerm too
    */
   function setDefaultAutofillEntry(autofillTag, searchTerm) {
@@ -463,12 +487,12 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     if (match) {
       match.searchTerms = searchTerm;
     }
-    log("match found", toolState.defaultList[autofillTag]);
   }
 
   /**
    * Populate the values for the default autofill tags
-   * @param {object} data - the html data that was recieved from the Website Settings of DCC
+   * @param {Object} data - the html data that was recieved from the Website Settings of DCC
+   * @returns {Promise} a promise message representing if the website settings gathered
    */
   function populateActiveAutofillList(data) {
     return new Promise((resolve, reject) => {
@@ -519,7 +543,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       activeList
     } = toolState;
     // set the default value to SEARCH_FOR_ME if values are blank
-    activeList.map((autofill) => {
+    activeList.forEach((autofill) => {
       if (autofill.searchTerms === "") {
         autofill.searchTerms = "SEARCH_FOR_ME";
         saveStateToLocalStorage();
@@ -532,7 +556,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    * return a reject promise
    *
    * @param {string} error - error message to log in the console
-   * @returns Promise.reject()
+   * @returns {Promise} Promise.reject()
    */
   function rejectError(error) {
     log("ERROR", error);
@@ -541,6 +565,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * Get data from "Settings" to autofill into the defaults list
+   * @returns {Promise} Complete process to gather general information from the Settings tab in WSM
    */
   function setGeneralInfo() {
     return new Promise((resolve) => {
@@ -579,7 +604,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * Fill in the values for the default phone number autofill tags
-   * @param {object} data - the HTML code for the Phone numbers section of the settings in WSM
+   * @param {Object} data - the HTML code for the Phone numbers section of the settings in WSM
+   * @returns {Promise} Promise object that represents a completion or failure message
    */
   function populateDefaultPhoneNumbers(data) {
     log("populate default phone numbers");
@@ -608,7 +634,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   *   Get Phone Numbers from website settings
+   * Get Phone Numbers from website settings
+   * @returns {Promise} Complete process to get phone number from the Settings tab in WSM
    */
   function setPhoneNumbers() {
     return new Promise((resolve) => {
@@ -634,7 +661,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   * jQuery functions for animate css
+   * jQuery function to apply animate.css effects to an element
+   * @returns {Object} the element that now has an animation effect attached to it
    */
   jQuery.fn.extend({
     animateCss(animationName) {
@@ -665,10 +693,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   *Updates the tool display message
-   *
+   * Updates the tool display message
    * @param {string} message - the message to display
-   * @param {string} animationType - the type of animation to use
+   * @param {string} [animationType=tada] - the type of animation to use
    */
   function updateDisplayMessage(message, animationType = "tada") {
     log("perform animation", animationType);
@@ -680,14 +707,13 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * Creates an array of the configured autofill tags and
    * Also performs simple validation to prevent empty values being saved
-   * @return {object} myArrayObj - returns object array of autofill entries in list
    */
   function convertActiveListToObject() {
     log("====== convert active list to object");
     const myArrayObj = [];
 
     // loop through configured autofills
-    Array.from(autofillOptionsList.children).map((element) => {
+    Array.from(autofillOptionsList.children).forEach((element) => {
       let regexInput = element.querySelector(".regEx").value.trim();
       const autofillTag = element.querySelector(".autofillTag").innerText; // trim it just in case the manual autofill input is triggerd
       const saveAutofill = {};
@@ -715,7 +741,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * save object to local storage
    * @param {string} name - object to be saved into local storage
-   * @param value - the value to save
+   * @param {(string|Object)} value - the value to save
    */
   function saveToLocalStorage(name, value) {
     log("save to local storage", name);
@@ -723,32 +749,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   * save autofill parameter list to local storage
-   * @param {Object} obj - parameter list to save
-   */
-  function saveStateToLocalStorage() {
-    log("save tool state to local storage", toolState);
-    const saveMe = JSON.stringify(toolState);
-
-    saveToLocalStorage("AutofillReplacerTool", saveMe);
-  }
-
-  // /**
-  //  * Update Active List State
-  //  */
-  // function saveState() {
-  //   log("save state");
-
-  //   saveStateToLocalStorage();
-
-  //   toolState.activeList.forEach((option) => {
-  //     console.log("activeAutofillList", option);
-  //   });
-  // }
-
-  /**
    * Scan autofill drop down list and remove disable class
-   * @param {object} elem - element being removed from the configured list
+   * @param {Object} elem - element being removed from the configured list
    */
   function removeDisable(elem) {
     log("remove disable calsses");
@@ -769,7 +771,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * Build a generic list item to use through out the tool
    * @param {string} autofill - the text that will be used to fill in the autofillTag div
-   * @param {string} text - the text that will be used as the input value, DEFAULT value = "SEARCH_FOR_ME"
+   * @param {string} [text=SEARCH_FOR_ME] - the text that will be used as the input value, DEFAULT value = "SEARCH_FOR_ME"
    */
   function listItem(autofill, text = "SEARCH_FOR_ME") {
     log(`list item ${autofill} ${text}`);
@@ -865,7 +867,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * Updates the inputs hover text
-   * @param {object} e - the event object
+   * @param {Object} e - the event object
    *
    */
   function updateInputTitle(e) {
@@ -895,7 +897,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    * will construct the autofill display area.
    * Will use data in local storage, if it exists
    * Otherwise defaults to Website information
-   * @return {object} Promise.resolve
+   * @return {Promise} Promise that represents the completion message
    */
   function buildActiveAutofillList() {
     const {
@@ -934,9 +936,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * resets all the autofill parameters to the default list
-   * @param {string} message - the message to show when the tool resets
    */
-  function resetAutofills(message) {
+  function resetAutofills() {
     log("reset autofills");
     // erase current list
     autofillOptionsList.innerHTML = "";
@@ -980,7 +981,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     // loop through the HTML collection query search results
     for (let z = 0; z < autofillListItems.length; z += 1) {
       // loop through active autofill list and disable it on the Modal Pop Up
-      activeList.map((autofill) => {
+      activeList.forEach((autofill) => {
         const {
           autofillTag
         } = autofill;
@@ -1007,7 +1008,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   function resetValues(confirm, message) {
     log("reset values");
     if (confirm && window.confirm("Reset Values?")) {
-      resetAutofills(message);
+      resetAutofills();
       buildActiveAutofillList();
       // reset apply button if it is disabled
       toggleMagicButton();
@@ -1023,7 +1024,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * Actions to be performed after the user selects an Autofill Options from the Auotfill Modal
    * Creates an active menu item that the tool will use to replace text with autofill tags
-   * @param {object} liElement - liElement that will get it"s onclick event binded
+   * @param {Object} liElement - liElement that will get it"s onclick event binded
    * @param {string} tag - the autofill tag for the ACTIVE list element
    */
   function addSelectedAutofillToList(liElement, tag) {
@@ -1064,35 +1065,46 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
+   * Creates a LI element and adds it to the active autofill list
+   * on the tool UI.
+   * @param {Object} autofill - the autofill listing object to create an LI element for
+   * @param {string} autofill.autofilltag - the autofill tag
+   * @param {string} autofill.description - the text to use as the elements "hover" text
+   */
+  function addItemtoList(autofill) {
+    const {
+      autofill: tag,
+      description
+    } = autofill;
+
+    // create "li" for each autofill tag in the list
+    const myListItem = document.createElement("li");
+    // attach new "li" to main list
+    const tooltipText = description ? description : "**No tooltip information available**";
+
+    // list item props
+    myListItem.textContent = tag;
+    myListItem.classList.add("btn");
+    myListItem.classList.add("btn-light");
+    myListItem.classList.add("autofill-list-item");
+    myListItem.dataset.autofillTag = tag;
+    myListItem.title = tooltipText;
+
+    // add the list element to the "drop down" list
+    allAutofillsList.appendChild(myListItem);
+  }
+
+  /**
    * Create the list elements for the autofill options list modal
-   * @param {object} autofillListData - the autofill object containing all the autofill options
+   * @param {Object[]} autofillListData - the autofill array containing all the autofill object options
+   * @param {Object} autofillListData[].autofill - the autofill array containing all the autofill object options
+   * @returns {Promise} promise message representing if the autofill UL element was created
    */
   function createAutofillListOptions(autofillListData) {
     return new Promise((resolve, reject) => {
       log("create autofill list options");
       // loop through each autofill object and add it to the list.
-      autofillListData.map((autofill) => {
-        const {
-          autofill: tag,
-          description
-        } = autofill;
-
-        // create "li" for each autofill tag in the list
-        const myListItem = document.createElement("li");
-        // attach new "li" to main list
-        const tooltipText = description ? description : "**No tooltip information available**";
-
-        // list item props
-        myListItem.textContent = tag;
-        myListItem.classList.add("btn");
-        myListItem.classList.add("btn-light");
-        myListItem.classList.add("autofill-list-item");
-        myListItem.dataset.autofillTag = tag;
-        myListItem.title = tooltipText;
-
-        // add the list element to the "drop down" list
-        allAutofillsList.appendChild(myListItem);
-      });
+      loopThroughArray(autofillListData, addItemtoList);
 
       // resolve or reject
       if (allAutofillsList.childElementCount > 0) {
@@ -1105,8 +1117,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * create treewalker to navigate DOM and return all TEXT nodes
-   * @param {object} base - base element to crawl for text nodes
-   * @return {array} wordArray - array containing all text nodes on the page
+   * @param {Object} base - base element to crawl for text nodes
+   * @returns {Object[]} an array containing all visible text on the webpage
    */
   function treeWalk(base) {
     log("tree walk");
@@ -1119,7 +1131,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       const $pElementName = jQuery(treeWalker.currentNode)[0].parentNode.nodeName;
 
       // check to see if the parent node is a SCRIPT, NOSCRIPT, or SYLE element
-      if ($pElementName !== 'NOSCRIPT' && $pElementName !== 'SCRIPT' && $pElementName !== 'STYLE') {
+      if ($pElementName !== "NOSCRIPT" && $pElementName !== "SCRIPT" && $pElementName !== "STYLE") {
 
         if (treeWalker.currentNode.textContent.trim() !== "") {
           // remember text node
@@ -1133,6 +1145,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * Escape characters to prevent malacious input from user
+   * @param {string} s - the string to properly escape special characters
+   * @returns {string} a string with all the characters properly escaped
    */
   RegExp.escape = (s) => {
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
@@ -1142,80 +1156,93 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    * Test if phone number
    * Checked format = 000-0000
    * @param {string} text - the text to verify
+   * @returns {string} the text with all special characters properly escaped
    */
   function phoneNumberText(text) {
     log("verify phone number", text);
     return RegExp.escape(text);
   }
 
-  /**
-   * Replaced matching words/phrases with the corresponding autofill tags
-   * @param {array} wordList - array containing all the visible text in the edit area
-   * @param {string} regReplace - text string to search for
-   */
-  function replaceText(wordList, regReplace) {
-    log("replace text");
+/**
+ * replace text within the text nodes scraped from the webpage
+ * @param {Object} autofillTag - Autofill object containing the autofill tag and search terms
+ * @param {string} autofillTag.autofilltag - the autofill tag
+ * @param {string} autofillTag.searchTerms - the search words or phrases to replace with the autofill tag
+ * @returns
+ */
+function replaceTextNode(autofillTag) {
+    let node = this;
+    let text = node.nodeValue;
     const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
+    const {
+      autofillTag: tag,
+      searchTerms
+    } = autofillTag;
 
-    wordList.map((node) => {
-      let text = node.nodeValue;
+    // skip iteration if Search Terms is blank
+    if (searchTerms === "") {
+      return;
+    }
 
-      // iterate through autofill array and replace matches in text
-      // replace all instances of "searchTerms" with "autofillTag"
-      for (const autofillTag in regReplace) {
-        const {
-          autofillTag: tag,
-          searchTerms
-        } = regReplace[autofillTag];
+    // if split phrases are needed
+    if (searchTerms.indexOf(";") > -1) {
+      const wordsToSearchFor = searchTerms.split(";");
 
-        // skip iteration if Search Terms is blank
-        if (searchTerms === "") {
-          continue;
-        }
+      wordsToSearchFor.forEach((searchText) => {
+        let findThis;
+        searchText = searchText.trim(); // trim text
 
-        // if split phrases are needed
-        if (searchTerms.indexOf(";") > -1) {
-          const findArray = searchTerms.split(";");
-          const arrayLength = findArray.length;
-
-          for (let a = 0; a < arrayLength; a += 1) {
-            let findThis;
-            const searchText = findArray[a].trim();
-
-            if (searchText !== "") {
-              findThis = phoneRegex.test(searchText) ? phoneNumberText(searchText) : `\\b${RegExp.escape(searchText)}\\b`;
-            } else {
-              continue;
-            }
-
-            const myRegex = new RegExp(findThis, "gi");
-
-            if (searchText === "") {
-              continue;
-            }
-
-            text = text.replace(myRegex, tag);
-          }
+        if (searchText === "") {
+          log("search term is blank :: skip");
+          return;
         } else {
-          // If phrases are do not need spliting
-          const findThis = phoneRegex.test(searchTerms) ? phoneNumberText(searchTerms) : `\\b${RegExp.escape(searchTerms)}\\b`;
+          findThis = phoneRegex.test(searchText) ? phoneNumberText(searchText) : `\\b${RegExp.escape(searchText)}\\b`;
           const myRegex = new RegExp(findThis, "gi");
 
+          // replace matching words or phrases with Autofill
           text = text.replace(myRegex, tag);
         }
-      }
+      });
+    } else { // If phrases are do not need spliting
+      const findThis = phoneRegex.test(searchTerms) ? phoneNumberText(searchTerms) : `\\b${RegExp.escape(searchTerms)}\\b`;
+      const myRegex = new RegExp(findThis, "gi");
 
-      // apply the adjusted text to the DOM
-      node.nodeValue = text;
-    });
+      // replace matching words or phrases with Autofill
+      text = text.replace(myRegex, tag);
+    }
+
+    // save text replacements to text node
+    this.nodeValue = text;
+  }
+
+  /**
+   * Replace input text with Autofill Tags
+   * @param {Object} node - the current text node to replace text
+   */
+  function replaceSearchTerms(node) {
+    const {
+      activeList
+    } = toolState;
+
+    // iterate through autofill array and replace matches in text
+    // replace all instances of "searchTerms" with "autofillTag"
+    loopThroughArray(activeList, replaceTextNode, node);
+  }
+
+  /**
+   * Replaced matching words/phrases with the corresponding autofill tags
+   * @param {Object[]} wordList - array containing all the visible text in the edit area
+   */
+  function replaceText(wordList) {
+    log("replace text");
+    loopThroughArray(wordList, replaceSearchTerms);
   }
 
   /**
    * loop through word list array and replace text with autofill tags
-   * @param {object} baseElem - base element to find and replace text with autofill tags
-   * @param {array} regReplace - object array that contains the regExpressions and corresponding autofill tags
+   * @param {Object} baseElem - base element to find and replace text with autofill tags
    */
-  function useAutofillTags(baseElem, regReplace) {
+  function useAutofillTags(baseElem) {
     log("use autofill tags");
     let wordList;
     const baseLength = baseElem.length;
@@ -1223,19 +1250,18 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     for (let z = 0; z < baseLength; z += 1) {
       // get all visible text on page
       wordList = treeWalk(baseElem[z]);
-      replaceText(wordList, regReplace);
+      replaceText(wordList);
     }
   }
 
   /**
    * Replace text on a CMS style input window
    * @param {array} recordEditWindow - array of DOM input elements
-   * @param {regex} regReplace - list of regex values
    */
-  function replaceTextCMS(recordEditWindow, regReplace) {
+  function replaceTextCMS(recordEditWindow) {
     log("replace text CMS");
     // pass elements with children as base element for autofill replacing
-    useAutofillTags(recordEditWindow, regReplace);
+    useAutofillTags(recordEditWindow);
 
     // change focus between text area to trigger text saving.
     const recordLength = recordEditWindow.length;
@@ -1252,12 +1278,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    * and with the content editor pop up open
    */
   function replaceTextInPopupCMS() {
-    const {
-      activeList
-    } = toolState;
     const contentFrame = jQuery("iframe#cblt_content").contents();
     const siteEditorIframe = contentFrame.find("iframe#siteEditorIframe").contents();
-    const regReplace = activeList; // get stored autofill tags from local storage
+    // const regReplace = activeList; // get stored autofill tags from local storage
 
     // save contents of cms content edit frame
     const cmsIframe = siteEditorIframe.find("iframe#cmsContentEditorIframe").contents();
@@ -1266,7 +1289,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     const recordEditWindow = cmsIframe.find("div.main-wrap").find(".input-field").find("div[data-which-field='copy']");
 
     // pass elements with children as base element for autofill replacing
-    replaceTextCMS(recordEditWindow, regReplace);
+    replaceTextCMS(recordEditWindow);
   }
 
 
@@ -1274,12 +1297,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    * Replace Text with Autofills while on the main WSM window
    */
   function replaceTextInMainWindow() {
-    const {
-      activeList
-    } = toolState;
     const contentFrame = jQuery("iframe#cblt_content").contents();
     const siteEditorIframe = contentFrame.find("iframe#siteEditorIframe").contents();
-    const regReplace = activeList; // get stored autofill tags from local storage
 
     // get contents of iframe
     let viewerIframe = siteEditorIframe.find("iframe#viewer").contents();
@@ -1292,7 +1311,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       }
     });
     // pass elements with children as base element for autofill replacing
-    useAutofillTags(myChild, regReplace);
+    useAutofillTags(myChild);
   }
 
   /**
@@ -1304,7 +1323,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     const recordEditWindow = contentFrame.find("div.main-wrap").find(".input-field").find("div[data-which-field='copy']");
 
     // pass elements with children as base element for autofill replacing
-    replaceTextCMS(recordEditWindow, regReplace);
+    replaceTextCMS(recordEditWindow);
   }
 
   /**
@@ -1411,7 +1430,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * Start events to build the autofill "drop down menu"
-   * @return {object} a Promise.resolve
+   * @return {Promise} A promise message show if the autofill drop down menu was created or not
    */
   function buildAutofillListModal() {
     log("build autofill list modal");
@@ -1430,7 +1449,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * builds and attaches the latest changes modal to the webpage.
-   * @return {object} a Promise.resolve
+   * @return {Promise} Promise message representing if the Latest Changes Modal was created and attached
    */
   function buildLatestChangesModal() {
     log("build latest changes modal");
@@ -1448,7 +1467,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
   /**
    * builds and attaches the latest changes modal to the webpage.
-   * @return {object} a Promise.resolve
+   * @return {Promise} Promise message representing if the instructions modal was created and attached
    */
   function buildInstructionsModal() {
     log("build instructions modal");
@@ -1467,7 +1486,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * Attaches the main tool container to the webpage and adds event
    * listeners to buttons
-   * @return {object} a Promise.resolve
+   * @return {Promise} Promise message representing if the main tool was attached
    */
   function buildMainTool() {
     log("build main tool");
