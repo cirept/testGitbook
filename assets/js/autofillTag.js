@@ -340,19 +340,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
     name = name.replace(leftSquareBracket, "\\[").replace(rightSquareBracket, "\\]");
     const escapedText = RegExp.escape(name);
-    const myString2 = `[\\?&]${escapedText}=([^&#]*)`;
-    const myString = `[\\?&]${name}=([^&#]*)`;
-
-    // console.log(myString2);
-    // console.log(myString);
-
+    const myString = `[\\?&]${escapedText}=([^&#]*)`;
     const regex = new RegExp(myString, "g");
-    const regex2 = new RegExp(myString2, "g");
-
-    // console.log(regex);
-    // console.log(regex2);
-
-    // const regex = new RegExp(RegExp.escape(myString), "g");
     const results = regex.exec(location.search);
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
@@ -1149,6 +1138,15 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   };
 
   /**
+   * Process a string of text and apply escaping characters
+   * @param {string} str - escape all characters
+   */
+  function escapeRegExp(str) {
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  }
+
+
+  /**
    * Test if phone number
    * Checked format = 000-0000
    * @param {string} text - the text to verify
@@ -1420,9 +1418,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       // build latest changes modal
       const myModal = document.createElement("div");
 
-      // const modalCode =
-      myModal.innerHTML =
-        `<div class="modal fade" id="${name}Modal" tabindex="-1" role="dialog" aria-labelledby="${name}Title" aria-hidden="true">
+      const modalCode =
+        // myModal.innerHTML = 
+        `<div class="modal fade" id="${escapeRegExp(name)}Modal" tabindex="-1" role="dialog" aria-labelledby="${escapeRegExp(name)}Title" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
               <div class="modal-body">
@@ -1433,7 +1431,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
         </div>`;
 
       // add the modal content + the Latest Changes Markdown Doc Content
-      // myModal.innerHTML = modalCode;
+      myModal.innerHTML = modalCode;
 
       // attach modal to page
       document.body.appendChild(myModal);
@@ -1544,6 +1542,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
 
     if (autoToolReset) {
       log("tool reset");
+      updateDisplayMessage("Detected a New Web ID, Tool Reset");
       setDefaultListAsActive();
       saveStateToLocalStorage();
     } else {
