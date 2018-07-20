@@ -335,13 +335,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    * @param {string} name - name of the parameter to return the value for
    */
   function getUrlParameter(name) {
-    const leftSquareBracket = /[\[]/;
-    const rightSquareBracket = /[\]]/;
-
-    name = name.replace(leftSquareBracket, "\\[").replace(rightSquareBracket, "\\]");
-    const escapedText = RegExp.escape(name);
-    const myString = `[\\?&]${escapedText}=([^&#]*)`;
-    const regex = new RegExp(myString, "g");
+    log("get url parameter", name);
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
     const results = regex.exec(location.search);
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
