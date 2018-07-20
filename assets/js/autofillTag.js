@@ -1,5 +1,3 @@
-import attachModal from "./attachModal.js";
-
 const AutofillReplacerTool = (function AutofillReplacerTool() {
   let toolState = {
     defaultList: [{
@@ -292,7 +290,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   function loopThroughArray(array, functionToRun, thisArg = this) {
     log("looping through array");
     array.forEach(functionToRun, thisArg);
-  };
+  }
 
   /**
    *  Generic function to perform ajax requests.  I wanted to make my own.  =]
@@ -400,6 +398,16 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
+   * save object to local storage
+   * @param {string} name - object to be saved into local storage
+   * @param {(string|Object)} value - the value to save
+   */
+  function saveToLocalStorage(name, value) {
+    log("save to local storage", name);
+    localStorage.setItem(name, value);
+  }
+
+  /**
    * save autofill parameter list to local storage
    */
   function saveStateToLocalStorage() {
@@ -453,25 +461,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       }
     });
   }
-
-  // /**
-  //  * Returns the autofill tag entry from the active list
-  //  * @param {Object} autofillTag - the autofill tag to return from default list
-  //  * @param {string} searchTerm - the string to set the searchTerm too
-  //  */
-  // function setActiveAutofillEntry(autofillTag, searchTerm) {
-  //   log(`set active autofill entry ${autofillTag} ${searchTerm}`);
-  //   const {
-  //     activeList
-  //   } = toolState;
-  //   const match = activeList.find((autofill) => autofill.autofillTag === autofillTag);
-
-  //   // if match is found, set the searchTerms to the parameter value
-  //   if (match) {
-  //     match.searchTerms = searchTerm;
-  //   }
-  //   log("match found", toolState.activeList[autofillTag]);
-  // }
 
   /**
    * Returns the autofill tag entry from the active list
@@ -741,16 +730,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   * save object to local storage
-   * @param {string} name - object to be saved into local storage
-   * @param {(string|Object)} value - the value to save
-   */
-  function saveToLocalStorage(name, value) {
-    log("save to local storage", name);
-    localStorage.setItem(name, value);
-  }
-
-  /**
    * Scan autofill drop down list and remove disable class
    * @param {Object} elem - element being removed from the configured list
    */
@@ -768,7 +747,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
         .classList.remove("disabled");
     }
   }
-
 
   /**
    * Build a generic list item to use through out the tool
@@ -1165,21 +1143,21 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     return RegExp.escape(text);
   }
 
-/**
- * replace text within the text nodes scraped from the webpage
- * @param {Object} autofillTag - Autofill object containing the autofill tag and search terms
- * @param {string} autofillTag.autofilltag - the autofill tag
- * @param {string} autofillTag.searchTerms - the search words or phrases to replace with the autofill tag
- * @returns
- */
-function replaceTextNode(autofillTag) {
-    let node = this;
-    let text = node.nodeValue;
+  /**
+   * replace text within the text nodes scraped from the webpage
+   * @param {Object} autofillTag - Autofill object containing the autofill tag and search terms
+   * @param {string} autofillTag.autofilltag - the autofill tag
+   * @param {string} autofillTag.searchTerms - the search words or phrases to replace with the autofill tag
+   * @returns {Object} will return nothing if it detects a blank search term skipping checking
+   */
+  function replaceTextNode(autofillTag) {
+    const self = this; // this = text NODE
     const phoneRegex = /((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}/g;
     const {
       autofillTag: tag,
       searchTerms
     } = autofillTag;
+    let text = self.nodeValue;
 
     // skip iteration if Search Terms is blank
     if (searchTerms === "") {
@@ -1282,7 +1260,6 @@ function replaceTextNode(autofillTag) {
   function replaceTextInPopupCMS() {
     const contentFrame = jQuery("iframe#cblt_content").contents();
     const siteEditorIframe = contentFrame.find("iframe#siteEditorIframe").contents();
-    // const regReplace = activeList; // get stored autofill tags from local storage
 
     // save contents of cms content edit frame
     const cmsIframe = siteEditorIframe.find("iframe#cmsContentEditorIframe").contents();
@@ -1354,18 +1331,6 @@ function replaceTextNode(autofillTag) {
   }
 
   /**
-   * Gets data item from local storage
-   * @param {string} name - the name of the local storage item to return
-   * @return the value for the data item or "No Data Found" message
-   */
-  function getItemFromLocalStorage(name) {
-    log("get item from local storage");
-    return window.localStorage.getItem(name) === null ?
-      "No Data Found in Local Storage" :
-      window.localStorage.getItem(name);
-  }
-
-  /**
    * Determine if the current website is different
    */
   function shouldToolAutoReset() {
@@ -1427,6 +1392,41 @@ function replaceTextNode(autofillTag) {
 
       // resolve converted data
       resolve(changeLogData);
+    });
+  }
+
+  /**
+   * Builds a modal and attaches it to the webpage.
+   * @param {string} name - the name of the modal
+   * @param {string} html - the content of the modal
+   * @return {object} Promise.resolve or reject
+   */
+  function attachModal(name, html) {
+    return new Promise((resolve, reject) => {
+      // build latest changes modal
+      const myModal = document.createElement("div");
+      const modalCode =
+        `<div class="modal fade" id="${name}Modal" tabindex="-1" role="dialog" aria-labelledby="${name}Title" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                ${html}
+              </div>
+            </div>
+          </div>
+        </div>`;
+
+      // add the modal content + the Latest Changes Markdown Doc Content
+      myModal.innerHTML = modalCode;
+
+      // attach modal to page
+      document.body.appendChild(myModal);
+
+      if (document.getElementById(`${name}Modal`)) {
+        resolve(`${name} Modal Attached`);
+      } else {
+        reject(`${name} Modal Not Attached`);
+      }
     });
   }
 
@@ -1559,6 +1559,5 @@ function replaceTextNode(autofillTag) {
   // Run Tool
   //
 
-  window.onload = init;
-  // main();
+  init();
 }());
