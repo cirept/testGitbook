@@ -335,7 +335,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    * @param {string} name - name of the parameter to return the value for
    */
   function getUrlParameter(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    const leftSquareBracket = /[\[]/;
+    const rightSquareBracket = /[\]]/;
+    name = name.replace(leftSquareBracket, "\\[").replace(rightSquareBracket, "\\]");
     const regex = new RegExp(`[\\?&]${name}=([^&#]*)`);
     const results = regex.exec(location.search);
 
@@ -1175,7 +1177,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
           log("search term is blank :: skip");
           return;
         } else {
-          let findThis = phoneRegex.test(searchText) ? phoneNumberText(searchText) : `\\b${RegExp.escape(searchText)}\\b`;
+          const findThis = phoneRegex.test(searchText) ? phoneNumberText(searchText) : `\\b${RegExp.escape(searchText)}\\b`;
           const myRegex = new RegExp(findThis, "gi");
 
           // replace matching words or phrases with Autofill
@@ -1403,6 +1405,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     return new Promise((resolve, reject) => {
       // build latest changes modal
       const myModal = document.createElement("div");
+      
       // const modalCode =
       myModal.innerHTML =
         `<div class="modal fade" id="${name}Modal" tabindex="-1" role="dialog" aria-labelledby="${name}Title" aria-hidden="true">
