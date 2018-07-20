@@ -1,61 +1,61 @@
 const AutofillReplacerTool = (function AutofillReplacerTool() {
   let toolState = {
     defaultList: [{
-        "autofillTag": "***How to Separate Words***",
-        "searchTerms": "Separate words with --> ;"
-      },
-      {
-        "autofillTag": "***Example***",
-        "searchTerms": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*"
-      },
-      {
-        "autofillTag": "%DEALER_NAME%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%FRANCHISES%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%STREET%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%CITY%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%STATE%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%STATE_FULL_NAME%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%ZIP%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%PHONE%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%NEW_PHONE%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%USED_PHONE%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%SERVICE_PHONE%",
-        "searchTerms": "SEARCH_FOR_ME"
-      },
-      {
-        "autofillTag": "%PARTS_PHONE%",
-        "searchTerms": "SEARCH_FOR_ME"
-      }
+      "autofillTag": "***How to Separate Words***",
+      "searchTerms": "Separate words with --> ;"
+    },
+    {
+      "autofillTag": "***Example***",
+      "searchTerms": "*`*like*`*;*`*this*`*;*`*you*`*;*`*see*`*"
+    },
+    {
+      "autofillTag": "%DEALER_NAME%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%FRANCHISES%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%STREET%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%CITY%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%STATE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%STATE_FULL_NAME%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%ZIP%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%NEW_PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%USED_PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%SERVICE_PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    },
+    {
+      "autofillTag": "%PARTS_PHONE%",
+      "searchTerms": "SEARCH_FOR_ME"
+    }
     ],
     activeList: [{}],
     autoToolReset: false,
@@ -209,7 +209,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   actionContainer.classList.add("container-fluid");
 
   // autofill list props
-  allAutofillsList.tabIndex = "4";
+  allAutofillsList.tabIndex = 4;
   allAutofillsList.id = "allAutofillsList";
 
   // list container props
@@ -248,9 +248,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * Custom Tool Console Logging for debugging purposes
    * @param {string} message - Message to write to the console.
-   * @param {Object} [obj] - OPTIONAL : the object to display in the console message
+   * @param {Object} obj - the object to display in the console message
    */
-  function log(message, obj) {
+  function log(message, [obj]) {
     /* eslint-disable */
     if (obj) {
       // remove comment to enable console logs
@@ -533,7 +533,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     const {
       activeList
     } = toolState;
-
     // set the default value to SEARCH_FOR_ME if values are blank
     activeList.forEach((autofill) => {
       if (autofill.searchTerms === "") {
@@ -619,8 +618,10 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       // save changes
       saveStateToLocalStorage();
       return Promise.resolve("Phone Numbers Set");
+    } else {
+      log("Phone Numbers Not Set");
+      return Promise.resolve("Phone Numbers Not Set");
     }
-    return Promise.resolve("Phone Numbers Not Set");
   }
 
   /**
@@ -750,8 +751,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * Build a generic list item to use through out the tool
    * @param {string} autofill - the text that will be used to fill in the autofillTag div
-   * @param {string} text - the text that will be used as the input value
-   * @default text = "SEARCH_FOR_ME"
+   * @param {string} [text=SEARCH_FOR_ME] - the text that will be used as the input value, DEFAULT value = "SEARCH_FOR_ME"
    */
   function listItem(autofill, text = "SEARCH_FOR_ME") {
     log(`list item ${autofill} ${text}`);
@@ -1169,13 +1169,14 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       const wordsToSearchFor = searchTerms.split(";");
 
       wordsToSearchFor.forEach((searchText) => {
+        let findThis;
         searchText = searchText.trim(); // trim text
 
         if (searchText === "") {
           log("search term is blank :: skip");
           return;
         } else {
-          let findThis = phoneRegex.test(searchText) ? phoneNumberText(searchText) : `\\b${RegExp.escape(searchText)}\\b`;
+          findThis = phoneRegex.test(searchText) ? phoneNumberText(searchText) : `\\b${RegExp.escape(searchText)}\\b`;
           const myRegex = new RegExp(findThis, "gi");
 
           // replace matching words or phrases with Autofill
@@ -1277,16 +1278,17 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   function replaceTextInMainWindow() {
     const contentFrame = jQuery("iframe#cblt_content").contents();
     const siteEditorIframe = contentFrame.find("iframe#siteEditorIframe").contents();
-    const viewerIframe = siteEditorIframe.find("iframe#viewer").contents(); // get contents of iframe
+
+    // get contents of iframe
+    let viewerIframe = siteEditorIframe.find("iframe#viewer").contents();
 
     // return array of elements that have children
-    const myChild = viewerIframe.find("body").children().filter((index, value) => {
+    let myChild = viewerIframe.find("body").children().filter((index, value) => {
       // only keep elements that are not empty
       if (value.children.length !== 0) {
         return value;
       }
     });
-
     // pass elements with children as base element for autofill replacing
     useAutofillTags(myChild);
   }
@@ -1403,8 +1405,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     return new Promise((resolve, reject) => {
       // build latest changes modal
       const myModal = document.createElement("div");
-      // const modalCode =
-      myModal.innerHTML =
+      const modalCode =
         `<div class="modal fade" id="${name}Modal" tabindex="-1" role="dialog" aria-labelledby="${name}Title" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
@@ -1416,7 +1417,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
         </div>`;
 
       // add the modal content + the Latest Changes Markdown Doc Content
-      // myModal.innerHTML = modalCode;
+      myModal.innerHTML = modalCode;
 
       // attach modal to page
       document.body.appendChild(myModal);
