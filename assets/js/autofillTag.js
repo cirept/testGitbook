@@ -1,3 +1,5 @@
+import attachModal from "./attachModal.js";
+
 const AutofillReplacerTool = (function AutofillReplacerTool() {
   let toolState = {
     defaultList: [{
@@ -1548,7 +1550,7 @@ function replaceTextNode(autofillTag) {
       .then(() => setPhoneNumbers())
       .catch((error) => log("Skipped Getting Default Values", error))
       .finally(() => {
-        log("Setup Autofill Tool UI")
+        log("Setup Autofill Tool UI");
         resetTool();
       });
   }
