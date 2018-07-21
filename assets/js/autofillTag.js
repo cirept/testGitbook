@@ -337,7 +337,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   function getUrlParameter(name) {
     log("get url parameter", name);
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+    const regex = new RegExp("[\\?&]" + escape(name) + "=([^&#]*)");
     const results = regex.exec(location.search);
 
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
@@ -1414,8 +1414,8 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       // build latest changes modal
       const myModal = document.createElement("div");
 
-      const modalCode =
-        // myModal.innerHTML = 
+      // const modalCode =
+      myModal.innerHTML = 
         `<div class="modal fade" id="${escapeRegExp(name)}Modal" tabindex="-1" role="dialog" aria-labelledby="${escapeRegExp(name)}Title" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
@@ -1427,7 +1427,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
         </div>`;
 
       // add the modal content + the Latest Changes Markdown Doc Content
-      myModal.innerHTML = modalCode;
+      // myModal.innerHTML = modalCode;
 
       // attach modal to page
       document.body.appendChild(myModal);
