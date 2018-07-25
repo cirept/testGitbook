@@ -1405,6 +1405,15 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     });
   }
 
+  function escapeHTML(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
   /**
    * Builds a modal and attaches it to the webpage.
    * @param {string} name - the name of the modal
@@ -1416,20 +1425,22 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       // build latest changes modal
       const myModal = document.createElement("div");
 
-      // add the modal content + the Latest Changes Markdown Doc Content
-      myModal.innerHTML =
-        `<div class="modal fade" id="${escapeRegExp(name)}Modal" tabindex="-1" role="dialog" aria-labelledby="${escapeRegExp(name)}Title" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-              <div class="modal-body">
-                ${html}
-              </div>
-            </div>
-          </div>
-        </div>`;
+      myModal.classList.add(`${name}ModalContainer`);
 
       // attach modal to page
       document.body.appendChild(myModal);
+
+      // myModal.innerHTML = escapeHTML(`<img src='x' onerror='alert(1)'>`);
+      // myModal.innerHTML = escapeHTML(`<div class='modal fade' id='${name}Modal' tabindex='-1' role='dialog' aria-labelledby='${name}Title' aria-hidden='true'>
+      document.querySelector(`.${name}ModalContainer`).innerHTML = escapeHTML(`<div class='modal fade' id='${name}Modal' tabindex='-1' role='dialog' aria-labelledby='${name}Title' aria-hidden='true'>
+      <div class='modal-dialog modal-dialog-centered modal-lg' role='document'>
+                  <div class='modal-content'>
+                    <div class='modal-body'>
+                      ${html}
+                    </div>
+                  </div>
+                </div>
+              </div>`);
 
       if (document.getElementById(`${name}Modal`)) {
         resolve(`${name} Modal Attached`);
