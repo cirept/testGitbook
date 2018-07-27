@@ -1298,7 +1298,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
    */
   function replaceTextInCMS() {
     const contentFrame = jQuery("iframe#cblt_content").contents();
-    // get contens of iframe
+    // get contents of iframe
     const recordEditWindow = contentFrame.find("div.main-wrap").find(".input-field").find("div[data-which-field='copy']");
 
     // pass elements with children as base element for autofill replacing
@@ -1306,7 +1306,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   * will walk through edittable portion of WSM window and perform text
+   * will walk through editable portion of WSM window and perform text
    * replacing with data contained in the list area of tool
    */
   function autofills() {
@@ -1345,7 +1345,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
     if (savedWebID !== currentWebID) {
       log("reset Values because web ids are different", currentWebID);
       log("saved web id", savedWebID);
-      // save webid
+      // save WebID
       toolState.webID = currentWebID;
       // save locale
       toolState.locale = currentLocale;
