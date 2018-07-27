@@ -1136,15 +1136,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   };
 
   /**
-   * Process a string of text and apply escaping characters
-   * @param {string} str - escape all characters
-   */
-  function escapeRegExp(str) {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-  }
-
-
-  /**
    * Test if phone number
    * Checked format = 000-0000
    * @param {string} text - the text to verify
@@ -1262,7 +1253,6 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
       jQuery(recordEditWindow[z]).focus();
     }
   }
-
 
   /**
    * Replace text with autofills while on the main WSM window
