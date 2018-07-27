@@ -265,7 +265,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   /**
    * Custom Tool Console Logging for debugging purposes
    * @param {string} message - Message to write to the console.
-   * @param {boolen} returnResolve - returns resolved
+   * @param {boolean} returnResolve - returns resolved
    * @return {Object} if resolve is true, returns empty resolve
    */
   function logReturn(message, returnResolve = false) {
@@ -311,9 +311,9 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   * retrive object from local storage
+   * retrieve object from local storage
    * @param {Object} obj - object to be saved into local storage
-   * @return {Object} the ACTIVE Autofill list retrived from localStorage
+   * @return {Object} the ACTIVE Autofill list retrieved from localStorage
    */
   function getToolState() {
     log("get from local storage");
@@ -1127,7 +1127,7 @@ const AutofillReplacerTool = (function AutofillReplacerTool() {
   }
 
   /**
-   * Escape characters to prevent malacious input from user
+   * Escape characters to prevent malicious input from user
    * @param {string} s - the string to properly escape special characters
    * @returns {string} a string with all the characters properly escaped
    */
