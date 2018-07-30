@@ -1,3 +1,19 @@
+## v1.1.8
+
+### Functionality
+
+* Improved Tool Load Times.
+
+``Released (07/17/2018)``
+
+<br>
+<br>
+
+---
+
+<br>
+<br>
+
 ## v1.1.6
 
 ### Updated UI
@@ -15,6 +31,6 @@
     * The reset happens when the tool initially loads.
 * ``%STATE_FULL_NAME%`` now displays the full state name when reset.
     * This value is based on the ``%STATE%`` value.
-    * This functionality is only supported on ``en_CA``, ``fr_CA``, ``en_US``, and ``en_AU`` Locales.  **If other locales need support, please submit an enhancement request.**
+    * This functionality is only supported on ``en_CA``, ``fr_CA``, ``en_US``, and ``en_AU`` Locales.  *If other locales need support, please submit an enhancement request.*
 
 ``Released (07/13/2018)``
