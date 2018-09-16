@@ -1,10 +1,10 @@
 ---
-description: 'This will trigger the tool primary functionality, the text replacing.'
+description: 'Performs the tools main magic trick, the text replacing.'
 ---
 
 # Magic Wand
 
-![Magic Wand Button](../images/Apply_autofills.jpg)
+![Magic Wand Button](../.gitbook/assets/apply_autofills.jpg)
 
 ## Editor Tab
 

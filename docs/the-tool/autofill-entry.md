@@ -1,12 +1,10 @@
 ---
-description: 'Enter the text autofill information here.'
+description: Enter the text autofill information here.
 ---
 
 # Autofill Entry
 
-### 
-
-![Example of Autofill Entry](../images/autofillEntry.jpg)
+![Example of Autofill Entry](../.gitbook/assets/autofillentry.jpg)
 
 This is comprised of three \(3\) parts:
 
@@ -26,9 +24,9 @@ This is comprised of three \(3\) parts:
 
 ### Separating Words?  How Come?
 
-Let's say a dealership has an Internet Sales Department with a manager who maintains all of the SEO on a page.  Then for the manager just picks up and moves to Spain.  A new manager is hired who has to now take care of the SEO on the dealer's page.  While the new manager is updating/creating SEO he uses a slightly different variant of the dealership's name.  I know what your thinking, that would be very unlikely, but you would be surprised.  =\]
+Let's say a dealership has an Internet Sales Department with a manager who maintains all of the SEO on a page. Then for the manager just picks up and moves to Spain. A new manager is hired who has to now take care of the SEO on the dealer's page. While the new manager is updating/creating SEO he uses a slightly different variant of the dealership's name. I know what your thinking, that would be very unlikely, but you would be surprised. =\]
 
-A very common dealership name consists of the Dealership Owner's last name and the primary make of cars that the dealership sells.  \(Chevrolet, INFINITI, etc.\)
+A very common dealership name consists of the Dealership Owner's last name and the primary make of cars that the dealership sells. \(Chevrolet, INFINITI, etc.\)
 
 * e.g. INFINITI of Tampa, could also be
   * Tampa INFINITI
@@ -42,7 +40,7 @@ Using the text mentioned above. I want to replace anything related to the dealer
 Tanaka Motors;Tanaka of Tokyo
 ```
 
-![Example of Autofill Entry](../images/autofillEntry.jpg)
+![Example of Autofill Entry](../.gitbook/assets/autofillentry.jpg)
 
 When you click the 'Magic' button the tool will break down the text if it sees ; and start its search.
 

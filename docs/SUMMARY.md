@@ -1,7 +1,8 @@
 # Table of contents
 
 * [Read Me](README.md)
-* [Overview](overview.md)
+* [Overview](overview/README.md)
+  * [How the Tool Works](overview/how-the-tool-works.md)
 * [Deep Dive](the-tool/README.md)
   * [Magic Wand](the-tool/magic-wand.md)
   * [Autofill Entry](the-tool/autofill-entry.md)
