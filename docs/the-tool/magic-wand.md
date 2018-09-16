@@ -4,7 +4,7 @@ description: 'This will trigger the tool primary functionality, the text replaci
 
 # Magic Wand
 
-![Magic Wand Button](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/Apply_autofills.jpg)
+![Magic Wand Button](../images/Apply_autofills.jpg)
 
 ## Editor Tab
 
