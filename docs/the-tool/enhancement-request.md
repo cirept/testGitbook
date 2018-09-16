@@ -1,3 +1,7 @@
+---
+description: 'Have an idea on how to make the tool better?  Share it!'
+---
+
 # Enhancement Request
 
 ![Enhancement Request Button](../images/enhancement.jpg)

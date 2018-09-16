@@ -1,3 +1,7 @@
+---
+description: 'Something acting funny?  Report that bug here.'
+---
+
 # Report Bug
 
 ![Bug Report Button](../images/bug.jpg)

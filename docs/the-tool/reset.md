@@ -1,3 +1,7 @@
+---
+description: 'Reset the autofill entry list.'
+---
+
 # Reset
 
 ![Reset Button](../images/Reset.jpg)
