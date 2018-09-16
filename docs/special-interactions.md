@@ -4,6 +4,10 @@
 
 The order of the autofill entries in the tool list will determine the how the autofill tool will replace text on the web page.
 
+{% hint style="info" %}
+This bug shouldn't happen that often as the order of the default list in the tool should prevent this from occurring.  However, it is still worth mentioning in the event that you experience this bug, you will know how to fix it.
+{% endhint %}
+
 ## Description
 
 * The tool scans the page once for each autofill entry in the list.
@@ -37,8 +41,4 @@ If we reversed the order and moved %DEALER\_NAME% before the %FRANCHISES% the to
    * Welcome to **%DEALER\_NAME%**! See yourself in a INFINITI today!
 2. Search for **INFINITI**
    * Welcome to **%DEALER\_NAME%**! See yourself in a **%FRANCHISES%** today!
-
-{% hint style="info" %}
-This bug shouldn't happen that often as the order of the default list in the tool should prevent this from occurring.  However, it is still worth mentioning in the event that you experience this bug, you will know how to fix it.
-{% endhint %}
 
