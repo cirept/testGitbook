@@ -14,7 +14,7 @@ Let's first break down the tools visual elements with some brief descriptions ab
 
 * This will hide / show main panel for the tool.
 
-![Show Tool](../.gitbook/assets/unhide_panel.png)
+![Show Tool](../.gitbook/assets/unhide_panel%20%281%29.png)
 
 ![Hide Tool](../.gitbook/assets/hide_panel.png)
 

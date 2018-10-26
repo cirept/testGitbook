@@ -72,13 +72,13 @@ Tool has been recently updated and some elements have been removed or modified.
 
 ### Magic Eye Button
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/Hide_panel.png) ![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/Unhide_panel.png)
+![Autofill Tool](.gitbook/assets/unhide_panel.png) ![Autofill Tool](.gitbook/assets/hide_panel%20%281%29.png)
 
 * This will hide / show main panel for the tool.
 
 ### Autofill Options
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/autofillEntry.jpg) \|-----------------------1---------------------\| \|--------------2------------\| \|--3--\|
+![Autofill Tool](.gitbook/assets/autofill_option_breakdown.png)
 
 This is comprised of three \(3\) parts.
 
@@ -164,7 +164,7 @@ Will open a new tab to submit a bug for this tool on Github.com.
 
 ![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/latestChanges.jpg)
 
-View the lastest changes that was made to the tool.
+View the latest changes that was made to the tool.
 
 ### Request Enhancement Button
 
