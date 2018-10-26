@@ -4,7 +4,7 @@ description: Reset the autofill entry list.
 
 # Reset
 
-![Reset Button](../.gitbook/assets/reset%20%281%29.jpg)
+![Reset Button](../.gitbook/assets/reset-1.jpg)
 
 Clicking this button will reset the tool to the default autofill tag list. This action is also performed when switching to a new web-id in WSM. Saves you two \(2\) mouse clicks! Tools are suppose to make life easier, am i right? =\]
 

@@ -15,7 +15,7 @@ When you click the magic button the tool performs theses steps on **each** autof
 
 That wasn't too bad was it? All this happens quick so it appears that all the replacing happens at once.
 
-![](../.gitbook/assets/image.png)
+![](.gitbook/assets/image.png)
 
 Now to go into depth on each of the tools buttons!
 
