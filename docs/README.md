@@ -1,13 +1,16 @@
 # Read Me
 
-## autofillReplacer
-
-Tool has been recently updated and some elements have been removed or modified.
-
-### Description
+## Description
 
 * This tool will crawl the editor window and replace all matching text with the designated autofill tag.
 * **Primarily meant for use WITH the migration tool.**
+
+### Working Environment\(s\)
+
+* Only works in **Next Gen Mode \(Next Gen toggle = ON\)**
+* Only works in **WSM \(Editor\) and CMS \(Content Library\)**
+  * **Changes made in Editor**, changes are not permanent and will revert to original text upon page reload. Main purpose of the tool would is to make migrating copy text from external sites easier.
+  * **Changes made in CMS \(Content Library\)**, are not permanent UNTIL you save the changes via one of the save button located at the top right area of the page.
 
 ### Additional Details
 
@@ -18,13 +21,8 @@ Tool has been recently updated and some elements have been removed or modified.
 * Tool now resets to defaults if you switch from web-id to web-id.
   * **The tool does this upon loading.**
   * The message display you see when you show the autofill list is in place just to remind you that the tool was reset.
-* Tool now resets to defaults if you switch from web-id to web-id.
-  * **The tool does this upon loading.**
-  * The message display you see when you show the autofill list is in place just to remind you that the tool was   reset.
 
-### How to Use the Tool
-
-#### During Migration
+## How to Use the Tool
 
 1. Begin the migration process of an internal or external page.
 2. On a blank landing page, choose external page to migrate.
@@ -40,135 +38,4 @@ Tool has been recently updated and some elements have been removed or modified.
 3. A pop up will appear.
 4. **RUN THE AUTOFILL TAG REPLACER TOOL**
 5. Save changes via **save** button.
-
-### Working Environment\(s\)
-
-* Only works in **NextGen Mode \(Next Gen toggle = ON\)**
-* Only works in **WSM \(Editor\) and CMS \(Content Library\)**
-  * **Changes made in Editor**, changes are not permanent and will revert to original text upon page reload. Main purpose of the tool would is to make migrating copy text from external sites easier.
-  * **Changes made in CMS \(Content Library\)**, are not permanent UNTIL you save the changes via one of the save button located at the top right area of the page.
-
-### What the tool looks like
-
-![What the Tool Looks Like](.gitbook/assets/whattoollookslike.jpg)
-
-### Magic Wand Button
-
-![Magic Wand](.gitbook/assets/apply_autofills.jpg)
-
-* This will trigger the tool's functionality
-
-#### Editor
-
-* Any text that has been designated inside the input areas will be found and replaced with it's corresponding Autofill tag
-* **Changes will not be permanent.**
-
-#### CMS
-
-* Any text that has been designated inside the input areas will be found and replaced with it's corresponding Autofill tag
-* **Save edits in order to keep the changes.**
-
-### Magic Eye Button
-
-![Show Tool](.gitbook/assets/unhide_panel.png)
-
-![Hide Tool](.gitbook/assets/hide_panel%20%281%29.png)
-
-* This will hide / show main panel for the tool.
-
-### Autofill Options
-
-![Autofill Option Breakdown](.gitbook/assets/autofill_option_breakdown.png)
-
-This is comprised of three \(3\) parts.
-
-* 1 Autofill **text input area**. \(purple background\)
-* 2 **Autofill tag** that will replace text.
-* 3 **Delete autofill** entry.
-
-### Text Input Area
-
-The text that should get replaced by the related autofill tag.
-
-_**Special Interactions**_
-
-Because some dealer's like to use different text for things.
-
-* e.g. INFINITI of Tampa, could also be
-  * Tampa INFINITI
-  * INFINITI Tampa
-* So to account for this, you can adjust the 'text to be replaced' and add all possible variations to the area.
-* You can separate the variations by using " ; " \(semi-colon\)
-
-#### Lets do a quick demo shall we?
-
-Using the text mentioned above. I want to replace anything related to the dealer's name with the autofill tag %DEALER\_NAME%. So I write this text into the autofill text area.
-
-```text
-Tanaka Motors;Tanaka of Tokyo
-```
-
-![Example: Autofill Option Filled Out](.gitbook/assets/autofillentry.jpg)
-
-When you click the 'Magic' button the tool will break down the text if it sees ; and start its search.
-
-* round 1 = Tanaka Motors
-* round 2 = Tanaka of Tokyo
-
-### Autofill Tag
-
-The autofill tag that will replace all instances of the text that is located in the **Text Input Area**.
-
-### Delete autofill
-
-Removes the autofill tag entry from the search list.
-
-### Add autofill Button
-
-![Add Autofill](.gitbook/assets/add_autofill%20%281%29.jpg)
-
-Clicking this will display a drop down of currently available autofill tags that looks like this.
-
-#### Why are the options grey'd out?
-
-![Autofill List with Options Grey&apos;d Out](.gitbook/assets/autofilldropdown.jpg)
-
-Autofill tags that have already been configured will be disabled. \(Depicted in grey in the screenshot\)
-
-### Reset Button
-
-![Reset Tool](.gitbook/assets/reset.jpg)
-
-Resets the tool to the most commonly used autofill tags.
-
-* %DEALER\_NAME%
-* %FRANCHISES%
-* %STREET%
-* %CITY%
-* %STATE%
-* %STATE\_FULL\_NAME%
-* %ZIP%
-* %PHONE%
-* %NEW\_PHONE%
-* %USED\_PHONE%
-* %SERVICE\_PHONE%
-* %PARTS\_PHONE%
-
-### Report Bug Button
-
-![Report Bug](.gitbook/assets/bug%20%281%29.jpg)
-
-Will open a new tab to submit a bug for this tool on Github.com.
-
-### Latest Changes Button
-
-![Latest Changes](.gitbook/assets/latestchanges.jpg)
-
-View the latest changes that was made to the tool.
-
-### Request Enhancement Button
-
-![Request Enhancement](.gitbook/assets/enhancement%20%281%29.jpg)
-
-Will open a new tab leading to the Github.com at the starting page for requesting a new enhancement for this tool.
 

@@ -5,7 +5,7 @@
 The order of the autofill entries in the tool list will determine the how the autofill tool will replace text on the web page.
 
 **Note:**  
-This bug shouldn't happen that often as the order of the default list in the tool should prevent this from occurring. However, it is still worth mentioning in the event that you experience this bug, you will know how to fix it.
+This bug shouldn't happen that often as the order of the default list in the tool should prevent this from occurring.  However, it is still worth mentioning in the event that you experience this bug, you will know how to fix it.
 
 ## Description
 
