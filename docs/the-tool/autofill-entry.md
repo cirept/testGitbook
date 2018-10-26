@@ -4,7 +4,7 @@ description: Enter the text autofill information here.
 
 # Autofill Entry
 
-![Example of Autofill Entry](../.gitbook/assets/autofillentry%20%281%29.jpg)
+![Example of Autofill Entry](../.gitbook/assets/autofillentry%20%282%29.jpg)
 
 This is comprised of three \(3\) parts:
 
@@ -40,7 +40,7 @@ Using the text mentioned above. I want to replace anything related to the dealer
 Tanaka Motors;Tanaka of Tokyo
 ```
 
-![Example of Autofill Entry](../.gitbook/assets/autofillentry.jpg)
+![Example of Autofill Entry](../.gitbook/assets/autofillentry%20%281%29.jpg)
 
 When you click the 'Magic' button the tool will break down the text if it sees ; and start its search.
 

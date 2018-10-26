@@ -2,13 +2,13 @@
 
 Let's first break down the tools visual elements with some brief descriptions about it's functionality and then dive deeper.
 
-![Autofill Tool](../.gitbook/assets/whattoollookslike.jpg)
+![Autofill Tool](../.gitbook/assets/whattoollookslike%20%281%29.jpg)
 
 ## Magic Wand Button
 
 * This will trigger the tool "text replace" functionality.
 
-![Magic Wand Button](../.gitbook/assets/apply_autofills.jpg)
+![Magic Wand Button](../.gitbook/assets/apply_autofills%20%281%29.jpg)
 
 ## Magic Eye Button
 
@@ -22,7 +22,7 @@ Let's first break down the tools visual elements with some brief descriptions ab
 
 * Where you will enter the custom text to be replaced on the web page.
 
-![Autofill Entry](../.gitbook/assets/autofillentry%20%281%29.jpg)
+![Autofill Entry](../.gitbook/assets/autofillentry%20%282%29.jpg)
 
 ## Add Autofill
 
@@ -34,7 +34,7 @@ Let's first break down the tools visual elements with some brief descriptions ab
 
 * Will reset all of the current autofill entries to the default list.
 
-![Reset Button](../.gitbook/assets/reset%20%281%29.jpg)
+![Reset Button](../.gitbook/assets/reset%20%282%29.jpg)
 
 ## Report Bug Button
 
@@ -46,7 +46,7 @@ Let's first break down the tools visual elements with some brief descriptions ab
 
 * View the latest changes to the tool.
 
-![Latest Changes Button](../.gitbook/assets/latestchanges.jpg)
+![Latest Changes Button](../.gitbook/assets/latestchanges%20%281%29.jpg)
 
 ## Request Enhancement Button
 

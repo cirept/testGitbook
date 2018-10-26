@@ -1,7 +1,5 @@
 # Read Me
 
-## Read Me
-
 ## autofillReplacer
 
 Tool has been recently updated and some elements have been removed or modified.
@@ -52,11 +50,11 @@ Tool has been recently updated and some elements have been removed or modified.
 
 ### What the tool looks like
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/WhatToolLooksLike.jpg)
+![What the Tool Looks Like](.gitbook/assets/whattoollookslike.jpg)
 
 ### Magic Wand Button
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/Apply_autofills.jpg)
+![Magic Wand](.gitbook/assets/apply_autofills.jpg)
 
 * This will trigger the tool's functionality
 
@@ -72,13 +70,15 @@ Tool has been recently updated and some elements have been removed or modified.
 
 ### Magic Eye Button
 
-![Autofill Tool](.gitbook/assets/unhide_panel.png) ![Autofill Tool](.gitbook/assets/hide_panel%20%281%29.png)
+![Show Tool](.gitbook/assets/unhide_panel.png)
+
+![Hide Tool](.gitbook/assets/hide_panel%20%281%29.png)
 
 * This will hide / show main panel for the tool.
 
 ### Autofill Options
 
-![Autofill Tool](.gitbook/assets/autofill_option_breakdown.png)
+![Autofill Option Breakdown](.gitbook/assets/autofill_option_breakdown.png)
 
 This is comprised of three \(3\) parts.
 
@@ -108,7 +108,7 @@ Using the text mentioned above. I want to replace anything related to the dealer
 Tanaka Motors;Tanaka of Tokyo
 ```
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/autofillEntry.jpg)
+![Example: Autofill Option Filled Out](.gitbook/assets/autofillentry.jpg)
 
 When you click the 'Magic' button the tool will break down the text if it sees ; and start its search.
 
@@ -125,19 +125,19 @@ Removes the autofill tag entry from the search list.
 
 ### Add autofill Button
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/Add_autofill.jpg)
+![Add Autofill](.gitbook/assets/add_autofill%20%281%29.jpg)
 
 Clicking this will display a drop down of currently available autofill tags that looks like this.
 
 #### Why are the options grey'd out?
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/AutofillDropdown.jpg)
+![Autofill List with Options Grey&apos;d Out](.gitbook/assets/autofilldropdown.jpg)
 
 Autofill tags that have already been configured will be disabled. \(Depicted in grey in the screenshot\)
 
 ### Reset Button
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/Reset.jpg)
+![Reset Tool](.gitbook/assets/reset.jpg)
 
 Resets the tool to the most commonly used autofill tags.
 
@@ -156,19 +156,19 @@ Resets the tool to the most commonly used autofill tags.
 
 ### Report Bug Button
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/bug.jpg)
+![Report Bug](.gitbook/assets/bug%20%281%29.jpg)
 
 Will open a new tab to submit a bug for this tool on Github.com.
 
 ### Latest Changes Button
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/latestChanges.jpg)
+![Latest Changes](.gitbook/assets/latestchanges.jpg)
 
 View the latest changes that was made to the tool.
 
 ### Request Enhancement Button
 
-![Autofill Tool](https://raw.githubusercontent.com/cirept/autofillReplacer/gh-pages/assets/images/enhancement.jpg)
+![Request Enhancement](.gitbook/assets/enhancement%20%281%29.jpg)
 
 Will open a new tab leading to the Github.com at the starting page for requesting a new enhancement for this tool.
 
