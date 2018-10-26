@@ -22,7 +22,7 @@ Let's first break down the tools visual elements with some brief descriptions ab
 
 * Where you will enter the custom text to be replaced on the web page.
 
-![Autofill Entry](../.gitbook/assets/autofillentry.jpg)
+![Autofill Entry](../.gitbook/assets/autofillentry%20%281%29.jpg)
 
 ## Add Autofill
 
@@ -34,7 +34,7 @@ Let's first break down the tools visual elements with some brief descriptions ab
 
 * Will reset all of the current autofill entries to the default list.
 
-![Reset Button](../.gitbook/assets/reset.jpg)
+![Reset Button](../.gitbook/assets/reset%20%281%29.jpg)
 
 ## Report Bug Button
 

@@ -4,7 +4,7 @@ description: Enter the text autofill information here.
 
 # Autofill Entry
 
-![Example of Autofill Entry](../.gitbook/assets/autofillentry.jpg)
+![Example of Autofill Entry](../.gitbook/assets/autofillentry%20%281%29.jpg)
 
 This is comprised of three \(3\) parts:
 
