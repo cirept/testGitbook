@@ -24,8 +24,6 @@
 
 ## How to Use the Tool
 
-### During Migration
-
 1. Begin the migration process of an internal or external page.
 2. On a blank landing page, choose external page to migrate.
 3. **Get** the URL of the external page
@@ -33,7 +31,7 @@
 5. **THE AUTOFILL TAG REPLACER TOOL**
 6. Continue with the normal steps to migrate over the content
 
-### During Page Editing
+#### During Page Editing
 
 1. Choose a card to edit
 2. Choose to edit **Content**

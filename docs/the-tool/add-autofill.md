@@ -10,7 +10,7 @@ Clicking this will display a drop down list of all the current autofill tags ava
 
 ## Why are the options grey'd out?
 
-![Autofill Tool](../.gitbook/assets/autofilldropdown.jpg)
+![Autofill Tool](../.gitbook/assets/autofilldropdown%20%281%29.jpg)
 
 Autofill tags that have already been configured will be disabled. \(Depicted in grey in the screenshot\). There isn't a need to have duplicate autofills since multiple words can be added into an autofill entry and separated with a semi-colon ";" to match and replace different words or phrases.
 

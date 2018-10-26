@@ -1,6 +1,6 @@
 # How the Tool Works
 
-Now that you have an idea of what the tool looks like, allow me to explain how it works.  I'll be brief so that I don't bore you.
+Now that you have an idea of what the tool looks like, allow me to explain how it works. I'll be brief so that I don't bore you.
 
 When you click the magic button the tool performs theses steps on **each** autofill entry in the list.
 
@@ -13,7 +13,7 @@ When you click the magic button the tool performs theses steps on **each** autof
 5. Steps 2 - 5 are performed for each autofill entry in the list until it reaches the end of the list.
 6. Once all autofill entries in the list have been looped through, the magic is complete.
 
-That wasn't too bad was it?  All this happens quick so it appears that all the replacing happens at once.
+That wasn't too bad was it? All this happens quick so it appears that all the replacing happens at once.
 
 ![](../.gitbook/assets/image.png)
 

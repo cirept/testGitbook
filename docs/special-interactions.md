@@ -22,12 +22,11 @@ With knowing how the tool works, if there are matching text inside two \(2\) sep
     * INFINITI of Tampa = %DEALER\_NAME%
   * Example Text:
     * Welcome to INFINITI of Tampa! See yourself in a INFINITI today! Using the example mentioned above:
-
-1. The tool would perform a search and replace for **INFINITI** resulting in:
-   * Welcome to **%FRANCHISES%** of Tampa! See yourself in a **%FRANCHISES%** today!
-2. the tool will now perform a search and replace for **INFINITI of Tampa** resulting in:
-   * Welcome to **%FRANCHISES%** of Tampa! See yourself in a **%FRANCHISES%** today!
-   * As you can see nothing happened. Because it didn't find an exact match = INFINITI of Tampa
+* The tool would perform a search and replace for **INFINITI** resulting in:
+  * Welcome to **%FRANCHISES%** of Tampa! See yourself in a **%FRANCHISES%** today!
+* the tool will now perform a search and replace for **INFINITI of Tampa** resulting in:
+  * Welcome to **%FRANCHISES%** of Tampa! See yourself in a **%FRANCHISES%** today!
+  * As you can see nothing happened. Because it didn't find an exact match = INFINITI of Tampa
 
 If we reversed the order and moved %DEALER\_NAME% before the %FRANCHISES% the tool will perform as expected.
 
@@ -35,9 +34,8 @@ If we reversed the order and moved %DEALER\_NAME% before the %FRANCHISES% the to
   * INFINITI of Tampa = %DEALER\_NAME%
   * INFINITI = %FRANCHISES%
 * Run tool on example above
-
-1. Search for **INFINITI of Tampa**
-   * Welcome to **%DEALER\_NAME%**! See yourself in a INFINITI today!
-2. Search for **INFINITI**
-   * Welcome to **%DEALER\_NAME%**! See yourself in a **%FRANCHISES%** today!
+* Search for **INFINITI of Tampa**
+  * Welcome to **%DEALER\_NAME%**! See yourself in a INFINITI today!
+* Search for **INFINITI**
+  * Welcome to **%DEALER\_NAME%**! See yourself in a **%FRANCHISES%** today!
 

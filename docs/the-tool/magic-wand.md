@@ -4,7 +4,7 @@ description: 'Performs the tools main magic trick, the text replacing.'
 
 # Magic Wand
 
-![Magic Wand Button](../.gitbook/assets/apply_autofills.jpg)
+![Magic Wand Button](../.gitbook/assets/apply_autofills%20%281%29.jpg)
 
 ## Editor Tab
 
