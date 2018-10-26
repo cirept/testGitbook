@@ -1,4 +1,4 @@
-[![codebeat badge](https://codebeat.co/badges/7c527dd3-7844-4173-960c-a231b1898a9a)](https://codebeat.co/projects/github-com-cirept-autofillreplacer-master)
+# Read Me
 
 # autofillReplacer
 Tool has been recently updated and some elements have been removed or modified.
@@ -6,6 +6,7 @@ Tool has been recently updated and some elements have been removed or modified.
 ----------------------------------------
 
 ## Description
+
 * This tool will crawl the editor window and replace all matching text with the designated autofill tag.
 * **Primarily meant for use WITH the migration tool.**
 
@@ -13,9 +14,12 @@ Tool has been recently updated and some elements have been removed or modified.
 
 ## Additional Details
 * Tool will auto save after every change to the input areas.
-    * Adding text
-    * Deleteing autofill entries
-    * Adding autofill entries
+  * Adding text
+  * Deleting autofill entries
+  * Adding autofill entries
+* Tool now resets to defaults if you switch from web-id to web-id.
+  * **The tool does this upon loading.**
+  * The message display you see when you show the autofill list is in place just to remind you that the tool was reset.
 
 * Tool now resets to defaults if you switch from web-id to web-id.
     * **The tool does this upon loading.**
@@ -24,20 +28,23 @@ Tool has been recently updated and some elements have been removed or modified.
 ----------------------------------------
 
 ## How to Use the Tool
-### During Migration:
+
+### During Migration
+
 1. Begin the migration process of an internal or external page.
 2. On a blank landing page, choose external page to migrate.
-3. 'Gett' the URL of the external page
+3. **Get** the URL of the external page
 4. Choose the bucket the page will go into
 5. **THE AUTOFILL TAG REPLACER TOOL**
-6. tinue with the normal steps to migrate over the content
+6. Continue with the normal steps to migrate over the content
 
-### During Page Editing:
+### During Page Editing
+
 1. Choose a card to edit
-2. Choose to edit 'Content'
+2. Choose to edit **Content**
 3. A pop up will appear.
 4. **RUN THE AUTOFILL TAG REPLACER TOOL**
-5. Save changes via 'save' button.
+5. Save changes via **save** button.
 
 ----------------------------------------
 
